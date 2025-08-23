@@ -1,0 +1,20 @@
+<div style="display: flex; flex-wrap: wrap; gap: 16px;">
+  @for(equipo of equipos; track equipo){
+    <div
+      (click)="seleccionarEquipo(equipo)"
+      [style.cursor]="'pointer'"
+      [style.border]="estaSeleccionado(equipo) ? '2px solid #1976d2' : '1px solid #ccc'"
+      [style.background]="estaSeleccionado(equipo) ? '#e3f2fd' : '#fff'"
+      style="border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 16px; min-width: 200px; transition: border 0.2s, background 0.2s;"
+    >
+      <h3>{{ equipo.nombre }}</h3>
+      <p>ID: {{ equipo.id_Equipo }}</p>
+      <p>Localidad ID: {{ equipo.id_Localidad }}</p>
+      <div *ngIf="estaSeleccionado(equipo)" style="color: #1976d2; font-weight: bold;">Seleccionado</div>
+    </div>
+  }
+</div>
+
+<div style="margin-top: 32px; text-align: center;">
+  <button *ngIf="equiposSeleccionados.length === 2" (click)="createPartido()" style="padding: 12px 32px; font-size: 1.1rem; background: #1976d2; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Subir</button>
+</div>

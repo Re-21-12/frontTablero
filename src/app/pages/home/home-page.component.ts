@@ -1,7 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableroFacade } from '../../core/tablero.facade';
-import { Itabler } from '../../core/models';
+import { Cuarto, Itabler } from '../../core/models';
+import { TableroService } from '../../core/services/tablero.service';
+import { LocalidadService } from '../../core/services/localidad.service';
+import { CuartoService } from '../../core/services/cuarto.service';
 
 @Component({
   standalone: true,
@@ -10,15 +13,26 @@ import { Itabler } from '../../core/models';
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.css']
 })
-export class HomePageComponent {
-Math: any;
+export class HomePageComponent implements OnInit {
+  private _tableroService = inject(TableroService);
+  private _localidadService = inject(LocalidadService);
+  private _cuartoService = inject(CuartoService);
+
   constructor(private facade: TableroFacade) {}
+  Math: any;
+
+  ngOnInit(): void {
+    this.getLocalidad();
+  }
 
   // estado marcador
+  /* local */
   scoreLocal = signal(0);
-  scoreVisit = signal(0);
   foulsLocal = signal(0);
+  /* Visitatnte */
+  scoreVisit = signal(0);
   foulsVisit = signal(0);
+  /* Numero de cuarto */
   quarter = signal(1);
 
   // cronómetro
@@ -44,6 +58,33 @@ Math: any;
   addLocal(n: number){ this.scoreLocal.set(Math.max(0, this.scoreLocal()+n)); }
   addVisit(n: number){ this.scoreVisit.set(Math.max(0, this.scoreVisit()+n)); }
 
+  getLocalidad(){
+  const localidadId=  this._tableroService.getEquiposSeleccionados()[0].id_Localidad;
+    this._localidadService.get(localidadId).subscribe(loc => {
+      this.locNombre = loc.nombre;
+    });
+    this.equipoLocalNombre = this._tableroService.getEquiposSeleccionados()[0].nombre;
+    this.equipoVisitNombre = this._tableroService.getEquiposSeleccionados()[1].nombre;
+  }
+  createCuarto(id_Equipo: number, totalFaltas: number, totalPunteo: number){
+
+    let cuarto:Cuarto = {
+      no_Cuarto: this.quarter(),
+      total_Faltas: totalFaltas,
+      total_Punteo: totalPunteo,
+      id_Partido: Number(this._tableroService.id_partido),
+      id_Equipo: id_Equipo
+    }
+
+    this._cuartoService.create(cuarto).subscribe({
+      next: (id) => {
+        console.log('Cuarto creado con ID:', id);
+      },
+      error: (err) => {
+        console.error('Error al crear cuarto:', err);
+      }
+    });
+  }
   start(){
     if (this.running()) return;
     this.running.set(true);
@@ -55,7 +96,20 @@ Math: any;
   }
   pause(){ this.running.set(false); if (this._handler) clearInterval(this._handler); }
   reset(){ this.pause(); this.timerSeconds.set(10*60); }
-  nextQuarter(){ if (this.quarter()<4) { this.quarter.set(this.quarter()+1); this.reset(); } }
+  nextQuarter(){
+     if (this.quarter()<4) { this.quarter.set(this.quarter()+1); this.reset(); }
+
+    this.createCuarto(this._tableroService.getEquiposSeleccionados()[0].id_Equipo, this.foulsLocal(), this.scoreLocal());
+    this.createCuarto(this._tableroService.getEquiposSeleccionados()[1].id_Equipo, this.foulsVisit(), this.scoreVisit());
+    this.clearValues()
+  }
+clearValues(){
+  this.foulsLocal.set(0);
+  this.foulsVisit.set(0);
+  this.scoreLocal.set(0);
+  this.scoreVisit.set(0);
+}
+
   hardReset(){
     this.pause();
     this.scoreLocal.set(0); this.scoreVisit.set(0);

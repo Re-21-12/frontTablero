@@ -7,13 +7,11 @@ export interface Itabler {
 }
 
 export interface Cuarto {
-  id_Cuarto:    number;
   no_Cuarto:    number;
   total_Punteo: number;
   total_Faltas: number;
   id_Partido:   number;
   id_Equipo:    number;
-  duenio:       string; // "l" | "v"
 }
 
 export interface Local {
@@ -29,8 +27,14 @@ export interface Localidad {
 }
 
 export interface Partido {
-  fechaHora:    Date;   
+  fechaHora:    Date;
   id_Localidad: number;
   id_Local:     number;
   id_Visitante: number;
+}
+
+export interface Equipo {
+  id_Equipo:    number;
+  nombre:       string;
+  id_Localidad: number;
 }

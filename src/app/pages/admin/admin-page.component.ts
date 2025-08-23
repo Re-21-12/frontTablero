@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { EquipoService } from '../../core/services/equipo.service';
 import { PartidoService } from '../../core/services/partido.service';
-import { Localidad, Local } from '../../core/models';
+import { Localidad, Local, Equipo } from '../../core/models';
 
 @Component({
   standalone: true,
@@ -15,7 +15,7 @@ import { Localidad, Local } from '../../core/models';
 })
 export class AdminPageComponent implements OnInit {
   localidades = signal<Localidad[]>([]);
-  equipos = signal<Local[]>([]);
+  equipos = signal<Equipo[]>([]);
   partidos = signal<any[]>([]);
 
   locNombre = '';
@@ -60,6 +60,7 @@ export class AdminPageComponent implements OnInit {
       id_Local: Number(this.partLocalId),
       id_Visitante: Number(this.partVisitId)
     };
+
     this.partSvc.create(payload).subscribe(()=> this.loadAll());
   }
 }

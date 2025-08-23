@@ -1,6 +1,8 @@
+<!-- Local-->
 <section class="board">
   <div class="team">
     <h2>Local</h2>
+    <h3>{{ equipoLocalNombre }}</h3>
     <div class="score">{{ scoreLocal() }}</div>
     <div class="btns">
       <button (click)="addLocal(1)">+1</button>
@@ -16,6 +18,8 @@
   </div>
 
   <div class="center">
+
+    <div class="location"> {{ locNombre }}</div>
     <div class="quarter">Cuarto: {{ quarter() }}/4</div>
     <div class="timer">{{ mmSS(timerSeconds()) }}</div>
     <div class="timer-btns">
@@ -25,9 +29,10 @@
       <button (click)="nextQuarter()">Siguiente cuarto</button>
     </div>
   </div>
-
+<!-- Visitante -->
   <div class="team">
     <h2>Visitante</h2>
+    <h3>{{ equipoVisitNombre }}</h3>
     <div class="score">{{ scoreVisit() }}</div>
     <div class="btns">
       <button (click)="addVisit(1)">+1</button>
@@ -41,40 +46,6 @@
       <button (click)="foulsVisit.set(Math.max(0,foulsVisit()-1))" [disabled]="foulsVisit()<=0">- Falta</button>
     </div>
   </div>
-</section>
-
-<section class="wrap">
-  <h3>Datos para guardar en BD</h3>
-  <div class="row">
-    <input placeholder="Localidad" [(ngModel)]="locNombre"/>
-    <input placeholder="Equipo Local" [(ngModel)]="equipoLocalNombre"/>
-    <input placeholder="Equipo Visitante" [(ngModel)]="equipoVisitNombre"/>
-    <input type="datetime-local" [(ngModel)]="fechaHoraLocal" />
-  </div>
-
-  <div class="quarters">
-    <div class="q" *ngFor="let q of [1,2,3,4]">
-      <h4>Q{{q}}</h4>
-      <label>Puntos:
-        <input type="number" [(ngModel)]="cuartos[q-1].total_Punteo" />
-      </label>
-      <label>Faltas:
-        <input type="number" [(ngModel)]="cuartos[q-1].total_Faltas" />
-      </label>
-      <label>Dueño:
-        <select [(ngModel)]="cuartos[q-1].duenio">
-          <option value="l">Local</option>
-          <option value="v">Visitante</option>
-        </select>
-      </label>
-    </div>
-  </div>
-
-  <div class="row">
-    <button (click)="finalizarGuardar()">Finalizar y guardar</button>
-  </div>
-
-  <p *ngIf="msg" class="msg">{{ msg }}</p>
 </section>
 
 <footer class="controls">

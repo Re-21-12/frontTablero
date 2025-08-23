@@ -12,7 +12,7 @@ export class CuartoService {
   getAll(): Observable<Cuarto[]> {
     return this.http.get<Cuarto[]>(this.base);
   }
-  create(body: Omit<Cuarto,'id_Cuarto'>): Observable<string> {
+  create(body: Cuarto): Observable<string> {
     return this.http.post(this.base, body, { responseType: 'text' as const });
   }
 }

@@ -12,6 +12,9 @@ export class LocalidadService {
   getAll(): Observable<Localidad[]> {
     return this.http.get<Localidad[]>(this.base);
   }
+  get(id: number): Observable<Localidad> {
+    return this.http.get<Localidad>(`${this.base}/${id}`);
+  }
   create(body: { nombre: string }): Observable<string> {
     return this.http.post(this.base, body, { responseType: 'text' as const });
   }

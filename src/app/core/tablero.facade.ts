@@ -66,7 +66,7 @@ export class TableroFacade {
           id_Visitante: visitTeam.id_Equipo
         };
 
- 
+
         return this.parSvc.create(body).pipe(
           switchMap(() => this.parSvc.getAll()),
           map(list => {
@@ -80,7 +80,7 @@ export class TableroFacade {
             const partidoId = getId(pick);
 
             if (!partidoId) throw new Error('No se pudo resolver id_Partido');
-    
+
             return { partidoId, localTeam, visitTeam };
           })
         );
@@ -92,11 +92,9 @@ export class TableroFacade {
         const seq = it.cuartos.reduce((flow, q) => {
           const payload: Omit<Cuarto, 'id_Cuarto'> = {
             no_Cuarto: q.no_Cuarto,
-            duenio: q.duenio,
             total_Punteo: q.total_Punteo,
             total_Faltas: q.total_Faltas,
             id_Partido: partidoId,
-            id_Equipo: ownerToEquipo(q.duenio)
           } as any;
 
           return flow.pipe(concatMap(() => this.cuaSvc.create(payload)));

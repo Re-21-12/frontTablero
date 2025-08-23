@@ -1,0 +1,22 @@
+.board{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;padding:16px}
+.team,.center{border:1px solid #eee;border-radius:12px;padding:16px}
+h2{margin:0 0 8px}
+.score{font-size:56px;font-weight:800;text-align:center;margin:8px 0}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+button{padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.timer{font-size:48px;font-weight:700;text-align:center;margin:8px 0}
+.quarter{font-size:20px;text-align:center}
+.timer-btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.controls{display:flex;justify-content:center;padding:16px;border-top:1px solid #eee}
+
+.wrap{border:1px solid #eee;border-radius:12px;padding:16px;margin:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+input, select{padding:8px;border:1px solid #ddd;border-radius:8px}
+.quarters{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.q{border:1px solid #eee;border-radius:12px;padding:12px}
+.msg{margin-top:8px}
+@media (max-width: 900px){
+  .board{grid-template-columns:1fr;}
+  .quarters{grid-template-columns:1fr 1fr;}
+}

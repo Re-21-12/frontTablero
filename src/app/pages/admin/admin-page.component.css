@@ -1,0 +1,5 @@
+.wrap{border:1px solid #eee;border-radius:12px;padding:16px;margin:16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+input{padding:8px;border:1px solid #ddd;border-radius:8px}
+button{padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer}
+ul{margin:0;padding-left:16px}

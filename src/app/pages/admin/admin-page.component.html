@@ -1,0 +1,32 @@
+<section class="wrap">
+  <h2>Localidades</h2>
+  <div class="row">
+    <input placeholder="Nombre" [(ngModel)]="locNombre" />
+    <button (click)="crearLocalidad()">Agregar</button>
+  </div>
+  <ul><li *ngFor="let l of localidades()">{{ l.id_Localidad }} — {{ l.nombre }}</li></ul>
+</section>
+
+<section class="wrap">
+  <h2>Equipos</h2>
+  <div class="row">
+    <input placeholder="Nombre" [(ngModel)]="eqNombre" />
+    <input placeholder="id_Localidad" type="number" [(ngModel)]="eqLocalidadId" />
+    <button (click)="crearEquipo()">Agregar</button>
+  </div>
+  <ul><li *ngFor="let e of equipos()">{{ e.id_Equipo }} — {{ e.nombre }} (Loc: {{ e.id_Localidad }})</li></ul>
+</section>
+
+<section class="wrap">
+  <h2>Partidos</h2>
+  <div class="row">
+    <input type="datetime-local" [(ngModel)]="fechaHoraLocal" />
+    <input placeholder="id_Localidad" type="number" [(ngModel)]="partLocalidadId" />
+    <input placeholder="id_Local" type="number" [(ngModel)]="partLocalId" />
+    <input placeholder="id_Visitante" type="number" [(ngModel)]="partVisitId" />
+    <button (click)="crearPartido()">Crear</button>
+  </div>
+  <ul><li *ngFor="let p of partidos()">
+    {{ p.id_Partido }} — {{ p.fechaHora }} | Loc: {{ p.id_Localidad }} | {{ p.id_Local }} vs {{ p.id_Visitante }}
+  </li></ul>
+</section>

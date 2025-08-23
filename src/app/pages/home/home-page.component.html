@@ -25,6 +25,7 @@
     <div class="timer-btns">
       <button (click)="start()" [disabled]="running()">Iniciar</button>
       <button (click)="pause()" [disabled]="!running()">Pausar</button>
+      <button (click)="finish()" >Finalizar</button>
       <button (click)="reset()">Reiniciar</button>
       <button (click)="nextQuarter()">Siguiente cuarto</button>
     </div>

@@ -38,3 +38,13 @@ export interface Equipo {
   nombre:       string;
   id_Localidad: number;
 }
+
+export interface Resultado {
+  nombreLocal: string;
+  nombreVisitante: string;
+  localidad: string;
+  totalFaltasLocal: number;
+  totalFaltasVisitante: number;
+  totalPunteoLocal: number;
+  totalPunteoVisitante: number;
+}

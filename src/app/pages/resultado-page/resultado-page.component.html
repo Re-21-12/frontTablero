@@ -1,0 +1,24 @@
+<section class="board">
+  <div class="team">
+    <h2>Local</h2>
+    <h3>{{ resultado?.nombreLocal }}</h3>
+    <div class="score">{{ resultado?.totalPunteoLocal }}</div>
+    <div class="fouls">Faltas: {{ resultado?.totalFaltasLocal }}</div>
+  </div>
+
+  <div class="center">
+    <div class="location">{{ resultado?.localidad }}</div>
+    <div class="msg" *ngIf="!resultado">No hay resultado disponible.</div>
+  </div>
+
+  <div class="team">
+    <h2>Visitante</h2>
+    <h3>{{ resultado?.nombreVisitante }}</h3>
+    <div class="score">{{ resultado?.totalPunteoVisitante }}</div>
+    <div class="fouls">Faltas: {{ resultado?.totalFaltasVisitante }}</div>
+  </div>
+</section>
+
+<footer class="controls">
+  <button routerLink="/home">Volver al inicio</button>
+</footer>

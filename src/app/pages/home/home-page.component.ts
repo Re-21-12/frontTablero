@@ -5,6 +5,7 @@ import { Cuarto, Itabler } from '../../core/models';
 import { TableroService } from '../../core/services/tablero.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { CuartoService } from '../../core/services/cuarto.service';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -17,7 +18,7 @@ export class HomePageComponent implements OnInit {
   private _tableroService = inject(TableroService);
   private _localidadService = inject(LocalidadService);
   private _cuartoService = inject(CuartoService);
-
+private _routerService = inject(Router);
   constructor(private facade: TableroFacade) {}
   Math: any;
 
@@ -95,6 +96,9 @@ export class HomePageComponent implements OnInit {
     }, 1000);
   }
   pause(){ this.running.set(false); if (this._handler) clearInterval(this._handler); }
+  finish(){
+    this._routerService.navigate(['/resultado']);
+  }
   reset(){ this.pause(); this.timerSeconds.set(10*60); }
   nextQuarter(){
      if (this.quarter()<4) { this.quarter.set(this.quarter()+1); this.reset(); }

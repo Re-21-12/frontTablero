@@ -1,0 +1,65 @@
+.board {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 16px;
+}
+.team,
+.center {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+}
+h2 {
+  margin: 0 0 8px;
+}
+.score {
+  font-size: 56px;
+  font-weight: 800;
+  text-align: center;
+  margin: 8px 0;
+  color: #1976d2;
+}
+.fouls {
+  font-size: 18px;
+  text-align: center;
+  margin: 8px 0;
+  color: #d32f2f;
+}
+.location {
+  font-size: 22px;
+  text-align: center;
+  margin: 16px 0 8px 0;
+  color: #388e3c;
+}
+.msg {
+  margin-top: 16px;
+  text-align: center;
+  color: #888;
+}
+footer.controls {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-top: 1px solid #eee;
+  margin-top: 24px;
+}
+button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #1976d2;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:hover {
+  background: #125ea2;
+}
+@media (max-width: 900px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}

@@ -2,27 +2,28 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableroService } from '../../core/services/tablero.service';
 import { Resultado } from '../../core/models';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-resultado-page',
   imports: [CommonModule],
   templateUrl: './resultado-page.component.html',
-  styleUrls: ['./resultado-page.component.css'] // (corrige styleUrl -> styleUrls)
+  styleUrls: ['./resultado-page.component.css'] 
 })
 export class ResultadoPageComponent implements OnInit {
   private _tableroService = inject(TableroService);
   private _activatedRoute = inject(ActivatedRoute);
+  private _router = inject(Router);
 
   resultado: Resultado | null = null;
   id: number | null = null;
 
-  // cache del state enviado desde Home (si existe)
+
   private readonly st: any = history.state ?? {};
 
   ngOnInit(): void {
-    this.verResultado(); // <- NO se tocó
+    this.verResultado();
   }
 
   getIdFromRoute() {
@@ -30,7 +31,7 @@ export class ResultadoPageComponent implements OnInit {
   }
 
   verResultado(){
-    // NO se tocó la estructura de comunicación con la API
+   
     this._tableroService.get(Number(this._tableroService.id_partido)).subscribe({
       next: (data) => { this.resultado = data; },
       error: (err) => { console.error('Error al obtener el resultado del partido:', err); }

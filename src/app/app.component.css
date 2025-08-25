@@ -1,6 +1,75 @@
-.wrap{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:12px 16px;border-bottom:1px solid #eee
+@import url('https://fonts.googleapis.com/css2?family=Jersey+15&family=Inter:wght@500;600&display=swap');
+
+:root{
+  --bg: rgba(12,15,23,.94);
+  --border: #2c3654;
+  --text: #eaf0f6;
+  --muted:#a8b0c3;
+  --accent:#2b78e4;
+  --accent-2:#215fb8;
+  --chip:#1a2133;
 }
-nav a{margin-right:12px;text-decoration:none}
-nav a:last-child{margin-right:0}
+
+/* ===== APPBAR ===== */
+.pro-appbar{
+  position: sticky; top: 0; z-index: 1000;
+  background: radial-gradient(1200px 360px at 50% -220px, rgba(43,120,228,.18), transparent 60%),
+              linear-gradient(180deg, var(--bg), rgba(12,15,23,.72));
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: saturate(140%) blur(8px);
+}
+.pro-appbar__inner{
+  max-width: 1280px; margin: 0 auto;
+  height: 72px; padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+/* Marca */
+.pro-brand{ text-decoration:none; color:inherit; display:flex; align-items:baseline; gap:14px; }
+.pro-brand__title{
+  font: 700 28px/1 "Jersey 15", system-ui, sans-serif;
+  letter-spacing:.6px; color: var(--text);
+}
+.pro-brand__section{
+  color: var(--muted);
+  font: 600 14px/1 "Inter", system-ui, sans-serif;
+  padding:6px 10px; border-radius:10px;
+  background: #0f1422; border:1px solid var(--border);
+}
+
+/* Nav chips */
+.pro-nav{ display:flex; gap:12px; align-items:center; }
+.pro-chip{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:40px; padding:0 18px; border-radius:12px;
+  background: var(--chip); color: var(--text);
+  border:1px solid var(--border); text-decoration:none; font-weight:600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.pro-chip:hover{ transform: translateY(-1px); box-shadow: 0 14px 32px rgba(0,0,0,.45); }
+.pro-chip.is-active{ background: var(--accent); border-color: var(--accent); color:#fff; }
+.is-hidden{ display:none !important; }
+
+/* Líneas de cancha (doble línea) */
+.pro-appbar__court{
+  height: 6px; position: relative;
+  background: linear-gradient(90deg, transparent, rgba(43,120,228,.32), transparent);
+}
+.pro-appbar__court i{
+  content:""; position:absolute; left:0; right:0; height:2px; display:block;
+  background: linear-gradient(90deg, transparent, #32406a, transparent);
+}
+.pro-appbar__court i:first-child{ top:0 }
+.pro-appbar__court i:last-child{ bottom:0 }
+
+/* Contenido */
+.pro-page{ max-width:1280px; margin:0 auto; padding:24px 24px 48px }
+
+/* Responsive */
+@media (max-width: 720px){
+  .pro-appbar__inner{ height: 64px; padding: 0 16px; }
+  .pro-brand__title{ font-size: 24px; }
+  .pro-brand__section{ display:none; }     /* compactar en móvil */
+  .pro-chip{ height:36px; padding:0 14px; }
+}

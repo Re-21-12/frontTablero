@@ -1,8 +1,36 @@
-<header class="wrap">
-  <h1>🏀 Tablero</h1>
-  <nav>
-    <a routerLink="">Marcador</a>
-    <a routerLink="admin">Admin</a>
-  </nav>
+<header class="pro-appbar">
+  <div class="pro-appbar__inner">
+    <a class="pro-brand" routerLink="/seleccion" aria-label="Inicio">
+      <span class="pro-brand__title">Tablero</span>
+      <span class="pro-brand__section">
+        {{ router.url.startsWith('/admin') ? 'Administración' : 'Marcador' }}
+      </span>
+    </a>
+
+    <nav class="pro-nav" role="navigation" aria-label="Principal">
+      <a
+        routerLink="/seleccion"
+        class="pro-chip"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        [class.is-hidden]="router.url.startsWith('/seleccion')"
+      >Marcador</a>
+
+      <a
+        routerLink="/admin"
+        class="pro-chip"
+        routerLinkActive="is-active"
+        [class.is-hidden]="router.url.startsWith('/admin')"
+      >Admin</a>
+    </nav>
+  </div>
+
+  <!-- líneas tipo cancha -->
+  <div class="pro-appbar__court">
+    <i></i><i></i>
+  </div>
 </header>
-<router-outlet></router-outlet>
+
+<main class="pro-page">
+  <router-outlet />
+</main>

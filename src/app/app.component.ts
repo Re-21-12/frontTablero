@@ -1,24 +1,43 @@
-import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
+import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
+import { NavigationEnd } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink],
-  template: `
-    <header class="wrap">
-      <h1>🏀 Tablero</h1>
-      <nav>
-        <a routerLink="">Marcador</a>
-        <a routerLink="admin">Admin</a>
-      </nav>
-    </header>
-    <router-outlet />
-  `,
-  styles: [`
-    .wrap{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #eee}
-    nav a{margin-right:12px;text-decoration:none}
-    nav a:last-child{margin-right:0}
-  `]
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {}
+export class AppComponent implements OnDestroy {
+  // Menú responsive (si usas el botón de hamburguesa)
+  menuOpen = false;
+
+  private navSub: Subscription;
+
+  constructor(public router: Router) {
+    // Cierra el menú al cambiar de ruta
+    this.navSub = this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(() => (this.menuOpen = false));
+  }
+
+  ngOnDestroy(): void {
+    this.navSub?.unsubscribe();
+  }
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
+  // Texto útil para el subtítulo del header, si lo usas
+  get currentSection(): string {
+    const u = this.router.url || '';
+    return u.startsWith('/admin') ? 'Administración' : 'Marcador';
+  }
+}

@@ -1,20 +1,66 @@
-<div style="display: flex; flex-wrap: wrap; gap: 16px;">
-  @for(equipo of equipos; track equipo){
-    <div
-      (click)="seleccionarEquipo(equipo)"
-      [style.cursor]="'pointer'"
-      [style.border]="estaSeleccionado(equipo) ? '2px solid #1976d2' : '1px solid #ccc'"
-      [style.background]="estaSeleccionado(equipo) ? '#e3f2fd' : '#fff'"
-      style="border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 16px; min-width: 200px; transition: border 0.2s, background 0.2s;"
-    >
-      <h3>{{ equipo.nombre }}</h3>
-      <p>ID: {{ equipo.id_Equipo }}</p>
-      <p>Localidad ID: {{ equipo.id_Localidad }}</p>
-      <div *ngIf="estaSeleccionado(equipo)" style="color: #1976d2; font-weight: bold;">Seleccionado</div>
-    </div>
-  }
-</div>
+<div class="page">
 
-<div style="margin-top: 32px; text-align: center;">
-  <button *ngIf="equiposSeleccionados.length === 2" (click)="createPartido()" style="padding: 12px 32px; font-size: 1.1rem; background: #1976d2; color: #fff; border: none; border-radius: 6px; cursor: pointer;">Subir</button>
+  <header class="selector-head">
+    <h2 class="selector-title">Elige 2 equipos</h2>
+    <p class="selector-hint">Toca una tarjeta para seleccionar Local y Visitante.</p>
+  </header>
+
+  <div class="grid">
+    @for (equipo of equipos; track equipo) {
+      <div
+        class="card equipo-card"
+        (click)="seleccionarEquipo(equipo)"
+        [class.is-selected]="estaSeleccionado(equipo)"
+        [class.is-disabled]="equiposSeleccionados.length === 2 && !estaSeleccionado(equipo)"
+        [attr.aria-pressed]="estaSeleccionado(equipo)"
+        role="button"
+        tabindex="0"
+      >
+        <div class="equipo-card__top">
+          <h3 class="equipo-titulo">{{ equipo.nombre }}</h3>
+
+          <!-- etiquetas de rol cuando está seleccionado -->
+          <span
+            class="chip chip--primary"
+            *ngIf="equiposSeleccionados[0]?.id_Equipo === equipo.id_Equipo"
+          >
+            Local
+          </span>
+          <span
+            class="chip chip--warning"
+            *ngIf="equiposSeleccionados[1]?.id_Equipo === equipo.id_Equipo"
+          >
+            Visitante
+          </span>
+        </div>
+
+        <div class="meta"><span class="k">ID:</span> {{ equipo.id_Equipo }}</div>
+        <div class="meta"><span class="k">Localidad ID:</span> {{ equipo.id_Localidad }}</div>
+
+        <div *ngIf="estaSeleccionado(equipo)" class="badge badge-selected">
+          ✓ Seleccionado
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- barra de acciones “pegajosa” cuando hay selección -->
+  <div class="actions actions--sticky" [class.is-visible]="equiposSeleccionados.length > 0">
+    <div class="picked">
+      <div class="picked__item" *ngIf="equiposSeleccionados[0] as l">
+        <span class="tag tag--primary">Local</span> {{ l.nombre }}
+      </div>
+      <div class="picked__item" *ngIf="equiposSeleccionados[1] as v">
+        <span class="tag tag--warning">Visitante</span> {{ v.nombre }}
+      </div>
+    </div>
+
+    <button
+      class="btn btn-primary btn-lg"
+      (click)="createPartido()"
+      [disabled]="equiposSeleccionados.length !== 2"
+    >
+      Subir
+    </button>
+  </div>
 </div>

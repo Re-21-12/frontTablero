@@ -1,32 +1,148 @@
-<section class="wrap">
-  <h2>Localidades</h2>
-  <div class="row">
-    <input placeholder="Nombre" [(ngModel)]="locNombre" />
-    <button (click)="crearLocalidad()">Agregar</button>
+<!-- ========== LOCALIDADES ========== -->
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Localidades</h2>
+  </header>
+
+  <div class="toolbar toolbar--wrap">
+    <div class="field">
+      <label class="label">Nombre</label>
+      <input class="input" placeholder="Nombre" [(ngModel)]="locNombre" />
+    </div>
+
+    <div class="field">
+      <label class="label">&nbsp;</label>
+      <button class="btn" (click)="crearLocalidad()" [disabled]="!locNombre?.trim()">
+        Agregar
+      </button>
+    </div>
   </div>
-  <ul><li *ngFor="let l of localidades()">{{ l.id_Localidad }} — {{ l.nombre }}</li></ul>
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let l of localidades()">
+        <span class="mono">#{{ l.id_Localidad }}</span>
+        <span class="name">{{ l.nombre }}</span>
+      </li>
+    </ul>
+  </div>
 </section>
 
-<section class="wrap">
-  <h2>Equipos</h2>
-  <div class="row">
-    <input placeholder="Nombre" [(ngModel)]="eqNombre" />
-    <input placeholder="id_Localidad" type="number" [(ngModel)]="eqLocalidadId" />
-    <button (click)="crearEquipo()">Agregar</button>
+<!-- ========== EQUIPOS ========== -->
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Equipos</h2>
+  </header>
+
+  <div class="toolbar toolbar--wrap">
+    <div class="field">
+      <label class="label">Nombre del equipo</label>
+      <input class="input" placeholder="Nombre" [(ngModel)]="eqNombre" />
+    </div>
+
+    <div class="field">
+      <label class="label">Localidad</label>
+      <!-- Usamos select para que elijas por nombre, sigue guardando el id en eqLocalidadId -->
+      <select class="input" [(ngModel)]="eqLocalidadId">
+        <option [ngValue]="null" disabled selected>Seleccionar localidad</option>
+        <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">
+          {{ l.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">&nbsp;</label>
+      <button class="btn" (click)="crearEquipo()" [disabled]="!eqNombre?.trim() || !eqLocalidadId">
+        Agregar
+      </button>
+    </div>
   </div>
-  <ul><li *ngFor="let e of equipos()">{{ e.id_Equipo }} — {{ e.nombre }} (Loc: {{ e.id_Localidad }})</li></ul>
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let e of equipos()">
+        <span class="mono">#{{ e.id_Equipo }}</span>
+        <span class="name">{{ e.nombre }}</span>
+        <span class="muted">Loc: {{ e.id_Localidad }}</span>
+      </li>
+    </ul>
+  </div>
 </section>
 
-<section class="wrap">
-  <h2>Partidos</h2>
-  <div class="row">
-    <input type="datetime-local" [(ngModel)]="fechaHoraLocal" />
-    <input placeholder="id_Localidad" type="number" [(ngModel)]="partLocalidadId" />
-    <input placeholder="id_Local" type="number" [(ngModel)]="partLocalId" />
-    <input placeholder="id_Visitante" type="number" [(ngModel)]="partVisitId" />
-    <button (click)="crearPartido()">Crear</button>
+<!-- ========== PARTIDOS ========== -->
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Partidos</h2>
+  </header>
+
+  <div class="toolbar toolbar--wrap">
+    <div class="field">
+      <label class="label">Fecha y hora</label>
+      <input class="input" type="datetime-local" [(ngModel)]="fechaHoraLocal" />
+    </div>
+
+    <div class="field">
+      <label class="label">Localidad</label>
+      <select class="input" [(ngModel)]="partLocalidadId">
+        <option [ngValue]="null" disabled selected>Seleccionar</option>
+        <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">
+          {{ l.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">Equipo Local</label>
+      <select class="input" [(ngModel)]="partLocalId">
+        <option [ngValue]="null" disabled selected>Seleccionar</option>
+        <option *ngFor="let e of equipos()" [ngValue]="e.id_Equipo">
+          {{ e.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">Equipo Visitante</label>
+      <select class="input" [(ngModel)]="partVisitId">
+        <option [ngValue]="null" disabled selected>Seleccionar</option>
+        <ng-container *ngFor="let e of equipos()">
+          <option *ngIf="e.id_Equipo !== partLocalId" [ngValue]="e.id_Equipo">
+            {{ e.nombre }}
+          </option>
+        </ng-container>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">&nbsp;</label>
+      <button
+        class="btn"
+        (click)="crearPartido()"
+        [disabled]="
+          !fechaHoraLocal || !partLocalidadId || !partLocalId || !partVisitId ||
+          partLocalId === partVisitId
+        "
+      >
+        Crear
+      </button>
+    </div>
   </div>
-  <ul><li *ngFor="let p of partidos()">
-    {{ p.id_Partido }} — {{ p.fechaHora }} | Loc: {{ p.id_Localidad }} | {{ p.id_Local }} vs {{ p.id_Visitante }}
-  </li></ul>
+
+  <small class="form-hint error"
+         *ngIf="partLocalId && partVisitId && partLocalId === partVisitId">
+    El equipo local y visitante no pueden ser el mismo.
+  </small>
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let p of partidos()">
+        <span class="mono">#{{ p.id_Partido }}</span>
+        <span class="name">{{ p.fechaHora }}</span>
+        <span class="muted">Localidad: {{ p.id_Localidad }}</span>
+        <span class="muted">|</span>
+        <span class="muted">{{ p.id_Local }} vs {{ p.id_Visitante }}</span>
+      </li>
+    </ul>
+  </div>
 </section>

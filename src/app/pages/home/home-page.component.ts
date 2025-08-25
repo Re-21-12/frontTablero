@@ -8,6 +8,12 @@ import { LocalidadService } from '../../core/services/localidad.service';
 import { CuartoService } from '../../core/services/cuarto.service';
 import { Router } from '@angular/router';
 
+type ResultadoState = {
+  locNombre: string;
+  local: { nombre: string; puntos: number; faltas: number; };
+  visit: { nombre: string; puntos: number; faltas: number; };
+};
+
 @Component({
   standalone: true,
   selector: 'app-home-page',
@@ -30,14 +36,13 @@ export class HomePageComponent implements OnInit {
     this.shotReset(24);
     this._possession.set('none');
 
-    // === Precarga de sonidos ===
-    this.sfxStart.src = '/assets/sounds/start.mp3';
-    this.sfxEnd.src   = '/assets/sounds/end.mp3';
+    // === Precarga de sonidos (sin slash inicial) ===
+    this.sfxStart.src = 'assets/sounds/start.mp3';
+    this.sfxEnd.src   = 'assets/sounds/end.mp3';
     this.sfxStart.preload = 'auto';
     this.sfxEnd.preload   = 'auto';
     this.sfxStart.volume = 0.9;
     this.sfxEnd.volume   = 0.9;
-
     this.sfxStart.load();
     this.sfxEnd.load();
   }
@@ -120,11 +125,9 @@ export class HomePageComponent implements OnInit {
   private playSfx(a: HTMLAudioElement){
     try {
       a.currentTime = 0;
-     
-      a.play().catch(() => {});
+      void a.play();
     } catch {}
   }
-
 
   @HostListener('document:click')
   @HostListener('document:keydown')
@@ -137,10 +140,10 @@ export class HomePageComponent implements OnInit {
         el.muted = true;
         el.currentTime = 0;
         await el.play();
-   
-        setTimeout(() => { el.pause(); el.currentTime = 0; el.muted = false; }, 0);
-      } catch {
-      }
+        el.pause();
+        el.currentTime = 0;
+        el.muted = false;
+      } catch {}
     };
     warmup(this.sfxStart);
     warmup(this.sfxEnd);
@@ -151,11 +154,13 @@ export class HomePageComponent implements OnInit {
     if (!this.teamsSelected()) { this.msg = 'Selecciona equipos (local y visitante) antes de iniciar.'; return; }
     if (this.running()) return;
 
+    this._unlockAudioOnce();
+
     this.running.set(true);
     this._periodEndLock = false;
     this.winnerMsg.set(null);
 
-    // sonido de inicio 
+    // sonido de inicio
     this.playSfx(this.sfxStart);
 
     if (!this._shotRunning()) this.shotStart();
@@ -166,10 +171,8 @@ export class HomePageComponent implements OnInit {
 
       if (t <= 0 && !this._periodEndLock) {
         this._periodEndLock = true;
-
         // sonido de fin de periodo
         this.playSfx(this.sfxEnd);
-
         this.pause();
         this._onTimeExpired();
       }
@@ -182,7 +185,18 @@ export class HomePageComponent implements OnInit {
     this.shotPause();
   }
 
-  finish(){ this._routerService.navigate(['/resultado']); }
+  // ⬇️ AJUSTADO: enviar datos al resultado
+  finish(){
+    this.pause();
+
+    const state: ResultadoState = {
+      locNombre: this.locNombre,
+      local: { nombre: this.equipoLocalNombre, puntos: this.scoreLocal(), faltas: this.foulsLocal() },
+      visit: { nombre: this.equipoVisitNombre, puntos: this.scoreVisit(), faltas: this.foulsVisit() }
+    };
+
+    this._routerService.navigate(['/resultado'], { state });
+  }
 
   reset(){
     this.pause();
@@ -277,7 +291,7 @@ export class HomePageComponent implements OnInit {
     return `${m}:${ss}`;
   }
 
-  // (sigue disponible si quieres usarlo)
+  // (opcional) beep simple
   beep(){
     try{
       const ctx=new (window as any).AudioContext();
@@ -391,7 +405,7 @@ export class HomePageComponent implements OnInit {
       const v = this._shot() - 1;
       this._shot.set(Math.max(0, v));
       if (v <= 0){
-        this.beep(); // quítalo si no quieres el pitido del 24s
+        // this.beep(); // descomenta si quieres pitido al agotar 24s
         this.shotPause();
       }
     }, 1000);
@@ -420,7 +434,10 @@ export class HomePageComponent implements OnInit {
       if (val === null) { this._backcourtStop(); return; }
       const v = val - 1;
       this._backcourt.set(v >= 0 ? v : 0);
-      if (v <= 0) { this.beep(); this._backcourtStop(); } // quítalo si no lo quieres
+      if (v <= 0) {
+        // this.beep(); // descomenta si quieres aviso al agotar 8s
+        this._backcourtStop();
+      }
     }, 1000);
   }
   crossedMidcourt(){ if (!this.canOperate()) return; this._backcourtStop(); }

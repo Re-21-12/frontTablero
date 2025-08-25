@@ -9,7 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
   selector: 'app-resultado-page',
   imports: [CommonModule],
   templateUrl: './resultado-page.component.html',
-  styleUrls: ['./resultado-page.component.css'] 
+  styleUrls: ['./resultado-page.component.css']
 })
 export class ResultadoPageComponent implements OnInit {
   private _tableroService = inject(TableroService);
@@ -31,7 +31,7 @@ export class ResultadoPageComponent implements OnInit {
   }
 
   verResultado(){
-   
+
     this._tableroService.get(Number(this._tableroService.id_partido)).subscribe({
       next: (data) => { this.resultado = data; },
       error: (err) => { console.error('Error al obtener el resultado del partido:', err); }
@@ -97,5 +97,8 @@ export class ResultadoPageComponent implements OnInit {
       ?? (this.resultado as any)?.totalFaltasVisitante
       ?? 0
     );
+  }
+  volverAlInicio() {
+    this._router.navigate(['/seleccion']);
   }
 }

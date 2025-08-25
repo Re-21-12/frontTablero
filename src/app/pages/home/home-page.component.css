@@ -1,180 +1,171 @@
 /* ===== GRID ===== */
-.sb-grid {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: 1fr;
-  margin-top: 16px;
-}
-@media (min-width: 1020px) {
-  .sb-grid { grid-template-columns: 1fr 1.2fr 1fr; }
-}
+.sb-grid{display:grid;gap:18px;grid-template-columns:1fr;margin-top:16px;}
+@media (min-width:1020px){.sb-grid{grid-template-columns:1fr 1.2fr 1fr;}}
 
 /* ===== PANEL ===== */
-.sb-panel{
-  background: linear-gradient(180deg,#161a25,#10141f);
-  border:1px solid #2a3451; border-radius:18px;
-  box-shadow:0 10px 28px rgba(0,0,0,.35);
-  padding:16px; display:flex; flex-direction:column;
-}
-.sb-panel--center{ border-width:2px; }
+.sb-panel{background:linear-gradient(180deg,#161a25,#10141f);border:1px solid #2a3451;border-radius:18px;box-shadow:0 10px 28px rgba(0,0,0,.35);padding:16px;display:flex;flex-direction:column;}
+.sb-panel--center{border-width:2px;}
 
 /* ===== HEADER ===== */
-.sb-header{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:10px; margin-bottom:12px;
-}
-.sb-header--center{ justify-content:space-between; }
-.sb-side{
-  margin:0; font:700 22px/1 "Jersey 15", system-ui, sans-serif;
-  letter-spacing:.3px; color:#fff;
-}
-.sb-side--right{ text-align:right; }
-.sb-location{ color:#a8b0c3; font-weight:700; }
-.sb-quarter{ color:#cfe3ff; font-weight:800; }
-
-/* Utilitarios de header */
-.flex-center{ display:flex; align-items:center; gap:10px; }
-.right-items{ display:flex; align-items:center; gap:8px; }
+.sb-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.sb-header--center{justify-content:space-between;}
+.sb-side{margin:0;font:700 22px/1 "Jersey 15",system-ui,sans-serif;letter-spacing:.3px;color:#fff;}
+.sb-side--right{text-align:right;}
+.sb-location{color:#a8b0c3;font-weight:700;}
+.sb-quarter{color:#cfe3ff;font-weight:800;}
+.flex-center{display:flex;align-items:center;gap:10px;}
+.right-items{display:flex;align-items:center;gap:8px;}
 
 /* ===== CHIPS ===== */
-.chip{ display:inline-flex; align-items:center; height:26px; padding:0 12px;
-  border-radius:999px; font-weight:800; font-size:13px; border:1px solid transparent; }
-.chip--primary{ background:#1b2c4d; color:#cfe3ff; border-color:#29406c; }
-.chip--warning{ background:#3a2a12; color:#ffd89b; border-color:#5a411b; }
-.tm-chip{ background:#1d263a; border:1px solid #2a3451; color:#cfe3ff; font-weight:800; letter-spacing:.03em; }
-.badge.bonus{
-  background:#ff3131; color:#fff; font-size:12px; padding:4px 10px; border-radius:6px;
-  font-weight:800; box-shadow:0 0 8px rgba(255,49,49,.6);
-}
+.chip{display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:999px;font-weight:800;font-size:13px;border:1px solid transparent;}
+.chip--primary{background:#1b2c4d;color:#cfe3ff;border-color:#29406c;}
+.chip--warning{background:#3a2a12;color:#ffd89b;border-color:#5a411b;}
+.tm-chip{background:#1d263a;border:1px solid #2a3451;color:#cfe3ff;font-weight:800;letter-spacing:.03em;}
+.badge.bonus{background:#ff3131;color:#fff;font-size:12px;padding:4px 10px;border-radius:6px;font-weight:800;box-shadow:0 0 8px rgba(255,49,49,.6);}
 
 /* ===== SCORE / TIMER ===== */
-.sb-score{
-  font-family:"Jersey 15", system-ui, sans-serif;
-  font-size:84px; line-height:1; text-align:center; margin:8px 0 10px; color:#fff;
-  text-shadow:0 6px 28px rgba(0,0,0,.45);
-}
-.sb-timer{
-  font-family:"Jersey 15", system-ui, sans-serif; font-size:72px; line-height:1; text-align:center;
-  margin:6px 0 10px; letter-spacing:2px; color:#fff; text-shadow:0 6px 24px rgba(0,0,0,.4);
-}
+.sb-score{font-family:"Jersey 15",system-ui,sans-serif;font-size:84px;line-height:1;text-align:center;margin:8px 0 10px;color:#fff;text-shadow:0 6px 28px rgba(0,0,0,.45);}
+.sb-timer{font-family:"Jersey 15",system-ui,sans-serif;font-size:72px;line-height:1;text-align:center;margin:6px 0 10px;letter-spacing:2px;color:#fff;text-shadow:0 6px 24px rgba(0,0,0,.4);}
 
 /* ===== CONTROLES ===== */
-.sb-controls{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px; }
-.sb-controls--timer{ gap:10px; }
-.sb-next{ display:flex; justify-content:center; margin-top:6px; }
+.sb-controls{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+.sb-controls--timer{gap:10px;}
+.sb-next{display:flex;justify-content:center;margin-top:6px;}
 
 /* ===== FOULS ===== */
-.sb-fouls{
-  display:flex; align-items:center; justify-content:space-between;
-  padding-top:8px; border-top:1px dashed #2a3451; color:#e8eef7; font-weight:700;
-}
-.btn-group{ display:flex; gap:8px; }
+.sb-fouls{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px dashed #2a3451;color:#e8eef7;font-weight:700;}
+.btn-group{display:flex;gap:8px;}
 
 /* ===== BOTONES ===== */
-.btn{
-  background:#2b78e4; color:#fff; border:1px solid transparent; padding:0 16px; height:40px;
-  border-radius:12px; font-weight:800; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,.3);
-  transition:background .15s, transform .06s, box-shadow .15s, opacity .15s;
-}
-.btn:hover{ background:#215fb8; box-shadow:0 12px 28px rgba(0,0,0,.36); }
-.btn:active{ background:#1e4f97; transform:translateY(1px); }
-.btn[disabled], .is-disabled{ opacity:.6; cursor:not-allowed; pointer-events:none; }
-.btn-ghost{ background:#1a2030; color:#eaf0f6; border:1px solid #2a3451; }
-.btn-pill{ border-radius:999px; padding:0 14px; height:36px; }
-.btn-sm{ height:34px; padding:0 12px; font-weight:700; }
-.btn-wide{ height:42px; padding:0 22px; border-radius:14px; }
+.btn{background:#2b78e4;color:#fff;border:1px solid transparent;padding:0 16px;height:40px;border-radius:12px;font-weight:800;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:background .15s,transform .06s,box-shadow .15s,opacity .15s;}
+.btn:hover{background:#215fb8;box-shadow:0 12px 28px rgba(0,0,0,.36);}
+.btn:active{background:#1e4f97;transform:translateY(1px);}
+.btn[disabled],.is-disabled{opacity:.6;cursor:not-allowed;pointer-events:none;}
+.btn-ghost{background:#1a2030;color:#eaf0f6;border:1px solid #2a3451;}
+.btn-pill{border-radius:999px;padding:0 14px;height:36px;}
+.btn-sm{height:34px;padding:0 12px;font-weight:700;}
+.btn-wide{height:42px;padding:0 22px;border-radius:14px;}
 
-.pos-none-btn {
-  display: flex;
-  justify-content: center;
-  margin-top: 1px;
-}
+/* ===== Botón utilitario (duplicado compatible) ===== */
+.btn-primary{background:#2b78e4;color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.3);transition:background .15s,transform .06s,box-shadow .15s;}
+.btn-primary:hover{background:#215fb8;box-shadow:0 12px 28px rgba(0,0,0,.36);}
+.btn-primary:active{background:#1e4f97;transform:translateY(1px);}
+.btn-lg{height:46px;padding:0 22px;border-radius:14px;}
 
-.pos-label.is-none {
-  background: #ffe9e9;
-  color: #cc0000;
-  font-weight: 50;
-  text-transform: uppercase;
-  box-shadow: inset 0 0 2px rgba(300,0,0,.4);
-}
-
-
-/* =========================================================
-   POSESIÓN — barra estilo consola (izq ▸ None ▸ der)
-   Coincide con el HTML .possession/.pos-bar/.pos-btn/.pos-label
-   ========================================================= */
-.possession{ display:flex; flex-direction:column; align-items:center; gap:6px; }
-.pos-title{
-  font-weight:900; letter-spacing:.08em; color:#d9e4ff; font-size:12px;
-  text-transform:uppercase; text-decoration:underline;
+/* ===== Banner de ganador ===== */
+.winner-banner{
+  margin:6px auto 0;
+  padding:6px 12px;
+  background:#0f1a2e;
+  border:1px solid #2b78e4;
+  border-radius:10px;
+  color:#e9f2ff;
+  font-weight:800;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  text-align:center;
 }
 
-/* Contenedor "cajitas" */
+/* ===== Posesión ===== */
+/* Contenedor: soporta .pos-box (HTML actual) y .possession (compatibilidad) */
+.pos-box,.possession{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.pos-title{font-weight:900;letter-spacing:.08em;color:#d9e4ff;font-size:11px;text-transform:uppercase;text-decoration:underline;margin-bottom:2px;}
+
+/* Barra compacta */
 .pos-bar{
-  display:grid; grid-template-columns: 44px 110px 44px; align-items:center;
-  background:#dfe3eb; border:1px solid #b7bfcc; border-radius:6px; overflow:hidden;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.5);
+  display:grid;
+  grid-template-columns:32px 92px 32px;   /* ← más angosta */
+  align-items:center;
+  background:#dfe3eb;border:1px solid #b7bfcc;border-radius:6px;overflow:hidden;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
 }
 
-/* Botones flecha */
+/* Flechas compactas */
 .pos-btn{
-  appearance:none; -webkit-appearance:none; border:none; outline:none;
-  height:36px; position:relative; background:#eceff5; cursor:pointer;
+  appearance:none;-webkit-appearance:none;border:none;outline:none;
+  height:30px;position:relative;background:#eceff5;cursor:pointer;
 }
-.pos-btn:hover{ background:#e5e9f2; }
-.pos-btn:active{ filter:brightness(.95); }
+.pos-btn:hover{background:#e5e9f2;}
+.pos-btn:active{filter:brightness(.95);}
+.pos-btn::before{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-style:solid;}
+.pos-left::before{border-width:8px 10px 8px 0;border-color:transparent #7a859b transparent transparent;}
+.pos-right::before{border-width:8px 0 8px 10px;border-color:transparent transparent transparent #7a859b;}
+.pos-btn.is-active{background:#fff1e0;}
+.pos-left.is-active::before{border-right-color:#ff8a00;}
+.pos-right.is-active::before{border-left-color:#ff8a00;}
 
-/* Triángulos */
-.pos-btn::before{
-  content:""; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  width:0; height:0; border-style:solid;
-}
-.pos-left::before{
-  border-width:10px 12px 10px 0;
-  border-color: transparent #7a859b transparent transparent; /* gris flecha */
-}
-.pos-right::before{
-  border-width:10px 0 10px 12px;
-  border-color: transparent transparent transparent #7a859b;
-}
-
-/* Estado activo */
-.pos-btn.is-active{ background:#fff1e0; }
-.pos-left.is-active::before{ border-right-color:#ff8a00; }
-.pos-right.is-active::before{ border-left-color:#ff8a00; }
-
-/* Casilla central "None | Local | Visitante" */
+/* Etiqueta central compacta */
 .pos-label{
-  height:36px; display:flex; align-items:center; justify-content:center;
-  background:#f6f8fb; color:#2d3748; font-weight:800; letter-spacing:.02em;
-  border-left:1px solid #c6cfdd; border-right:1px solid #c6cfdd;
+  height:30px;display:flex;align-items:center;justify-content:center;
+  background:#f6f8fb;color:#2d3748;font-weight:800;letter-spacing:.02em;
+  border-left:1px solid #c6cfdd;border-right:1px solid #c6cfdd;
+  font-size:12px; padding:0 8px;
 }
 
-/* ===== POSESIÓN ===== */
-.poss-chip{
-  display:inline-flex; align-items:center; gap:10px; padding:6px 10px; border-radius:10px;
-  background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
-  color:#eaf0f6; font-weight:900; letter-spacing:.05em;
-}
-.poss-chip span{ display:inline-block; min-width:14px; opacity:.35; transform:translateY(-1px); }
-.poss-chip span.is-on{ opacity:1; color:#2b78e4; }
+/* Estado NONE */
+.pos-label.is-none{background:#ffe9e9;color:#cc0000;font-weight:800;text-transform:uppercase;box-shadow:inset 0 0 2px rgba(255,0,0,.35);}
+
+/* Botón “Ninguno” debajo */
+.pos-none-btn{display:flex;justify-content:center;margin-top:2px;}
+.pos-none-btn .btn{height:30px;padding:0 10px;border-radius:8px;}
+
+/* ===== Chip de posesión (si lo usas en otros lados) ===== */
+.poss-chip{display:inline-flex;align-items:center;gap:10px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#eaf0f6;font-weight:900;letter-spacing:.05em;}
+.poss-chip span{display:inline-block;min-width:14px;opacity:.35;transform:translateY(-1px);}
+.poss-chip span.is-on{opacity:1;color:#2b78e4;}
 
 /* ===== FOOTER ===== */
-.sb-bottom{ display:flex; justify-content:center; margin:18px 0 6px; }
+.sb-bottom{display:flex;justify-content:center;margin:18px 0 6px;}
+.sb-bottom .sb-controls {gap:12px;}
 
-/* Accesibilidad: screen-reader only (si lo necesitas en el HTML) */
-.sr-only{
-  position:absolute !important; width:1px; height:1px; padding:0; margin:-1px;
-  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+/* Accesibilidad */
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;} 
+
+/* ===== TOPBAR (Ayuda) ===== */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; padding:10px 12px; margin-bottom:8px;
+  background: linear-gradient(180deg,#141827,#0d1220);
+  border:1px solid #2a3451; border-radius:14px;
+  box-shadow:0 10px 24px rgba(0,0,0,.28);
+}
+.app-title{
+  margin:0; font:700 20px/1 "Jersey 15",system-ui,sans-serif; color:#e9f2ff;
+  letter-spacing:.4px; text-shadow:0 4px 18px rgba(0,0,0,.35);
+}
+.topbar__left, .topbar__right{ display:flex; align-items:center; gap:8px; }
+
+/* ===== HELP PANEL (Atajos) ===== */
+.help-panel{
+  margin:8px 0 12px;
+  background:linear-gradient(180deg,#101623,#0b111e);
+  border:1px solid #2a3451; border-radius:14px;
+  box-shadow:0 8px 22px rgba(0,0,0,.28);
+  padding:12px;
+  color:#dce6ff;
+}
+.help-grid{
+  display:grid; gap:12px;
+  grid-template-columns: 1fr;
+}
+@media (min-width:820px){
+  .help-grid{ grid-template-columns: repeat(3, 1fr); }
+}
+.help-col h3{
+  margin:0 0 8px; color:#cfe3ff; font-weight:900; letter-spacing:.03em;
+  font-size:14px; text-transform:uppercase;
+}
+.help-col ul{ margin:0; padding-left:16px; }
+.help-col li{ margin:4px 0; line-height:1.3; color:#b8c4dc; }
+.help-col strong{
+  color:#fff; background:#1a2030; border:1px solid #2a3451;
+  padding:2px 6px; border-radius:8px; font-weight:900; font-size:12px;
 }
 
-/* Botón */
-.btn{ border:none; border-radius:10px; padding:0 16px; height:42px; cursor:pointer; font-weight:800; }
-.btn-primary{
-  background:#2b78e4; color:#fff; box-shadow:0 8px 24px rgba(0,0,0,.3);
-  transition: background .15s, transform .06s, box-shadow .15s;
+/* Mejoras de accesibilidad / foco */
+.btn:focus-visible{
+  outline:2px solid #2b78e4; outline-offset:2px;
+  box-shadow:0 0 0 3px rgba(43,120,228,.25);
 }
-.btn-primary:hover{ background:#215fb8; box-shadow:0 12px 28px rgba(0,0,0,.36); }
-.btn-primary:active{ background:#1e4f97; transform:translateY(1px); }
-.btn-lg{ height:46px; padding:0 22px; border-radius:14px; }
-.btn[disabled]{ opacity:.65; cursor:not-allowed; }
+
+/* Alineación de utilidades (consistencia con tablero) */
+.sb-controls .btn-ghost{ min-width:88px; }

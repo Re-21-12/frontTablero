@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableroFacade } from '../../core/tablero.facade';
@@ -26,14 +26,23 @@ export class HomePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.getLocalidad();
-    this._assignTimeoutsForPeriod();        // TM correctos desde inicio
-    this.shotReset(24);                      // Shot listo
-    this._possession.set('none');            // Posesión arranca en NONE
+    this._assignTimeoutsForPeriod();
+    this.shotReset(24);
+    this._possession.set('none');
+
+    // === Precarga de sonidos ===
+    this.sfxStart.src = '/assets/sounds/start.mp3';
+    this.sfxEnd.src   = '/assets/sounds/end.mp3';
+    this.sfxStart.preload = 'auto';
+    this.sfxEnd.preload   = 'auto';
+    this.sfxStart.volume = 0.9;
+    this.sfxEnd.volume   = 0.9;
+
+    this.sfxStart.load();
+    this.sfxEnd.load();
   }
 
-  /* =========================
-   *  ESTADO PRINCIPAL
-   * ========================= */
+  // ===== Estado =====
   scoreLocal = signal(0);
   foulsLocal = signal(0);
   scoreVisit = signal(0);
@@ -43,7 +52,9 @@ export class HomePageComponent implements OnInit {
   timerSeconds = signal(10 * 60);
   running = signal(false);
   private _handler?: number;
-  private _periodEndLock = false;            // <- evita doble avance al llegar a 0
+  private _periodEndLock = false;
+
+  winnerMsg = signal<string | null>(null);
 
   locNombre = '';
   equipoLocalNombre = '';
@@ -59,23 +70,30 @@ export class HomePageComponent implements OnInit {
 
   msg = '';
 
-  /* ========= Marcador ========= */
-  addLocal(n: number){ this.scoreLocal.set(Math.max(0, this.scoreLocal() + n)); }
-  addVisit(n: number){ this.scoreVisit.set(Math.max(0, this.scoreVisit() + n)); }
+  // ===== Ayuda =====
+  helpOpen = signal(false);
+  toggleHelp(){ this.helpOpen.set(!this.helpOpen()); }
 
-  /* Falta + / - con métodos (más confiable que repetir expresiones en template) */
-addFoulLocal(){ this.foulsLocal.set(this.foulsLocal() + 1); }
-subFoulLocal(){ this.foulsLocal.set(Math.max(0, this.foulsLocal() - 1)); }
-addFoulVisit(){ this.foulsVisit.set(this.foulsVisit() + 1); }
-subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
+  // ===== Habilitadores =====
+  teamsSelected(): boolean {
+    return !!(this.equipoLocalNombre?.trim() && this.equipoVisitNombre?.trim());
+  }
+  canOperate(): boolean { return this.running(); }
+  canStart(): boolean { return this.teamsSelected() && !this.running(); }
 
+  // ===== Marcador =====
+  addLocal(n: number){ if (!this.canOperate()) return; this.scoreLocal.set(Math.max(0, this.scoreLocal() + n)); }
+  addVisit(n: number){ if (!this.canOperate()) return; this.scoreVisit.set(Math.max(0, this.scoreVisit() + n)); }
+
+  addFoulLocal(){ if (!this.canOperate()) return; this.foulsLocal.set(this.foulsLocal() + 1); }
+  subFoulLocal(){ if (!this.canOperate()) return; this.foulsLocal.set(Math.max(0, this.foulsLocal() - 1)); }
+  addFoulVisit(){ if (!this.canOperate()) return; this.foulsVisit.set(this.foulsVisit() + 1); }
+  subFoulVisit(){ if (!this.canOperate()) return; this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
 
   getLocalidad(){
     const s = this._tableroService.getEquiposSeleccionados() ?? [];
     const localidadId = s[0]?.id_Localidad;
-    if (localidadId) {
-      this._localidadService.get(localidadId).subscribe(loc => this.locNombre = loc.nombre);
-    }
+    if (localidadId) { this._localidadService.get(localidadId).subscribe(loc => this.locNombre = loc.nombre); }
     this.equipoLocalNombre = s[0]?.nombre ?? '';
     this.equipoVisitNombre = s[1]?.nombre ?? '';
   }
@@ -94,27 +112,66 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
     });
   }
 
-  /* =========================
-   *     JUEGO / CRONÓMETRO
-   * ========================= */
+  // ====== SFX ======
+  private sfxStart = new Audio();
+  private sfxEnd   = new Audio();
+  private audioUnlocked = false;
+
+  private playSfx(a: HTMLAudioElement){
+    try {
+      a.currentTime = 0;
+     
+      a.play().catch(() => {});
+    } catch {}
+  }
+
+
+  @HostListener('document:click')
+  @HostListener('document:keydown')
+  private _unlockAudioOnce(){
+    if (this.audioUnlocked) return;
+    this.audioUnlocked = true;
+
+    const warmup = async (el: HTMLAudioElement) => {
+      try {
+        el.muted = true;
+        el.currentTime = 0;
+        await el.play();
+   
+        setTimeout(() => { el.pause(); el.currentTime = 0; el.muted = false; }, 0);
+      } catch {
+      }
+    };
+    warmup(this.sfxStart);
+    warmup(this.sfxEnd);
+  }
+
+  // ===== Juego / Cronómetro =====
   start(){
+    if (!this.teamsSelected()) { this.msg = 'Selecciona equipos (local y visitante) antes de iniciar.'; return; }
     if (this.running()) return;
+
     this.running.set(true);
     this._periodEndLock = false;
+    this.winnerMsg.set(null);
 
-    // Si quieres que el shot corra junto al juego, descomenta:
-    // if (!this._shotRunning()) this.shotStart();
+    // sonido de inicio 
+    this.playSfx(this.sfxStart);
+
+    if (!this._shotRunning()) this.shotStart();
 
     this._handler = window.setInterval(() => {
       const t = this.timerSeconds() - 1;
-      // garantizamos que muestre 00:00
       this.timerSeconds.set(t >= 0 ? t : 0);
 
       if (t <= 0 && !this._periodEndLock) {
         this._periodEndLock = true;
-        this.beep();
-        this.pause();              // detiene cronos
-        this._handleEndOfPeriod(); // avanza periodo automáticamente
+
+        // sonido de fin de periodo
+        this.playSfx(this.sfxEnd);
+
+        this.pause();
+        this._onTimeExpired();
       }
     }, 1000);
   }
@@ -122,8 +179,7 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
   pause(){
     this.running.set(false);
     if (this._handler !== undefined) { clearInterval(this._handler); this._handler = undefined; }
-    // Si decidiste ligar el shot al juego, también páralo:
-    // this.shotPause();
+    this.shotPause();
   }
 
   finish(){ this._routerService.navigate(['/resultado']); }
@@ -132,49 +188,73 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
     this.pause();
     this.timerSeconds.set(10 * 60);
     this._periodEndLock = false;
+    this.winnerMsg.set(null);
   }
 
-  /* Avance de periodo manual (botón) */
+  prevQuarter(){
+    if (this.running()) return;
+    if (this.quarter() > 1){
+      this.quarter.set(this.quarter() - 1);
+      this.timerSeconds.set(10 * 60);
+      this._resetPeriodState();
+    }
+  }
+
   nextQuarter(){
-    this._saveQuarterStatsAndAdvance();
+    this.winnerMsg.set(null);
+    if (this.running()) return;
+    this._advancePeriod();
   }
 
-  /* Avance de periodo automático cuando llega a 00:00 */
-  private _handleEndOfPeriod(){
-    this._saveQuarterStatsAndAdvance();
+  private _onTimeExpired(){
+    if (this.quarter() < 4) { this._advancePeriod(); return; }
+    const l = this.scoreLocal();
+    const v = this.scoreVisit();
+    if (l === v) {
+      this._startOvertime();
+    } else {
+      const ganador = l > v ? (this.equipoLocalNombre || 'Local') : (this.equipoVisitNombre || 'Visitante');
+      this.winnerMsg.set(`Ganador: ${ganador} (${Math.max(l, v)} - ${Math.min(l, v)})`);
+      this._periodEndLock = false;
+    }
   }
 
-  /* Guarda las stats del periodo actual y avanza según FIBA */
-  private _saveQuarterStatsAndAdvance(){
-    const s = this._tableroService.getEquiposSeleccionados() ?? [];
-    this.createCuarto(s[0]?.id_Equipo ?? 0, this.foulsLocal(), this.scoreLocal());
-    this.createCuarto(s[1]?.id_Equipo ?? 0, this.foulsVisit(), this.scoreVisit());
+  private _startOvertime(){
+    this._saveQuarterStats();
+    this.quarter.set(this.quarter() + 1);
+    this.timerSeconds.set(5 * 60);
+    this._resetPeriodState();
+    this._periodEndLock = false;
+  }
 
-    if (this.quarter() < 4){
+  private _advancePeriod(){
+    this._saveQuarterStats();
+    if (this.quarter() < 4) {
       this.quarter.set(this.quarter() + 1);
       this.timerSeconds.set(10 * 60);
     } else {
-      // Prórroga (5:00)
       this.quarter.set(this.quarter() + 1);
       this.timerSeconds.set(5 * 60);
     }
+    this._resetPeriodState();
+    this._periodEndLock = false;
+  }
 
-    // Reset de faltas por periodo/OT, TMs, shot y posesión si quieres
+  private _saveQuarterStats(){
+    const s = this._tableroService.getEquiposSeleccionados() ?? [];
+    this.createCuarto(s[0]?.id_Equipo ?? 0, this.foulsLocal(), this.scoreLocal());
+    this.createCuarto(s[1]?.id_Equipo ?? 0, this.foulsVisit(), this.scoreVisit());
+  }
+
+  private _resetPeriodState(){
     this.foulsLocal.set(0);
     this.foulsVisit.set(0);
     this._assignTimeoutsForPeriod();
     this.shotReset(24);
-    // this._possession.set('none'); // si quieres limpiar posesión al cambiar de periodo
-
-    this._periodEndLock = false;
+    this.winnerMsg.set(null);
   }
 
-  clearValues(){
-    this.foulsLocal.set(0);
-    this.foulsVisit.set(0);
-    this.scoreLocal.set(0);
-    this.scoreVisit.set(0);
-  }
+  clearValues(){ this.foulsLocal.set(0); this.foulsVisit.set(0); this.scoreLocal.set(0); this.scoreVisit.set(0); }
 
   hardReset(){
     this.pause();
@@ -183,12 +263,12 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
     this.quarter.set(1);
     this.timerSeconds.set(10 * 60);
     this.msg = '';
-
     this._assignTimeoutsForPeriod();
     this._possession.set('none');
     this.shotPause(); this.shotReset(24);
     this._backcourtStop();
     this._periodEndLock = false;
+    this.winnerMsg.set(null);
   }
 
   mmSS(s:number){
@@ -197,6 +277,7 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
     return `${m}:${ss}`;
   }
 
+  // (sigue disponible si quieres usarlo)
   beep(){
     try{
       const ctx=new (window as any).AudioContext();
@@ -228,16 +309,11 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
     });
   }
 
-  /* ===========================================================
-   *     FIBA: Tiempos muertos / Posesión / Shot / 8s
-   * =========================================================== */
-
-  /* ------ Tiempos muertos ------ */
+  // ===== FIBA: TMs / Posesión / Shot / 8s =====
   private _timeoutsLocal = signal(2);
   private _timeoutsVisit = signal(2);
   private _timeoutsUsedInLast2minLocal = signal(0);
   private _timeoutsUsedInLast2minVisit = signal(0);
-
   timeoutsLocal(){ return this._timeoutsLocal(); }
   timeoutsVisit(){ return this._timeoutsVisit(); }
 
@@ -246,6 +322,7 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
   }
 
   canTimeout(side:'local'|'visit'){
+    if (!this.canOperate()) return false;
     if (side === 'local'){
       if (this._inLastTwoMinutes() && this._timeoutsUsedInLast2minLocal() >= 2) return false;
       return this._timeoutsLocal() > 0;
@@ -284,31 +361,25 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
     }
   }
 
-  /* ------ Posesión (local | visit | none) ------ */
+  // Posesión
   private _possession = signal<'local'|'visit'|'none'>('none');
-
   possession(){ return this._possession(); }
-  setPossession(side:'local'|'visit'){ this._possession.set(side); }
-  clearPossession(){ this._possession.set('none'); }
-
+  setPossession(side:'local'|'visit'){ if (!this.canOperate()) return; this._possession.set(side); }
+  clearPossession(){ if (!this.canOperate()) return; this._possession.set('none'); }
   possessionIsLeftOn(){ return this._possession() === 'local'; }
   possessionIsRightOn(){ return this._possession() === 'visit'; }
-  possessionLabel(){
-    const p = this._possession();
-    return p === 'local' ? 'Local' : p === 'visit' ? 'Visitante' : 'None';
-  }
-
+  possessionLabel(){ const p = this._possession(); return p === 'local' ? 'Local' : p === 'visit' ? 'Visitante' : 'None'; }
   changePossession(){
+    if (!this.canOperate()) return;
     this.shotReset(24);
     if (this._possession() === 'local') this._possession.set('visit');
     else if (this._possession() === 'visit') this._possession.set('local');
   }
 
-  /* ------ Shot clock 24/14 ------ */
+  // Shot clock
   private _shot = signal(24);
   private _shotRunningFlag = signal(false);
   private _shotHandler?: number;
-
   shotClock(){ return this._shot(); }
   shotRunning(){ return this._shotRunning(); }
   private _shotRunning(){ return this._shotRunningFlag(); }
@@ -320,10 +391,8 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
       const v = this._shot() - 1;
       this._shot.set(Math.max(0, v));
       if (v <= 0){
-        this.beep();
+        this.beep(); // quítalo si no quieres el pitido del 24s
         this.shotPause();
-        // si quieres, pausa también el juego al violar 24s:
-        // this.pause();
       }
     }, 1000);
   }
@@ -334,15 +403,16 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
   }
 
   shotReset(to: 24|14){ this._shot.set(to); }
+  shot24(){ if (!this.canOperate()) return; this.shotReset(24); this.shotStart(); }
 
-  /* ------ 8 segundos backcourt (opcional) ------ */
+  // 8s backcourt
   private _backcourt = signal<number|null>(null);
   private _backcourtHandler?: number;
-
   showBackcourt8(){ return this._backcourt() !== null; }
   backcourtSeconds(){ return this._backcourt() ?? 0; }
 
   startBackcourt8(){
+    if (!this.canOperate()) return;
     if (this._backcourtHandler !== undefined) { clearInterval(this._backcourtHandler); this._backcourtHandler = undefined; }
     this._backcourt.set(8);
     this._backcourtHandler = window.setInterval(() => {
@@ -350,14 +420,54 @@ subFoulVisit(){ this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1)); }
       if (val === null) { this._backcourtStop(); return; }
       const v = val - 1;
       this._backcourt.set(v >= 0 ? v : 0);
-      if (v <= 0) { this.beep(); this._backcourtStop(); }
+      if (v <= 0) { this.beep(); this._backcourtStop(); } // quítalo si no lo quieres
     }, 1000);
   }
-
-  crossedMidcourt(){ this._backcourtStop(); }
-
+  crossedMidcourt(){ if (!this.canOperate()) return; this._backcourtStop(); }
   private _backcourtStop(){
     if (this._backcourtHandler !== undefined) { clearInterval(this._backcourtHandler); this._backcourtHandler = undefined; }
     this._backcourt.set(null);
+  }
+
+  // ========= ATAJOS DE TECLADO =========
+  @HostListener('window:keydown', ['$event'])
+  handleKeys(e: KeyboardEvent){
+    const k = e.key.toLowerCase();
+    const tag = (e.target as HTMLElement)?.tagName;
+    if (['INPUT','TEXTAREA','SELECT'].includes(tag)) return;
+    const prevent = () => { e.preventDefault(); e.stopPropagation(); };
+
+    if (k === ' ') { prevent(); this.running() ? this.pause() : (this.canStart() && this.start()); return; }
+    if (k === 'r') { prevent(); this.reset(); return; }
+    if (k === 'escape') { prevent(); this.hardReset(); return; }
+
+    if (!this.running()){
+      if (k === 'q') { prevent(); this.prevQuarter(); return; }
+      if (k === 'n') { prevent(); this.nextQuarter(); return; }
+    }
+
+    if (k === 'c') { prevent(); this.shot24(); return; }
+    if (k === 'b') { prevent(); this.startBackcourt8(); return; }
+    if (k === 'v') { prevent(); this.crossedMidcourt(); return; }
+
+    if (e.key === 'ArrowLeft')  { prevent(); this.setPossession('local'); return; }
+    if (e.key === 'ArrowRight') { prevent(); this.setPossession('visit'); return; }
+    if (k === 'o') { prevent(); this.clearPossession(); return; }
+    if (k === 'p') { prevent(); this.changePossession(); return; }
+
+    if (k === '1') { prevent(); this.addLocal(1); return; }
+    if (k === '2') { prevent(); this.addLocal(2); return; }
+    if (k === '3') { prevent(); this.addLocal(3); return; }
+    if (k === '4') { prevent(); this.addLocal(-1); return; }
+
+    if (k === '9') { prevent(); this.addVisit(1); return; }
+    if (k === '8') { prevent(); this.addVisit(2); return; }
+    if (k === '7') { prevent(); this.addVisit(3); return; }
+    if (k === '0') { prevent(); this.addVisit(-1); return; }
+
+    if (k === 'f') { prevent(); this.addFoulLocal(); return; }
+    if (k === 'g') { prevent(); this.subFoulLocal(); return; }
+    if (k === 'j') { prevent(); this.addFoulVisit(); return; }
+    if (k === 'k') { prevent(); this.subFoulVisit(); return; }
   }
 }

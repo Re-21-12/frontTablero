@@ -42,9 +42,8 @@
 
     <div class="field">
       <label class="label">Localidad</label>
-      <!-- Usamos select para que elijas por nombre, sigue guardando el id en eqLocalidadId -->
       <select class="input" [(ngModel)]="eqLocalidadId">
-        <option [ngValue]="null" disabled selected>Seleccionar localidad</option>
+        <option [ngValue]="null">Seleccionar localidad</option>
         <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">
           {{ l.nombre }}
         </option>
@@ -85,7 +84,7 @@
     <div class="field">
       <label class="label">Localidad</label>
       <select class="input" [(ngModel)]="partLocalidadId">
-        <option [ngValue]="null" disabled selected>Seleccionar</option>
+        <option [ngValue]="null">Seleccionar</option>
         <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">
           {{ l.nombre }}
         </option>
@@ -95,7 +94,7 @@
     <div class="field">
       <label class="label">Equipo Local</label>
       <select class="input" [(ngModel)]="partLocalId">
-        <option [ngValue]="null" disabled selected>Seleccionar</option>
+        <option [ngValue]="null">Seleccionar</option>
         <option *ngFor="let e of equipos()" [ngValue]="e.id_Equipo">
           {{ e.nombre }}
         </option>
@@ -105,7 +104,7 @@
     <div class="field">
       <label class="label">Equipo Visitante</label>
       <select class="input" [(ngModel)]="partVisitId">
-        <option [ngValue]="null" disabled selected>Seleccionar</option>
+        <option [ngValue]="null">Seleccionar</option>
         <ng-container *ngFor="let e of equipos()">
           <option *ngIf="e.id_Equipo !== partLocalId" [ngValue]="e.id_Equipo">
             {{ e.nombre }}

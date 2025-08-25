@@ -1,6 +1,68 @@
-<!-- ===== TABLERO (estructura lista para estilos/funcionalidad) ===== -->
-<section class="sb-grid" aria-label="Marcador de partido">
+<!-- ===== BARRA SUPERIOR / AYUDA ===== -->
+<header class="topbar" aria-label="Acciones superiores">
+  <div class="topbar__left">
+    <h1 class="app-title">Tablero</h1>
+  </div>
+  <div>
+    <button
+      type="button"
+      class="btn btn-ghost"
+      (click)="toggleHelp()"
+      [attr.aria-expanded]="helpOpen()"
+    >
+      Ayuda / Atajos
+    </button>
+  </div>
+</header>
 
+<!-- Panel de ayuda -->
+<section class="help-panel" *ngIf="helpOpen()" aria-label="Atajos de teclado">
+  <div class="help-grid">
+    <div class="help-col">
+      <h3>Tiempo</h3>
+      <ul>
+        <li><strong>Espacio</strong>: Iniciar/Pausar</li>
+        <li><strong>R</strong>: Reiniciar reloj (10:00)</li>
+        <li><strong>Esc</strong>: Reinicio total</li>
+      </ul>
+      <h3>Cuartos (en pausa)</h3>
+      <ul>
+        <li><strong>Q</strong>: Cuarto anterior</li>
+        <li><strong>N</strong>: Siguiente cuarto</li>
+      </ul>
+    </div>
+    <div class="help-col">
+      <h3>Posesión</h3>
+      <ul>
+        <li><strong>←</strong>: Local</li>
+        <li><strong>→</strong>: Visitante</li>
+        <li><strong>O</strong>: Ninguno</li>
+        <li><strong>P</strong>: Cambiar posesión</li>
+      </ul>
+      <h3>Shot / 8s</h3>
+      <ul>
+        <li><strong>C</strong>: Tiro 24s (reset + start)</li>
+        <li><strong>B</strong>: Iniciar 8s</li>
+        <li><strong>V</strong>: Cruza media (detiene 8s)</li>
+      </ul>
+    </div>
+    <div class="help-col">
+      <h3>Puntos</h3>
+      <ul>
+        <li><strong>Local</strong>: 1/2/3 = +1/+2/+3, 4 = −1</li>
+        <li><strong>Visitante</strong>: 9/8/7 = +1/+2/+3, 0 = −1</li>
+      </ul>
+      <h3>Faltas</h3>
+      <ul>
+        <li><strong>Local</strong>: F = +, G = −</li>
+        <li><strong>Visitante</strong>: J = +, K = −</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TABLERO  ===== -->
+<section class="sb-grid" aria-label="Marcador de partido">
   <!-- ================= LOCAL ================= -->
   <article class="sb-panel" aria-labelledby="lbl-local">
     <header class="sb-header">
@@ -10,16 +72,19 @@
       </div>
 
       <div class="right-items">
-        <span class="chip chip--primary" title="Equipo local">{{ equipoLocalNombre }}</span>
+        <span class="chip chip--primary" title="Equipo local">{{ equipoLocalNombre || '—' }}</span>
 
         <span class="chip tm-chip" id="tm-local" title="Tiempos muertos disponibles">
           TM: {{ timeoutsLocal() }}
         </span>
-        <button type="button" class="btn btn-sm btn-ghost"
-                (click)="takeTimeout('local')"
-                [disabled]="!canTimeout('local')"
-                aria-describedby="tm-local"
-                title="Solicitar tiempo muerto">
+        <button
+          type="button"
+          class="btn btn-sm btn-ghost"
+          (click)="takeTimeout('local')"
+          [disabled]="!canTimeout('local')"
+          aria-describedby="tm-local"
+          title="Solicitar tiempo muerto"
+        >
           Tiempo muerto
         </button>
       </div>
@@ -28,47 +93,56 @@
     <div class="sb-score" aria-live="polite">{{ scoreLocal() }}</div>
 
     <div class="sb-controls" aria-label="Controles de puntos local">
-      <button type="button" class="btn btn-pill" (click)="addLocal(1)"  title="+1 punto local">+1</button>
-      <button type="button" class="btn btn-pill" (click)="addLocal(2)"  title="+2 puntos local">+2</button>
-      <button type="button" class="btn btn-pill" (click)="addLocal(3)"  title="+3 puntos local">+3</button>
-      <button type="button" class="btn btn-pill btn-ghost"
-              (click)="addLocal(-1)" [disabled]="scoreLocal()<=0"
-              title="-1 punto local">-1</button>
+      <button type="button" class="btn btn-pill" (click)="addLocal(1)" [disabled]="!canOperate()" title="+1 punto local">+1</button>
+      <button type="button" class="btn btn-pill" (click)="addLocal(2)" [disabled]="!canOperate()" title="+2 puntos local">+2</button>
+      <button type="button" class="btn btn-pill" (click)="addLocal(3)" [disabled]="!canOperate()" title="+3 puntos local">+3</button>
+      <button
+        type="button"
+        class="btn btn-pill btn-ghost"
+        (click)="addLocal(-1)"
+        [disabled]="!canOperate() || scoreLocal()<=0"
+        title="-1 punto local"
+      >
+        -1
+      </button>
     </div>
 
-  <div class="sb-fouls" aria-label="Faltas del equipo local">
-  <span>Faltas: <strong>{{ foulsLocal() }}</strong></span>
-  <div class="btn-group">
-    <button type="button" class="btn btn-sm"
-            (click)="addFoulLocal()" title="Añadir falta">+ Falta</button>
-    <button type="button" class="btn btn-sm btn-ghost"
-            (click)="subFoulLocal()"
-            [disabled]="foulsLocal()<=0"
-            title="Quitar falta">- Falta</button>
-  </div>
-</div>
+    <div class="sb-fouls" aria-label="Faltas del equipo local">
+      <span>Faltas: <strong>{{ foulsLocal() }}</strong></span>
+      <div class="btn-group">
+        <button type="button" class="btn btn-sm" (click)="addFoulLocal()" [disabled]="!canOperate()" title="Añadir falta">+ Falta</button>
+        <button
+          type="button"
+          class="btn btn-sm btn-ghost"
+          (click)="subFoulLocal()"
+          [disabled]="!canOperate() || foulsLocal()<=0"
+          title="Quitar falta"
+        >
+          - Falta
+        </button>
+      </div>
+    </div>
   </article>
 
   <!-- ================= CENTRO ================= -->
   <article class="sb-panel sb-panel--center" aria-label="Reloj, periodo y posesión">
     <header class="sb-header sb-header--center">
-      <div class="sb-location" title="Localidad">{{ locNombre }}</div>
+      <div class="sb-location" title="Localidad">{{ locNombre || '—' }}</div>
 
-      <!-- ===== POSESIÓN (estilo PCScoreboards) ===== -->
+      <!-- ===== POSESIÓN — versión original con barra y botón Ninguno debajo ===== -->
       <div class="pos-box" aria-label="Posesión alterna">
         <div class="pos-title">POSSESSION</div>
 
-        <div class="pos-bar"
-             [class.none]="possession() === 'none'"
-             role="group" aria-label="Selector de posesión">
-
+        <div class="pos-bar" [class.none]="possession() === 'none'" role="group" aria-label="Selector de posesión">
           <!-- Flecha izquierda (Local) -->
-          <button type="button"
-                  class="pos-btn pos-left"
-                  [class.is-active]="possessionIsLeftOn()"
-                  (click)="setPossession('local')"
-                  aria-label="Posesión Local">
-          </button>
+          <button
+            type="button"
+            class="pos-btn pos-left"
+            [class.is-active]="possessionIsLeftOn()"
+            (click)="setPossession('local')"
+            [disabled]="!canOperate()"
+            aria-label="Posesión Local"
+          ></button>
 
           <!-- Etiqueta central -->
           <div class="pos-label" [class.is-none]="possession() === 'none'">
@@ -76,19 +150,25 @@
           </div>
 
           <!-- Flecha derecha (Visitante) -->
-          <button type="button"
-                  class="pos-btn pos-right"
-                  [class.is-active]="possessionIsRightOn()"
-                  (click)="setPossession('visit')"
-                  aria-label="Posesión Visitante">
-          </button>
+          <button
+            type="button"
+            class="pos-btn pos-right"
+            [class.is-active]="possessionIsRightOn()"
+            (click)="setPossession('visit')"
+            [disabled]="!canOperate()"
+            aria-label="Posesión Visitante"
+          ></button>
         </div>
 
-        <!-- Botón para poner NONE -->
+        <!-- Botón para poner NONE debajo de la barra (como antes) -->
         <div class="pos-none-btn">
-          <button type="button" class="btn btn-sm btn-ghost"
-                  (click)="clearPossession()"
-                  title="Quitar posesión (None)">
+          <button
+            type="button"
+            class="btn btn-sm btn-ghost"
+            (click)="clearPossession()"
+            [disabled]="!canOperate()"
+            title="Quitar posesión (None)"
+          >
             Ninguno
           </button>
         </div>
@@ -102,32 +182,63 @@
 
     <div class="sb-timer" aria-live="polite">{{ mmSS(timerSeconds()) }}</div>
 
+    <!-- Indicadores -->
     <div class="sb-controls" aria-label="Indicadores de tiempo de ataque">
-      <span class="chip tm-chip" title="Tiempo de tiro (shot clock)">Shot: {{ shotClock() }}s</span>
-      <span class="chip chip--warning" *ngIf="showBackcourt8()" title="8 segundos en campo trasero">
-        8s: {{ backcourtSeconds() }}
-      </span>
+      <span class="chip tm-chip" title="Tiempo de ataque (24s)">Ataque: {{ shotClock() }}s</span>
+      <span class="chip chip--warning" *ngIf="showBackcourt8()" title="8 segundos en campo trasero"> 8s: {{ backcourtSeconds() }} </span>
     </div>
 
+    <small class="form-hint error" *ngIf="!teamsSelected()">
+      Selecciona equipos local y visitante para poder iniciar.
+    </small>
+
+    <!-- Controles reloj -->
     <div class="sb-controls sb-controls--timer" aria-label="Controles del reloj de juego">
-      <button type="button" class="btn"       (click)="start()"  [disabled]="running()"  title="Iniciar reloj">Iniciar</button>
-      <button type="button" class="btn btn-ghost" (click)="pause()"  [disabled]="!running()" title="Pausar reloj">Pausar</button>
-      <button type="button" class="btn"       (click)="finish()"                         title="Finalizar partido">Finalizar</button>
-      <button type="button" class="btn btn-ghost" (click)="reset()"                      title="Reiniciar reloj">Reiniciar</button>
+      <button type="button" class="btn" (click)="start()" [disabled]="!canStart()" title="Iniciar reloj">Iniciar</button>
+      <button type="button" class="btn btn-ghost" (click)="pause()" [disabled]="!running()" title="Pausar reloj">Pausar</button>
+      <button type="button" class="btn btn-ghost" (click)="reset()" title="Reiniciar reloj">Reiniciar</button>
     </div>
 
+    <!-- Utilidades -->
     <div class="sb-controls" aria-label="Acciones rápidas">
-      <button type="button" class="btn btn-ghost" (click)="shotReset(24)"       title="Reset shot a 24s">Shot 24</button>
-      <button type="button" class="btn btn-ghost" (click)="shotReset(14)"       title="Reset shot a 14s">Shot 14</button>
-      <button type="button" class="btn btn-ghost" (click)="startBackcourt8()"   title="Iniciar conteo 8s">Start 8s</button>
-      <button type="button" class="btn btn-ghost" (click)="crossedMidcourt()" [disabled]="!showBackcourt8()" title="Cruzar media">Cruzar media</button>
-      <button type="button" class="btn btn-ghost" (click)="changePossession()"  title="Cambiar posesión + reset 24s">Cambio posesión</button>
+      <button type="button" class="btn btn-ghost" (click)="shot24()" [disabled]="!canOperate()" title="Reiniciar y arrancar ataque a 24s">Tiro 24s</button>
+      <button type="button" class="btn btn-ghost" (click)="startBackcourt8()" [disabled]="!canOperate()" title="Iniciar conteo 8s">Start 8s</button>
+      <button
+        type="button"
+        class="btn btn-ghost"
+        (click)="crossedMidcourt()"
+        [disabled]="!canOperate() || !showBackcourt8()"
+        title="Cruzar media"
+      >
+        Cruzar media
+      </button>
+      <button type="button" class="btn btn-ghost" (click)="changePossession()" [disabled]="!canOperate()" title="Cambiar posesión + reset 24s">
+        Cambio posesión
+      </button>
+      <!-- OJO: ya no va “Ninguno” aquí porque está debajo de la barra -->
     </div>
 
-    <div class="sb-next">
-      <button type="button" class="btn btn-wide" (click)="nextQuarter()" title="Ir al siguiente cuarto">
-        Siguiente cuarto
-      </button>
+    <!-- Banner de ganador -->
+    <div class="winner-banner" *ngIf="winnerMsg() as win">
+      {{ win }}
+    </div>
+
+    <!-- Navegación de cuartos -->
+    <div class="sb-next" aria-label="Cambio de cuarto">
+      <div class="sb-controls">
+        <button
+          type="button"
+          class="btn btn-ghost"
+          (click)="prevQuarter()"
+          [disabled]="running() || quarter()<=1"
+          title="Ir al cuarto anterior"
+        >
+          Cuarto anterior
+        </button>
+        <button type="button" class="btn" (click)="nextQuarter()" [disabled]="running()" title="Ir al siguiente cuarto">
+          Siguiente cuarto
+        </button>
+      </div>
     </div>
   </article>
 
@@ -140,16 +251,19 @@
       </div>
 
       <div class="right-items">
-        <span class="chip chip--warning" title="Equipo visitante">{{ equipoVisitNombre }}</span>
+        <span class="chip chip--warning" title="Equipo visitante">{{ equipoVisitNombre || '—' }}</span>
 
         <span class="chip tm-chip" id="tm-visit" title="Tiempos muertos disponibles">
           TM: {{ timeoutsVisit() }}
         </span>
-        <button type="button" class="btn btn-sm btn-ghost"
-                (click)="takeTimeout('visit')"
-                [disabled]="!canTimeout('visit')"
-                aria-describedby="tm-visit"
-                title="Solicitar tiempo muerto">
+        <button
+          type="button"
+          class="btn btn-sm btn-ghost"
+          (click)="takeTimeout('visit')"
+          [disabled]="!canTimeout('visit')"
+          aria-describedby="tm-visit"
+          title="Solicitar tiempo muerto"
+        >
           Tiempo muerto
         </button>
       </div>
@@ -158,35 +272,41 @@
     <div class="sb-score" aria-live="polite">{{ scoreVisit() }}</div>
 
     <div class="sb-controls" aria-label="Controles de puntos visitante">
-      <button type="button" class="btn btn-pill" (click)="addVisit(1)"  title="+1 punto visitante">+1</button>
-      <button type="button" class="btn btn-pill" (click)="addVisit(2)"  title="+2 puntos visitante">+2</button>
-      <button type="button" class="btn btn-pill" (click)="addVisit(3)"  title="+3 puntos visitante">+3</button>
-      <button type="button" class="btn btn-pill btn-ghost"
-              (click)="addVisit(-1)" [disabled]="scoreVisit()<=0"
-              title="-1 punto visitante">-1</button>
+      <button type="button" class="btn btn-pill" (click)="addVisit(1)" [disabled]="!canOperate()" title="+1 punto visitante">+1</button>
+      <button type="button" class="btn btn-pill" (click)="addVisit(2)" [disabled]="!canOperate()" title="+2 puntos visitante">+2</button>
+      <button type="button" class="btn btn-pill" (click)="addVisit(3)" [disabled]="!canOperate()" title="+3 puntos visitante">+3</button>
+      <button
+        type="button"
+        class="btn btn-pill btn-ghost"
+        (click)="addVisit(-1)"
+        [disabled]="!canOperate() || scoreVisit()<=0"
+        title="-1 punto visitante"
+      >
+        -1
+      </button>
     </div>
 
-
-
-
-<div class="sb-fouls" aria-label="Faltas del equipo visitante">
-  <span>Faltas: <strong>{{ foulsVisit() }}</strong></span>
-  <div class="btn-group">
-    <button type="button" class="btn btn-sm"
-            (click)="addFoulVisit()" title="Añadir falta">+ Falta</button>
-    <button type="button" class="btn btn-sm btn-ghost"
-            (click)="subFoulVisit()"
-            [disabled]="foulsVisit()<=0"
-            title="Quitar falta">- Falta</button>
-  </div>
-</div>
-
+    <div class="sb-fouls" aria-label="Faltas del equipo visitante">
+      <span>Faltas: <strong>{{ foulsVisit() }}</strong></span>
+      <div class="btn-group">
+        <button type="button" class="btn btn-sm" (click)="addFoulVisit()" [disabled]="!canOperate()" title="Añadir falta">+ Falta</button>
+        <button
+          type="button"
+          class="btn btn-sm btn-ghost"
+          (click)="subFoulVisit()"
+          [disabled]="!canOperate() || foulsVisit()<=0"
+          title="Quitar falta"
+        >
+          - Falta
+        </button>
+      </div>
+    </div>
   </article>
-
 </section>
 
 <footer class="sb-bottom" aria-label="Acción global">
-  <button type="button" class="btn btn-wide" (click)="hardReset()" title="Reiniciar completamente el partido">
-    Reiniciar partido
-  </button>
+  <div class="sb-controls">
+    <button type="button" class="btn" (click)="finish()" title="Finalizar partido">Finalizar</button>
+    <button type="button" class="btn btn-ghost" (click)="hardReset()" title="Reiniciar completamente el partido">Reiniciar partido</button>
+  </div>
 </footer>

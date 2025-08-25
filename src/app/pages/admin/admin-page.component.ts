@@ -1,10 +1,11 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { EquipoService } from '../../core/services/equipo.service';
 import { PartidoService } from '../../core/services/partido.service';
-import { Localidad, Local, Equipo } from '../../core/models';
+import { Localidad, Equipo } from '../../core/models';
+import { NotifyService } from '../shared/notify.service';
 
 @Component({
   standalone: true,
@@ -20,47 +21,98 @@ export class AdminPageComponent implements OnInit {
 
   locNombre = '';
   eqNombre = '';
-  eqLocalidadId!: number;
+  eqLocalidadId?: number;
 
   fechaHoraLocal = '';
-  partLocalidadId!: number;
-  partLocalId!: number;
-  partVisitId!: number;
+  partLocalidadId?: number;
+  partLocalId?: number;
+  partVisitId?: number;
 
-  constructor(
-    private locSvc: LocalidadService,
-    private eqSvc: EquipoService,
-    private partSvc: PartidoService
-  ) {}
+  loadingLoc = signal(false);
+  loadingEq  = signal(false);
+  loadingPar = signal(false);
+
+  private locSvc  = inject(LocalidadService);
+  private eqSvc   = inject(EquipoService);
+  private partSvc = inject(PartidoService);
+  private notify  = inject(NotifyService);
 
   ngOnInit(){ this.loadAll(); }
 
   loadAll(){
-    this.locSvc.getAll().subscribe(d=>this.localidades.set(d));
-    this.eqSvc.getAll().subscribe(d=>this.equipos.set(d));
-    this.partSvc.getAll().subscribe(d=>this.partidos.set(d));
+    this.locSvc.getAll().subscribe({
+      next: d => this.localidades.set(d),
+      error: () => this.notify.error('No se pudieron cargar localidades')
+    });
+    this.eqSvc.getAll().subscribe({
+      next: d => this.equipos.set(d),
+      error: () => this.notify.error('No se pudieron cargar equipos')
+    });
+    this.partSvc.getAll().subscribe({
+      next: d => this.partidos.set(d),
+      error: () => this.notify.error('No se pudieron cargar partidos')
+    });
   }
 
   crearLocalidad(){
-    const nombre = this.locNombre.trim(); if (!nombre) return;
-    this.locSvc.create({ nombre }).subscribe(()=>{ this.locNombre=''; this.loadAll(); });
+    const nombre = this.locNombre.trim();
+    if (!nombre) { this.notify.info('Ingresa un nombre de localidad'); return; }
+    this.loadingLoc.set(true);
+    this.locSvc.create({ nombre }).subscribe({
+      next: () => { this.locNombre = ''; this.notify.success('Agregado correctamente'); this.loadAll(); },
+      error: () => this.notify.error('Error al agregar localidad'),
+      complete: () => this.loadingLoc.set(false)
+    });
   }
+
   crearEquipo(){
     const nombre = this.eqNombre.trim();
-    const idLoc = Number(this.eqLocalidadId);
-    if (!nombre || !idLoc) return;
-    this.eqSvc.create({ nombre, id_Localidad: idLoc }).subscribe(()=>{ this.eqNombre=''; this.eqLocalidadId = NaN as any; this.loadAll(); });
+    const idLoc  = Number(this.eqLocalidadId);
+    if (!nombre) { this.notify.info('Ingresa un nombre de equipo'); return; }
+    if (!idLoc)  { this.notify.info('Selecciona una localidad para el equipo'); return; }
+    this.loadingEq.set(true);
+    this.eqSvc.create({ nombre, id_Localidad: idLoc }).subscribe({
+      next: () => { this.eqNombre = ''; this.eqLocalidadId = undefined; this.notify.success('Agregado correctamente'); this.loadAll(); },
+      error: () => this.notify.error('Error al agregar equipo'),
+      complete: () => this.loadingEq.set(false)
+    });
   }
+
+  private toLocalIso(dtLocal: string): string {
+    const d = new Date(dtLocal);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
+  }
+
   crearPartido(){
-    if (!this.fechaHoraLocal) return;
-    const iso = new Date(this.fechaHoraLocal).toISOString();
+    if (!this.fechaHoraLocal) { this.notify.info('Selecciona fecha y hora'); return; }
+    const idLoc   = Number(this.partLocalidadId);
+    const idLocal = Number(this.partLocalId);
+    const idVisit = Number(this.partVisitId);
+    if (!idLoc)   { this.notify.info('Selecciona localidad del partido'); return; }
+    if (!idLocal) { this.notify.info('Selecciona equipo local'); return; }
+    if (!idVisit) { this.notify.info('Selecciona equipo visitante'); return; }
+    if (idLocal === idVisit) { this.notify.info('Local y visitante no pueden ser el mismo'); return; }
+
     const payload = {
-      fechaHora: iso,
-      id_Localidad: Number(this.partLocalidadId),
-      id_Local: Number(this.partLocalId),
-      id_Visitante: Number(this.partVisitId)
+      fechaHora: this.toLocalIso(this.fechaHoraLocal),
+      id_Localidad: idLoc,
+      id_Local: idLocal,
+      id_Visitante: idVisit
     };
 
-    this.partSvc.create(payload).subscribe(()=> this.loadAll());
+    this.loadingPar.set(true);
+    this.partSvc.create(payload).subscribe({
+      next: () => {
+        this.fechaHoraLocal = '';
+        this.partLocalidadId = undefined;
+        this.partLocalId = undefined;
+        this.partVisitId = undefined;
+        this.notify.success('Agregado correctamente');
+        this.loadAll();
+      },
+      error: () => this.notify.error('Error al agregar partido'),
+      complete: () => this.loadingPar.set(false)
+    });
   }
 }

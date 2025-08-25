@@ -207,3 +207,13 @@ hr.sep { border: none; border-top: 1px dashed var(--line); margin: var(--gap-2) 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/*notificaciones*/
+.snack-base {
+  font-weight: 700;
+  letter-spacing: .2px;
+  border-radius: 10px !important;
+}
+.snack-success { background: #1e7e34 !important; color: #fff !important; }
+.snack-error   { background: #b00020 !important; color: #fff !important; }
+.snack-info    { background: #2b78e4 !important; color: #fff !important; }

@@ -36,7 +36,7 @@ export class HomePageComponent implements OnInit {
     this.shotReset(24);
     this._possession.set('none');
 
-    // === Precarga de sonidos (sin slash inicial) ===
+    // === Precarga de sonidos  ===
     this.sfxStart.src = 'assets/sounds/start.mp3';
     this.sfxEnd.src   = 'assets/sounds/end.mp3';
     this.sfxStart.preload = 'auto';
@@ -185,7 +185,7 @@ export class HomePageComponent implements OnInit {
     this.shotPause();
   }
 
-  // ⬇️ AJUSTADO: enviar datos al resultado
+  // AJUSTADO: enviar datos al resultado
   finish(){
     this.pause();
 
@@ -291,7 +291,7 @@ export class HomePageComponent implements OnInit {
     return `${m}:${ss}`;
   }
 
-  // (opcional) beep simple
+  //  beep simple
   beep(){
     try{
       const ctx=new (window as any).AudioContext();
@@ -405,7 +405,7 @@ export class HomePageComponent implements OnInit {
       const v = this._shot() - 1;
       this._shot.set(Math.max(0, v));
       if (v <= 0){
-        // this.beep(); // descomenta si quieres pitido al agotar 24s
+        // this.beep(); 
         this.shotPause();
       }
     }, 1000);
@@ -435,7 +435,7 @@ export class HomePageComponent implements OnInit {
       const v = val - 1;
       this._backcourt.set(v >= 0 ? v : 0);
       if (v <= 0) {
-        // this.beep(); // descomenta si quieres aviso al agotar 8s
+        // this.beep(); 
         this._backcourtStop();
       }
     }, 1000);

@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'http://localhost:5232/api', // ajusta para prod si quieres
+  apiBaseUrl: 'http://157.180.19.137/api/api',  // ⚡ usar /api sin puerto 8080
 };

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { Equipo, Local } from '../models';
+import { Equipo, Local } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class EquipoService {

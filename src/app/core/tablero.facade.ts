@@ -3,7 +3,7 @@ import { LocalidadService } from './services/localidad.service';
 import { EquipoService } from './services/equipo.service';
 import { PartidoService } from './services/partido.service';
 import { CuartoService } from './services/cuarto.service';
-import { Itabler, Localidad, Local, Cuarto } from './models';
+import { Itabler, Localidad, Local, Cuarto } from './interfaces/models';
 import { concatMap, map, of, switchMap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

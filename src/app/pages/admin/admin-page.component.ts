@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { EquipoService } from '../../core/services/equipo.service';
 import { PartidoService } from '../../core/services/partido.service';
-import { Localidad, Equipo } from '../../core/models';
+import { Localidad, Equipo } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
 
 @Component({

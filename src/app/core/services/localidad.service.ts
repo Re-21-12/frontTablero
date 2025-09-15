@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
-import { Localidad } from '../models';
+import { Localidad } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class LocalidadService {

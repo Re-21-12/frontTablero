@@ -2,7 +2,7 @@ import { Component, inject, OnInit, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableroFacade } from '../../core/tablero.facade';
-import { Cuarto, Itabler } from '../../core/models';
+import { Cuarto, Itabler } from '../../core/interfaces/models';
 import { TableroService } from '../../core/services/tablero.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { CuartoService } from '../../core/services/cuarto.service';
@@ -185,7 +185,6 @@ export class HomePageComponent implements OnInit {
     this.shotPause();
   }
 
-  // ⬇️ AJUSTADO: enviar datos al resultado
   finish(){
     this.pause();
 

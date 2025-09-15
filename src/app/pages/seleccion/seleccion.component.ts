@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EquipoService } from '../../core/services/equipo.service';
-import { Equipo } from '../../core/models';
+import { Equipo } from '../../core/interfaces/models';
 import { TableroService } from '../../core/services/tablero.service';
 import { Router } from '@angular/router';
 import { PartidoService } from '../../core/services/partido.service';

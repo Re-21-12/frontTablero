@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableroService } from '../../core/services/tablero.service';
-import { Resultado } from '../../core/models';
+import { Resultado } from '../../core/interfaces/models';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({

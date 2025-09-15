@@ -21,16 +21,16 @@ export class AuthService {
   }
 
   login(login: LoginRequest): Observable<LoginResponse> {
-      return this._httpClient.post<LoginResponse>(environment.apiBaseUrl + '/Auth/login', login);
+      return this._httpClient.post<LoginResponse>(environment.dev.apiBaseUrl + '/Auth/login', login);
   }
   register(register: RegisterRequest): Observable<string> {
-      return this._httpClient.post<string>(environment.apiBaseUrl + '/Auth/register', register);
+      return this._httpClient.post<string>(environment.dev.apiBaseUrl + '/Auth/register', register);
   }
   saveLoginData(response: LoginResponse): void {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(
       this.userKey,
-      JSON.stringify({ username: response.username, role: response.role?.name })
+      JSON.stringify({ nombre: response.nombre, rol: response.role?.nombre, exp: Date.now() + response.expiresIn * 60000 })
     );
   }
 

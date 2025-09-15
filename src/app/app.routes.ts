@@ -18,6 +18,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/resultado-page/resultado-page.component').then(m => m.ResultadoPageComponent),
     title: 'Resultado'
   },
+  {
+    path: 'login',
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+    title: 'Login'
+  },
+  {
+    path: 'sign-in',
+    loadComponent: () => import('./pages/sign-in/sign-in.component').then(m => m.SignInComponent),
+    title: 'Registrarse'
+  },
 
   // Rutas de administración
   {

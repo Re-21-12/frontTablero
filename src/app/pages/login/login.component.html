@@ -8,21 +8,21 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Campo Usuario -->
       <div class="form-group">
-        <label for="username" class="form-label">Usuario</label>
+        <label for="nombre" class="form-label">Usuario</label>
         <div class="input-wrapper">
           <input
-            id="username"
+            id="nombre"
             type="text"
-            formControlName="username"
+            formControlName="nombre"
             class="form-input"
-            [class.error]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+            [class.error]="loginForm.get('nombre')?.invalid && loginForm.get('nombre')?.touched"
             placeholder="Ingresa tu usuario"
-            autocomplete="username"
+            autocomplete="nombre"
           >
           <span class="input-icon">👤</span>
         </div>
-        <div class="error-message" *ngIf="getFieldError('username')">
-          {{ getFieldError('username') }}
+        <div class="error-message" *ngIf="getFieldError('nombre')">
+          {{ getFieldError('nombre') }}
         </div>
       </div>
 
@@ -31,11 +31,11 @@
         <label for="password" class="form-label">Contraseña</label>
         <div class="input-wrapper">
           <input
-            id="password"
+            id="contrasena"
             [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
+            formControlName="contrasena"
             class="form-input"
-            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            [class.error]="loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched"
             placeholder="Ingresa tu contraseña"
             autocomplete="current-password"
           >
@@ -48,8 +48,8 @@
             {{ showPassword ? '🙈' : '👁️' }}
           </button>
         </div>
-        <div class="error-message" *ngIf="getFieldError('password')">
-          {{ getFieldError('password') }}
+        <div class="error-message" *ngIf="getFieldError('contrasena')">
+          {{ getFieldError('contrasena') }}
         </div>
       </div>
 

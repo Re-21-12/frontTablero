@@ -6,7 +6,7 @@ import { Equipo, Local } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class EquipoService {
-  private base = `${environment.apiBaseUrl}/Equipo`;
+  private base = `${environment.dev.apiBaseUrl}/Equipo`;
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Equipo[]> {

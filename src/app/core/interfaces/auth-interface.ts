@@ -18,6 +18,10 @@ export interface RefreshTokenResponse {
 }
 export interface LoginResponse {
     token: string;
-    username: string;
-    role: any;
+    nombre: string;
+    refreshToken: string;
+    expiresIn: number;
+    role: {
+        nombre: string;
+    };
 }

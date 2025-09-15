@@ -1,6 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +11,14 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  private readonly _authService = inject(AuthService);
+  readonly _router = inject(Router);
   title = 'frontTablero';
 
   // Signals para el estado
   isDarkMode = signal(true);
   sidebarOpen = signal(false);
 
-  constructor(public router: Router) {}
 
   ngOnInit() {
     this.setInitialTheme();
@@ -29,7 +31,10 @@ export class AppComponent implements OnInit {
     this.isDarkMode.set(shouldBeDark);
     this.applyTheme();
   }
-
+  logout() {
+    this._authService.logout();
+    this._router.navigate(['/login']);
+  }
   toggleTheme() {
     this.isDarkMode.update(current => !current);
     this.applyTheme();

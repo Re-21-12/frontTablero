@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { LoginRequest } from '../../core/interfaces/auth-interface';
 
 @Component({
   selector: 'app-login',
@@ -22,8 +23,8 @@ export class LoginComponent {
 
   constructor() {
     this.loginForm = this._fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      contrasena: ['', [Validators.required, Validators.minLength(1)]]
     });
   }
 

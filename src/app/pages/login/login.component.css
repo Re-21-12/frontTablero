@@ -78,6 +78,7 @@
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: #fafafa;
+  color: #374151; /* Color del texto */
 }
 
 .form-input:focus {
@@ -85,11 +86,17 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   background: white;
+  color: #111827; /* Color del texto más oscuro al hacer focus */
 }
 
 .form-input.error {
   border-color: #dc2626;
   background: #fef2f2;
+  color: #374151; /* Mantener color del texto en error */
+}
+
+.form-input::placeholder {
+  color: #9ca3af; /* Color del placeholder */
 }
 
 .input-icon {

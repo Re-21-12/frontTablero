@@ -15,7 +15,7 @@
     <a class="pro-brand" routerLink="/seleccion" aria-label="Inicio">
       <span class="pro-brand__title">Tablero</span>
       <span class="pro-brand__section">
-        {{ router.url.startsWith('/admin') ? 'Administración' : 'Marcador' }}
+        {{ _router.url.startsWith('/admin') ? 'Administración' : 'Marcador' }}
       </span>
     </a>
 
@@ -41,15 +41,27 @@
           class="pro-chip"
           routerLinkActive="is-active"
           [routerLinkActiveOptions]="{ exact: true }"
-          [class.is-hidden]="router.url.startsWith('/seleccion')"
+          [class.is-hidden]="_router.url.startsWith('/seleccion')"
         >Marcador</a>
-
         <a
-          routerLink="/admin"
+          routerLink="/login"
           class="pro-chip"
           routerLinkActive="is-active"
-          [class.is-hidden]="router.url.startsWith('/admin')"
-        >Admin</a>
+          [class.is-hidden]="_router.url.startsWith('/login')"
+        >Iniciar sesión</a>
+        <a
+          routerLink="/sign-in"
+          class="pro-chip"
+          routerLinkActive="is-active"
+          [class.is-hidden]="_router.url.startsWith('/sign-in')"
+        >Registrarse</a>
+        <a
+          routerLink="/login"
+          class="pro-chip"
+          routerLinkActive="is-active"
+          [class.is-hidden]="_router.url.startsWith('/login')"
+          (click)="logout()"
+        >Cerrar sesión</a>
       </nav>
     </div>
   </div>

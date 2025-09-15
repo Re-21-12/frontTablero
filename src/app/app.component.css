@@ -1,75 +1,304 @@
-@import url('https://fonts.googleapis.com/css2?family=Jersey+15&family=Inter:wght@500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Jersey+15&family=Inter:wght@500;600&display=swap");
 
-:root{
-  --bg: rgba(12,15,23,.94);
+/* ===== VARIABLES DE TEMA ===== */
+:root,
+.dark-theme {
+  --bg: rgba(12, 15, 23, 0.94);
   --border: #2c3654;
   --text: #eaf0f6;
-  --muted:#a8b0c3;
-  --accent:#2b78e4;
-  --accent-2:#215fb8;
-  --chip:#1a2133;
+  --muted: #a8b0c3;
+  --accent: #2b78e4;
+  --accent-2: #215fb8;
+  --chip: #1a2133;
+  --sidebar-bg: #0c0f17;
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+}
+
+.light-theme {
+  --bg: rgba(248, 250, 252, 0.94);
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --muted: #64748b;
+  --accent: #3b82f6;
+  --accent-2: #2563eb;
+  --chip: #f8fafc;
+  --sidebar-bg: #ffffff;
+  --overlay-bg: rgba(0, 0, 0, 0.3);
 }
 
 /* ===== APPBAR ===== */
-.pro-appbar{
-  position: sticky; top: 0; z-index: 1000;
-  background: radial-gradient(1200px 360px at 50% -220px, rgba(43,120,228,.18), transparent 60%),
-              linear-gradient(180deg, var(--bg), rgba(12,15,23,.72));
+.pro-appbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: radial-gradient(
+      1200px 360px at 50% -220px,
+      rgba(43, 120, 228, 0.18),
+      transparent 60%
+    ),
+    linear-gradient(180deg, var(--bg), rgba(12, 15, 23, 0.72));
   border-bottom: 1px solid var(--border);
   backdrop-filter: saturate(140%) blur(8px);
 }
-.pro-appbar__inner{
-  max-width: 1280px; margin: 0 auto;
-  height: 72px; padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between;
+.pro-appbar__inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 72px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Sidebar Toggle */
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+  margin-right: 16px;
+}
+.sidebar-toggle:hover {
+  background: var(--chip);
 }
 
 /* Marca */
-.pro-brand{ text-decoration:none; color:inherit; display:flex; align-items:baseline; gap:14px; }
-.pro-brand__title{
-  font: 700 28px/1 "Jersey 15", system-ui, sans-serif;
-  letter-spacing:.6px; color: var(--text);
+.pro-brand {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
 }
-.pro-brand__section{
+.pro-brand__title {
+  font: 700 28px/1 "Jersey 15", system-ui, sans-serif;
+  letter-spacing: 0.6px;
+  color: var(--text);
+}
+.pro-brand__section {
   color: var(--muted);
   font: 600 14px/1 "Inter", system-ui, sans-serif;
-  padding:6px 10px; border-radius:10px;
-  background: #0f1422; border:1px solid var(--border);
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #0f1422;
+  border: 1px solid var(--border);
+}
+
+/* Grupo de navegación */
+.pro-nav-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Botón de tema */
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--chip);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Nav chips */
-.pro-nav{ display:flex; gap:12px; align-items:center; }
-.pro-chip{
-  display:inline-flex; align-items:center; justify-content:center;
-  height:40px; padding:0 18px; border-radius:12px;
-  background: var(--chip); color: var(--text);
-  border:1px solid var(--border); text-decoration:none; font-weight:600;
-  box-shadow: 0 8px 24px rgba(0,0,0,.35);
-  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+.pro-nav {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
-.pro-chip:hover{ transform: translateY(-1px); box-shadow: 0 14px 32px rgba(0,0,0,.45); }
-.pro-chip.is-active{ background: var(--accent); border-color: var(--accent); color:#fff; }
-.is-hidden{ display:none !important; }
+.pro-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: var(--chip);
+  color: var(--text);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.pro-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+.pro-chip.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.is-hidden {
+  display: none !important;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-bg);
+  z-index: 1100;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -320px;
+  width: 320px;
+  height: 100vh;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  z-index: 1200;
+  transition: left 0.3s ease;
+  overflow-y: auto;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar.is-open {
+  left: 0;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h3 {
+  margin: 0;
+  color: var(--text);
+  font: 600 18px/1 "Inter", system-ui, sans-serif;
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+.sidebar-close:hover {
+  color: var(--text);
+  background: var(--chip);
+}
+
+.sidebar-nav {
+  padding: 24px 0;
+}
+
+.nav-section {
+  margin-bottom: 32px;
+}
+
+.nav-section h4 {
+  color: var(--muted);
+  font: 600 12px/1 "Inter", system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px 24px;
+}
+
+.nav-section a {
+  display: block;
+  padding: 12px 24px;
+  color: var(--text);
+  text-decoration: none;
+  font: 500 14px/1 "Inter", system-ui, sans-serif;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-section a:hover {
+  background: var(--chip);
+  border-left-color: var(--accent);
+}
+
+.nav-section a.active {
+  background: var(--chip);
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
 
 /* Líneas de cancha (doble línea) */
-.pro-appbar__court{
-  height: 6px; position: relative;
-  background: linear-gradient(90deg, transparent, rgba(43,120,228,.32), transparent);
+.pro-appbar__court {
+  height: 6px;
+  position: relative;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(43, 120, 228, 0.32),
+    transparent
+  );
 }
-.pro-appbar__court i{
-  content:""; position:absolute; left:0; right:0; height:2px; display:block;
+.pro-appbar__court i {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  display: block;
   background: linear-gradient(90deg, transparent, #32406a, transparent);
 }
-.pro-appbar__court i:first-child{ top:0 }
-.pro-appbar__court i:last-child{ bottom:0 }
+.pro-appbar__court i:first-child {
+  top: 0;
+}
+.pro-appbar__court i:last-child {
+  bottom: 0;
+}
 
 /* Contenido */
-.pro-page{ max-width:1280px; margin:0 auto; padding:24px 24px 48px }
+.pro-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+}
 
 /* Responsive */
-@media (max-width: 720px){
-  .pro-appbar__inner{ height: 64px; padding: 0 16px; }
-  .pro-brand__title{ font-size: 24px; }
-  .pro-brand__section{ display:none; }     /* compactar en móvil */
-  .pro-chip{ height:36px; padding:0 14px; }
+@media (max-width: 720px) {
+  .pro-appbar__inner {
+    height: 64px;
+    padding: 0 16px;
+  }
+  .pro-brand__title {
+    font-size: 24px;
+  }
+  .pro-brand__section {
+    display: none;
+  }
+  .pro-chip {
+    height: 36px;
+    padding: 0 14px;
+  }
+  .pro-nav-group {
+    gap: 8px;
+  }
+  .theme-toggle {
+    padding: 8px;
+  }
+
+  .sidebar {
+    width: 280px;
+    left: -280px;
+  }
 }

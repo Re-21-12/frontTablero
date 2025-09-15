@@ -2,9 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LoginResponse } from '../interfaces/login-response-interface';
-import { Login as LoginRequest } from '../interfaces/login-request-interface';
 import { environment } from '../../../environments/environment';
+import { LoginRequest, LoginResponse, RegisterRequest } from '../interfaces/auth-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -22,9 +21,11 @@ export class AuthService {
   }
 
   login(login: LoginRequest): Observable<LoginResponse> {
-      return this._httpClient.post<LoginResponse>(environment.apiBaseUrl + '/auth/login', login);
+      return this._httpClient.post<LoginResponse>(environment.apiBaseUrl + '/Auth/login', login);
   }
-
+  register(register: RegisterRequest): Observable<string> {
+      return this._httpClient.post<string>(environment.apiBaseUrl + '/Auth/register', register);
+  }
   saveLoginData(response: LoginResponse): void {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(

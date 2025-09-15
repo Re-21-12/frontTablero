@@ -1,43 +1,60 @@
-import { Component, OnDestroy } from '@angular/core';
-import { Router, RouterLink, RouterOutlet, RouterLinkActive } from '@angular/router';
-import { NavigationEnd } from '@angular/router';
-import { filter, Subscription } from 'rxjs';
+import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnDestroy {
-  // Menú responsive (si usas el botón de hamburguesa)
-  menuOpen = false;
+export class AppComponent implements OnInit {
+  title = 'frontTablero';
 
-  private navSub: Subscription;
+  // Signals para el estado
+  isDarkMode = signal(true);
+  sidebarOpen = signal(false);
 
-  constructor(public router: Router) {
-    // Cierra el menú al cambiar de ruta
-    this.navSub = this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(() => (this.menuOpen = false));
+  constructor(public router: Router) {}
+
+  ngOnInit() {
+    this.setInitialTheme();
   }
 
-  ngOnDestroy(): void {
-    this.navSub?.unsubscribe();
+  private setInitialTheme() {
+    const hour = new Date().getHours();
+    // Modo oscuro entre 18:00 y 6:00
+    const shouldBeDark = hour >= 18 || hour < 6;
+    this.isDarkMode.set(shouldBeDark);
+    this.applyTheme();
   }
 
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
+  toggleTheme() {
+    this.isDarkMode.update(current => !current);
+    this.applyTheme();
   }
 
-  closeMenu(): void {
-    this.menuOpen = false;
+  private applyTheme() {
+    const body = document.body;
+    if (this.isDarkMode()) {
+      body.classList.remove('light-theme');
+      body.classList.add('dark-theme');
+    } else {
+      body.classList.remove('dark-theme');
+      body.classList.add('light-theme');
+    }
   }
 
-  // Texto útil para el subtítulo del header, si lo usas
-  get currentSection(): string {
-    const u = this.router.url || '';
-    return u.startsWith('/admin') ? 'Administración' : 'Marcador';
+  toggleSidebar() {
+    this.sidebarOpen.update(current => !current);
+  }
+
+  closeSidebar() {
+    this.sidebarOpen.set(false);
+  }
+
+  onSidebarClick(event: Event) {
+    event.stopPropagation();
   }
 }

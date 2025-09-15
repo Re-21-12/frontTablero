@@ -1,5 +1,17 @@
 <header class="pro-appbar">
   <div class="pro-appbar__inner">
+    <!-- Botón del sidebar -->
+    <button
+      class="sidebar-toggle"
+      (click)="toggleSidebar()"
+      aria-label="Abrir menú"
+      title="Menú de navegación"
+    >
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+      </svg>
+    </button>
+
     <a class="pro-brand" routerLink="/seleccion" aria-label="Inicio">
       <span class="pro-brand__title">Tablero</span>
       <span class="pro-brand__section">
@@ -7,22 +19,39 @@
       </span>
     </a>
 
-    <nav class="pro-nav" role="navigation" aria-label="Principal">
-      <a
-        routerLink="/seleccion"
-        class="pro-chip"
-        routerLinkActive="is-active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        [class.is-hidden]="router.url.startsWith('/seleccion')"
-      >Marcador</a>
+    <div class="pro-nav-group">
+      <!-- Botón tema -->
+      <button
+        class="theme-toggle"
+        (click)="toggleTheme()"
+        [attr.aria-label]="isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+        [title]="isDarkMode() ? 'Modo claro' : 'Modo oscuro'"
+      >
+        <svg *ngIf="isDarkMode()" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
+        </svg>
+        <svg *ngIf="!isDarkMode()" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
+        </svg>
+      </button>
 
-      <a
-        routerLink="/admin"
-        class="pro-chip"
-        routerLinkActive="is-active"
-        [class.is-hidden]="router.url.startsWith('/admin')"
-      >Admin</a>
-    </nav>
+      <nav class="pro-nav" role="navigation" aria-label="Principal">
+        <a
+          routerLink="/seleccion"
+          class="pro-chip"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          [class.is-hidden]="router.url.startsWith('/seleccion')"
+        >Marcador</a>
+
+        <a
+          routerLink="/admin"
+          class="pro-chip"
+          routerLinkActive="is-active"
+          [class.is-hidden]="router.url.startsWith('/admin')"
+        >Admin</a>
+      </nav>
+    </div>
   </div>
 
   <!-- líneas tipo cancha -->
@@ -30,6 +59,49 @@
     <i></i><i></i>
   </div>
 </header>
+
+<!-- Sidebar -->
+<div class="sidebar-overlay" *ngIf="sidebarOpen()" (click)="closeSidebar()"></div>
+<aside class="sidebar" [class.is-open]="sidebarOpen()" (click)="onSidebarClick($event)">
+  <div class="sidebar-header">
+    <h3>Navegación</h3>
+    <button class="sidebar-close" (click)="closeSidebar()" aria-label="Cerrar menú">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <h4>Tablero</h4>
+      <a routerLink="/seleccion" (click)="closeSidebar()">Selección</a>
+      <a routerLink="/tablero" (click)="closeSidebar()">Marcador</a>
+      <a routerLink="/resultado" (click)="closeSidebar()">Resultado</a>
+    </div>
+
+    <div class="nav-section">
+      <h4>Administración</h4>
+      <a routerLink="/admin" (click)="closeSidebar()">Panel Admin</a>
+      <a routerLink="/admin/usuarios" (click)="closeSidebar()">Usuarios</a>
+      <a routerLink="/admin/roles" (click)="closeSidebar()">Roles</a>
+      <a routerLink="/admin/permisos" (click)="closeSidebar()">Permisos</a>
+    </div>
+
+    <div class="nav-section">
+      <h4>Gestión</h4>
+      <a routerLink="/admin/equipos" (click)="closeSidebar()">Equipos</a>
+      <a routerLink="/admin/localidades" (click)="closeSidebar()">Localidades</a>
+      <a routerLink="/admin/partidos" (click)="closeSidebar()">Partidos</a>
+      <a routerLink="/admin/cuartos" (click)="closeSidebar()">Cuartos</a>
+    </div>
+
+    <div class="nav-section">
+      <h4>Recursos</h4>
+      <a routerLink="/admin/imagenes" (click)="closeSidebar()">Imágenes</a>
+    </div>
+  </nav>
+</aside>
 
 <main class="pro-page">
   <router-outlet />

@@ -1,0 +1,40 @@
+
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Equipos</h2>
+  </header>
+
+  <div class="toolbar toolbar--wrap">
+    <div class="field">
+      <label class="label">Nombre del equipo</label>
+      <input class="input" placeholder="Nombre" [(ngModel)]="eqNombre" />
+    </div>
+
+    <div class="field">
+      <label class="label">Localidad</label>
+      <select class="input" [(ngModel)]="eqLocalidadId">
+        <option [ngValue]="null">Seleccionar localidad</option>
+        <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">
+          {{ l.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label class="label">&nbsp;</label>
+      <button class="btn" (click)="crearEquipo()" [disabled]="!eqNombre.trim() || !eqLocalidadId">
+        Agregar
+      </button>
+    </div>
+  </div>
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let e of equipos()">
+        <span class="mono">#{{ e.id_Equipo }}</span>
+        <span class="name">{{ e.nombre }}</span>
+        <span class="muted">Loc: {{ e.id_Localidad }}</span>
+      </li>
+    </ul>
+  </div>
+</section>

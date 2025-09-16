@@ -1,51 +1,74 @@
-/* Panel */
-.panel{
-  background: linear-gradient(180deg,#161a25,#10141f);
-  border:1px solid #2a3451; border-radius:18px;
-  box-shadow:0 10px 28px rgba(0,0,0,.35);
-  padding:16px; margin-bottom:18px;
+/* Nav */
+.toolbar.nav a,
+.toolbar.nav a:link,
+.toolbar.nav a:visited,
+.toolbar.nav a:hover,
+.toolbar.nav a:active {
+  text-decoration: none;
+  border-bottom: none;
+  outline: 0;
 }
-.panel__header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
-.panel__title{ margin:0; font:700 22px/1 "Jersey 15", system-ui, sans-serif; letter-spacing:.4px; }
 
-/* Form */
-.toolbar{ display:flex; gap:10px; align-items:flex-end; margin-bottom:12px; }
-.toolbar--wrap{ flex-wrap:wrap; }
-
-/* ---- Field + Label ---- */
-.field{
-  display:flex; flex-direction:column;
-  flex:1 1 180px; min-width:160px;
+/* Barra */
+.toolbar.nav a {
+  padding: 0.45rem 1.2rem;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #cbd5e1;
 }
-.label{
-  font-size:13px; font-weight:600; color:#a8b0c3;
+.toolbar.nav a:hover { background:#1e293b; color:#fff; }
+.toolbar.nav a.active {
+  background:#2563eb; border-color:#2563eb; color:#fff;
+  box-shadow:0 2px 6px rgba(37,99,235,.4);
+}
+
+/* formulario */
+.toolbar.form{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 220px));
+  gap:12px;
+  align-items:end;
+  margin-bottom:12px;
+}
+
+/* Campos */
+.field{ display:flex; flex-direction:column; gap:6px; }
+
+/* Etiquetas  */
+.field .label{
+  text-decoration:none;
+  color:#cbd5e1;
+  font-weight:600;
+  font-size:.8rem;
   margin:0 0 4px 2px;
 }
 
 /* Inputs */
-.input{
-  flex:1 1 auto; width:100%;
-  background:#1a2030; color:#eaf0f6;
-  border:1px solid #2a3451; border-radius:10px; padding:10px 12px; outline:none;
-  transition:border-color .15s, background .15s, box-shadow .15s;
-}
-.input:focus{ border-color:#2b78e4; background:#202842; box-shadow:0 0 0 3px rgba(43,120,228,.22); }
-/* quita flechas number */
-.input[type=number]::-webkit-inner-spin-button,
-.input[type=number]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
-.input[type=number]{ -moz-appearance:textfield; }
-/* estado inválido (Angular) */
-.input.ng-invalid.ng-touched{
-  border-color:#ef6b6b; box-shadow:0 0 0 3px rgba(239,107,107,.18);
+.field > .input,
+.field > input.input,
+.field > select.input,
+.toolbar.form .input {
+  box-sizing:border-box;
+  width:100%;
+  height:36px;
+  min-height:36px;
+  max-height:36px;
+  padding:8px 12px;
+  line-height:20px;
+  background:#1e293b;
+  border:1px solid #334155;
+  border-radius:6px;
+  color:#fff;
+  flex:0 0 auto;     
 }
 
-/* Select con look de input */
-select.input{
+/* Select */
+.field > select.input{
   appearance:none;
-  padding-right:36px; /* espacio para el chevron */
+  padding-right:36px;
   background-image:
-    linear-gradient(45deg, transparent 50%, #8792a7 50%),
-    linear-gradient(135deg, #8792a7 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+    linear-gradient(135deg, #94a3b8 50%, transparent 50%);
   background-position:
     calc(100% - 18px) calc(50% - 3px),
     calc(100% - 12px) calc(50% - 3px);
@@ -53,50 +76,35 @@ select.input{
   background-repeat:no-repeat;
 }
 
-/* Botón pro */
+
+.field > input[type="datetime-local"].input{
+  height:36px ;
+  padding:6px 10px ;
+}
+
+/* Focus */
+.input:focus{
+  outline:none;
+  border-color:#3b82f6;
+  box-shadow:0 0 0 2px rgba(59,130,246,.3);
+}
+
+/* Botón alineado a 36px */
 .btn{
-  background:#2b78e4; color:#fff; border:1px solid transparent;
-  height:40px; padding:0 16px; border-radius:12px; font-weight:700; cursor:pointer;
-  box-shadow:0 8px 24px rgba(0,0,0,.3);
-  transition:background .15s, transform .06s, box-shadow .15s;
+  height:36px;
+  padding:0 1rem;
+  border-radius:6px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
 }
-.btn:hover{ background:#215fb8; box-shadow:0 12px 28px rgba(0,0,0,.36); }
-.btn:active{ background:#1e4f97; transform:translateY(1px); }
-.btn:focus-visible{ outline:3px solid rgba(43,120,228,.35); outline-offset:2px; }
-.btn[disabled]{ opacity:.65; cursor:not-allowed; }
 
-/* Lista con scroll */
-.list-scroll{
-  max-height: 320px; overflow:auto;
-  border:1px solid rgba(42,52,81,.6); border-radius:12px;
-  background: rgba(10,14,22,.35); padding:8px;
-  scroll-behavior:smooth;
-}
-.list{ list-style:none; margin:0; padding:0; }
-.row-item{
-  display:grid; grid-template-columns:auto 1fr auto auto; gap:10px; align-items:center;
-  padding:10px 12px; border-radius:10px; color:#eaf0f6; border:1px solid transparent;
-  transition:background .15s, border-color .15s;
-}
-.row-item + .row-item{ margin-top:6px; }
-.row-item:hover{ background:#1a2133; border-color:#2a3451; }
-
-.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "JetBrains Mono", monospace; color:#cfd7ea; }
-.name{ font-weight:600; }
-.muted{ color:#a8b0c3; }
-
-/* Hints/errores */
-.form-hint{ font-size:12px; margin:2px 0 8px 2px; color:#a8b0c3; }
-.form-hint.error{ color:#ef6b6b; }
-
-/* Scrollbar bonito */
-.list-scroll::-webkit-scrollbar{ width:8px; }
-.list-scroll::-webkit-scrollbar-thumb{ background:#2a3658; border-radius:10px; }
-.list-scroll{ scrollbar-color:#2a3658 transparent; scrollbar-width:thin; }
+/* Lista un poco más compacta (opcional) */
+.list-scroll{ max-height:260px; }
+.row-item{ padding:.5rem 0; }
 
 /* Responsive */
-@media (max-width: 720px){
-  .row-item{ grid-template-columns:auto 1fr; }
-  .list-scroll{ max-height: 260px; }
-  .toolbar{ align-items:stretch; }  /* evita desalinear labels */
+@media (max-width: 768px){
+  .toolbar.form{ grid-template-columns: 1fr; }
 }

@@ -1,0 +1,28 @@
+/* Acento: azul */
+:host ::ng-deep .panel__title { color: #fff; }
+
+.toolbar.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 220px));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+/* inputs */
+.field > .input,
+.field > input.input,
+.field > select.input {
+  height: 36px;
+}
+
+/* Lista de equipos */
+.list-scroll { max-height: 260px; }
+.row-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto; 
+  gap: 12px;
+  align-items: center;
+}
+.mono { color: #60a5fa; }      
+.muted { color: #9fb5d7; }     

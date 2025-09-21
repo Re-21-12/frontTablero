@@ -6,11 +6,12 @@ import { EquipoService } from '../../core/services/equipo.service';
 import { PartidoService } from '../../core/services/partido.service';
 import { Localidad, Equipo } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
+import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-admin-page',
-  imports: [CommonModule, FormsModule],
+  imports: [RouterModule, RouterLink, RouterLinkActive],
   templateUrl: './admin-page.component.html',
   styleUrls: ['./admin-page.component.css']
 })

@@ -1,0 +1,36 @@
+
+:host ::ng-deep .panel__title { color: #ffffff; }
+
+.toolbar.form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 220px));
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+
+/* inputs */
+.field > .input,
+.field > input.input,
+.field > select.input {
+  height: 36px;
+}
+
+/* Mensaje de validación */
+.form-hint.error { color: #fca5a5; }
+
+/* Lista de partidos*/
+.list-scroll { max-height: 280px; }
+.row-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto; 
+  gap: 12px;
+  align-items: center;
+}
+.mono { color: #a78bfa; } 
+.muted { color: #b9aedf; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .row-item { grid-template-columns: auto 1fr; }
+}

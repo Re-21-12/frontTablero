@@ -1,0 +1,29 @@
+
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Localidades</h2>
+  </header>
+
+  <div class="toolbar toolbar--wrap">
+    <div class="field">
+      <label class="label">Nombre</label>
+      <input class="input" placeholder="Nombre" [(ngModel)]="locNombre" />
+    </div>
+
+    <div class="field">
+      <label class="label">&nbsp;</label>
+      <button class="btn" (click)="crearLocalidad()" [disabled]="!locNombre.trim()">
+        Agregar
+      </button>
+    </div>
+  </div>
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let l of localidades()">
+        <span class="mono">#{{ l.id_Localidad }}</span>
+        <span class="name">{{ l.nombre }}</span>
+      </li>
+    </ul>
+  </div>
+</section>

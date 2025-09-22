@@ -16,12 +16,12 @@ import { NotifyService } from '../shared/notify.service';
 export class EquiposPageComponent implements OnInit {
   eqNombre = '';
   eqLocalidadId?: number;
-
+  errorNombre = '';
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
 
-  private eqService= inject(EquipoService);
-  private locService= inject(LocalidadService);
+  private eqService = inject(EquipoService);
+  private locService = inject(LocalidadService);
   private notify = inject(NotifyService);
 
   ngOnInit() { this.cargar(); }
@@ -39,13 +39,27 @@ export class EquiposPageComponent implements OnInit {
 
   crearEquipo() {
     const nombre = this.eqNombre.trim();
-    const idLoc  = Number(this.eqLocalidadId);
+    const idLoc = Number(this.eqLocalidadId);
     if (!nombre) { this.notify.info('Ingresa un nombre de equipo'); return; }
-    if (!idLoc)  { this.notify.info('Selecciona una localidad para el equipo'); return; }
+    if (!idLoc) { this.notify.info('Selecciona una localidad para el equipo'); return; }
 
     this.eqService.create({ nombre, id_Localidad: idLoc }).subscribe({
       next: () => { this.eqNombre = ''; this.eqLocalidadId = undefined; this.notify.success('Agregado correctamente'); this.cargar(); },
       error: () => this.notify.error('Error al agregar equipo')
     });
+  }
+
+  validarNombre(valor: string) {
+
+    if (!valor.trim()) {
+      this.errorNombre = 'El nombre no puede estar vacío.';
+      this.notify.error(this.errorNombre);
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
+      this.errorNombre = 'El nombre solo puede contener letras y espacios.';
+      this.notify.error(this.errorNombre);
+    } else {
+      this.errorNombre = '';
+
+    }
   }
 }

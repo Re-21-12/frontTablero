@@ -7,7 +7,7 @@
   <div class="toolbar toolbar--wrap">
     <div class="field">
       <label class="label">Nombre del equipo</label>
-      <input class="input" placeholder="Nombre" [(ngModel)]="eqNombre" />
+      <input class="input" placeholder="Nombre" [(ngModel)]="eqNombre" (keyup)="validarNombre(eqNombre)" />
     </div>
 
     <div class="field">
@@ -22,7 +22,7 @@
 
     <div class="field">
       <label class="label">&nbsp;</label>
-      <button class="btn" (click)="crearEquipo()" [disabled]="!eqNombre.trim() || !eqLocalidadId">
+      <button class="btn" (click)="crearEquipo()" [disabled]="!eqNombre.trim() || !eqLocalidadId || eqNombre">
         Agregar
       </button>
     </div>

@@ -1,0 +1,68 @@
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Jugadores</h2>
+  </header>
+
+  <div class="toolbar form">
+    <div class="field">
+      <label class="label">Nombre</label>
+      <input class="input" [(ngModel)]="nombre" placeholder="Nombre" />
+    </div>
+
+    <div class="field">
+      <label class="label">Apellido</label>
+      <input class="input" [(ngModel)]="apellido" placeholder="Apellido" />
+    </div>
+
+    <div class="field">
+      <label class="label">Edad</label>
+      <input class="input" type="number" [(ngModel)]="edad" min="1" placeholder="Edad" />
+    </div>
+
+    <div class="field">
+      <label class="label">Equipo</label>
+      <select class="input" [(ngModel)]="idEquipo">
+        <option [ngValue]="null">Seleccionar</option>
+        <option *ngFor="let e of equipos()" [ngValue]="e.id_Equipo">{{ e.nombre }}</option>
+      </select>
+    </div>
+
+    <!-- CRUD -->
+    <div class="field field--actions">
+      <label class="label">&nbsp;</label>
+      <button class="btn" (click)="crear()"
+        [disabled]="!nombre.trim() || !apellido.trim() || !edad || !idEquipo || loading()">
+        {{ loading() ? 'Guardando...' : 'Agregar' }}
+      </button>
+    </div>
+    <div class="field id-group">
+      <label class="label">ID</label>
+      <input class="input input--id" type="number" [(ngModel)]="idCrud" min="1" placeholder="#ID" />
+    </div>
+    <div class="field field--actions-sm">
+      <label class="label">&nbsp;</label>
+      <button class="btn btn--ghost" (click)="buscarPorId()" [disabled]="!idCrud || loading()">Buscar</button>
+    </div>
+    <div class="field field--actions-sm">
+      <label class="label">&nbsp;</label>
+      <button class="btn btn--ghost" (click)="editar()"
+        [disabled]="!idCrud || !nombre.trim() || !apellido.trim() || !edad || !idEquipo || loading()">Editar</button>
+    </div>
+    <div class="field field--actions-sm">
+      <label class="label">&nbsp;</label>
+      <button class="btn btn--ghost danger" (click)="borrarPorId()" [disabled]="!idCrud || loading()">Borrar</button>
+    </div>
+  </div>
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let j of jugadores(); let i = index">
+        <span class="mono">#{{ j.id_Jugador ?? (i + 1) }}</span>
+        <span class="name">{{ j.nombre }} {{ j.apellido }}</span>
+        <span class="muted">Edad: {{ j.edad }}</span>
+        <span class="muted">Equipo: {{ j.id_Equipo }}</span>
+        <button class="btn btn--ghost" (click)="borrar(j)">Eliminar</button>
+      </li>
+    </ul>
+  </div>
+</section>

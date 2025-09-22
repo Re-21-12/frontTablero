@@ -14,6 +14,8 @@ import { NotifyService } from '../shared/notify.service';
 })
 export class LocalidadesPageComponent implements OnInit {
   locNombre = '';
+  errorNombre = '';
+
   localidades = signal<Localidad[]>([]);
   private locService = inject(LocalidadService);
   private notify = inject(NotifyService);
@@ -35,4 +37,20 @@ export class LocalidadesPageComponent implements OnInit {
       error: () => this.notify.error('Error al agregar localidad')
     });
   }
+
+  validarNombre(valor: string) {
+  
+  if (!valor.trim()) {
+    this.errorNombre = 'El nombre no puede estar vacío.';
+    this.notify.error(this.errorNombre);
+  } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
+    this.errorNombre = 'El nombre solo puede contener letras y espacios.';
+    this.notify.error(this.errorNombre);
+  } else {
+    this.errorNombre = '';
+    
+  }
+
+
+}
 }

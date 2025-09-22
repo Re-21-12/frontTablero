@@ -48,3 +48,10 @@ export interface Resultado {
   totalPunteoLocal: number;
   totalPunteoVisitante: number;
 }
+
+export interface Jugador{
+  nombre: string;
+  apellido: string;
+  edad: number;
+  id_Equipo: number;
+}

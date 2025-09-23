@@ -12,7 +12,7 @@ export interface Jugador {
 
 @Injectable({ providedIn: 'root' })
 export class JugadorService {
-  private base = `${environment.apiBaseUrl}/Jugador`;
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Jugador`;
 
   constructor(private http: HttpClient) {}
 

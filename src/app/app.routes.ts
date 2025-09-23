@@ -72,6 +72,14 @@ export const routes: Routes = [
         .then((m) => m.ResultadoPageComponent),
     title: 'Resultado'
   },
+  {
+  path: 'admin/seguridad',
+  loadComponent: () =>
+    import('./pages/seguridad-admin/seguridad-admin-page/seguridad-admin-page.component')
+      .then(m => m.SeguridadAdminPageComponent),
+  title: 'Administración (Seguridad)'
+},
+
 
   { path: '**', redirectTo: 'seleccion' }
 ];

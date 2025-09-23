@@ -6,12 +6,8 @@ import { Localidad } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class LocalidadService {
-<<<<<<< HEAD
   private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Localidad`;
-=======
-  private base = `${environment.apiBaseUrl}/Localidad`;
 
->>>>>>> origin/stableDani
   constructor(private http: HttpClient) {}
 
 

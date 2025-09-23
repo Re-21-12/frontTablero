@@ -6,12 +6,7 @@ import { Equipo } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class EquipoService {
-<<<<<<< HEAD
   private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Equipo`;
-=======
-  private base = `${environment.apiBaseUrl}/Equipo`;
-
->>>>>>> origin/stableDani
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Equipo[]> {

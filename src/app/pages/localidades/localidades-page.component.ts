@@ -13,7 +13,7 @@ import { NotifyService } from '../shared/notify.service';
   styleUrls: ['./localidades-page.component.css']
 })
 export class LocalidadesPageComponent implements OnInit {
-  
+
   locNombre = '';
   errorNombre = '';
 
@@ -114,18 +114,18 @@ export class LocalidadesPageComponent implements OnInit {
   }
 
   validarNombre(valor: string) {
-  
-  if (!valor.trim()) {
-    this.errorNombre = 'El nombre no puede estar vacío.';
-    this.notify.error(this.errorNombre);
-  } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
-    this.errorNombre = 'El nombre solo puede contener letras y espacios.';
-    this.notify.error(this.errorNombre);
-  } else {
-    this.errorNombre = '';
-    
+
+    if (!valor.trim()) {
+      this.errorNombre = 'El nombre no puede estar vacío.';
+      this.notify.error(this.errorNombre);
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
+      this.errorNombre = 'El nombre solo puede contener letras y espacios.';
+      this.notify.error(this.errorNombre);
+    } else {
+      this.errorNombre = '';
+
+    }
+
+
   }
-
-
-}
 }

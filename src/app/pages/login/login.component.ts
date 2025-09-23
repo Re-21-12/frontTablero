@@ -22,8 +22,8 @@ export class LoginComponent {
 
   constructor() {
     this.loginForm = this._fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      nombre: ['', [Validators.required, Validators.minLength(3)]],
+      contrasena: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
@@ -33,7 +33,7 @@ export class LoginComponent {
       this.errorMessage = '';
 
       const loginData = this.loginForm.value;
-
+      
       this._authService.login(loginData).subscribe({
         next: (response) => {
           this._authService.saveLoginData(response);
@@ -63,7 +63,7 @@ export class LoginComponent {
   getFieldError(field: string): string {
     const control = this.loginForm.get(field);
     if (control?.errors && control.touched) {
-      if (control.errors['required']) return `${field === 'username' ? 'Usuario' : 'Contraseña'} es requerido`;
+      if (control.errors['required']) return `${field === 'nombre' ? 'nombre' : 'contrasena'} es requerido`;
       if (control.errors['minlength']) return `Mínimo ${control.errors['minlength'].requiredLength} caracteres`;
     }
     return '';

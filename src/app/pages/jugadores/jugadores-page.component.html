@@ -6,17 +6,17 @@
   <div class="toolbar form">
     <div class="field">
       <label class="label">Nombre</label>
-      <input class="input" [(ngModel)]="nombre" placeholder="Nombre" />
+      <input class="input" [(ngModel)]="nombre" placeholder="Nombre" (keyup)="validarNombre(nombre)" />
     </div>
 
     <div class="field">
       <label class="label">Apellido</label>
-      <input class="input" [(ngModel)]="apellido" placeholder="Apellido" />
+      <input class="input" [(ngModel)]="apellido" placeholder="Apellido" (keyup)="validarNombre(apellido)" />
     </div>
 
     <div class="field">
       <label class="label">Edad</label>
-      <input class="input" type="number" [(ngModel)]="edad" min="1" placeholder="Edad" />
+      <input class="input" type="number" [(ngModel)]="edad" min="1" placeholder="Edad"/>
     </div>
 
     <div class="field">
@@ -31,7 +31,7 @@
     <div class="field field--actions">
       <label class="label">&nbsp;</label>
       <button class="btn" (click)="crear()"
-        [disabled]="!nombre.trim() || !apellido.trim() || !edad || !idEquipo || loading()">
+        [disabled]="!nombre.trim() || !apellido.trim() || !edad || !idEquipo || loading()||errorNombre">
         {{ loading() ? 'Guardando...' : 'Agregar' }}
       </button>
     </div>

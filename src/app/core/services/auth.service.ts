@@ -21,6 +21,7 @@ export class AuthService {
   }
 
   login(login: LoginRequest): Observable<LoginResponse> {
+    console.log(login);
       return this._httpClient.post<LoginResponse>(environment.apiBaseUrl + '/Auth/login', login);
   }
   register(register: RegisterRequest): Observable<string> {

@@ -14,38 +14,123 @@ import { NotifyService } from '../shared/notify.service';
   styleUrls: ['./equipos-page.component.css']
 })
 export class EquiposPageComponent implements OnInit {
-  eqNombre = '';
-  eqLocalidadId?: number;
+
+  nombre = '';
+  idLocalidad?: number;
+  idCrud?: number;
 
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
+  loading = signal(false);
 
-  private eqService= inject(EquipoService);
-  private locService= inject(LocalidadService);
+  private equipoSvc = inject(EquipoService);
+  private locSvc = inject(LocalidadService);
   private notify = inject(NotifyService);
 
-  ngOnInit() { this.cargar(); }
+  ngOnInit() {
+    this.cargar();
+    this.cargarLocalidades();
+  }
 
   cargar() {
-    this.eqService.getAll().subscribe({
+    this.equipoSvc.getAll().subscribe({
       next: d => this.equipos.set(d),
       error: () => this.notify.error('No se pudieron cargar equipos')
     });
-    this.locService.getAll().subscribe({
+  }
+
+  cargarLocalidades() {
+    this.locSvc.getAll().subscribe({
       next: d => this.localidades.set(d),
       error: () => this.notify.error('No se pudieron cargar localidades')
     });
   }
 
-  crearEquipo() {
-    const nombre = this.eqNombre.trim();
-    const idLoc  = Number(this.eqLocalidadId);
+  crear() {
+    const nombre = this.nombre.trim();
+    const id_Localidad = Number(this.idLocalidad);
     if (!nombre) { this.notify.info('Ingresa un nombre de equipo'); return; }
-    if (!idLoc)  { this.notify.info('Selecciona una localidad para el equipo'); return; }
+    if (!id_Localidad) { this.notify.info('Selecciona una localidad'); return; }
 
-    this.eqService.create({ nombre, id_Localidad: idLoc }).subscribe({
-      next: () => { this.eqNombre = ''; this.eqLocalidadId = undefined; this.notify.success('Agregado correctamente'); this.cargar(); },
-      error: () => this.notify.error('Error al agregar equipo')
+    this.loading.set(true);
+    this.equipoSvc.create({ nombre, id_Localidad }).subscribe({
+      next: () => {
+        this.resetForm();
+        this.notify.success('Equipo agregado');
+        this.cargar();
+      },
+      error: () => this.notify.error('Error al agregar equipo'),
+      complete: () => this.loading.set(false)
     });
+  }
+
+  buscarPorId() {
+    const id = Number(this.idCrud);
+    if (!id) { this.notify.info('Ingresa un ID'); return; }
+
+    this.loading.set(true);
+    this.equipoSvc.getById(id).subscribe({
+      next: (e) => {
+        this.nombre = e?.nombre ?? '';
+        this.idLocalidad = e?.id_Localidad;
+        this.notify.info('Equipo cargado en el formulario');
+      },
+      error: () => this.notify.error('No se encontró el equipo'),
+      complete: () => this.loading.set(false)
+    });
+  }
+
+  editar() {
+    const id_Equipo = Number(this.idCrud);
+    const nombre = this.nombre.trim();
+    const id_Localidad = Number(this.idLocalidad);
+
+    if (!id_Equipo) { this.notify.info('Ingresa el ID a editar'); return; }
+    if (!nombre) { this.notify.info('Ingresa el nombre'); return; }
+    if (!id_Localidad) { this.notify.info('Selecciona una localidad'); return; }
+
+    this.loading.set(true);
+    this.equipoSvc.update({ id_Equipo, nombre, id_Localidad }).subscribe({
+      next: () => {
+        this.notify.success('Equipo actualizado');
+        this.resetForm();
+        this.cargar();
+      },
+      error: () => this.notify.error('Error al actualizar equipo'),
+      complete: () => this.loading.set(false)
+    });
+  }
+
+  borrarPorId() {
+    const id = Number(this.idCrud);
+    if (!id) { this.notify.info('Ingresa el ID a borrar'); return; }
+    if (!confirm(`¿Eliminar el equipo #${id}?`)) return;
+
+    this.loading.set(true);
+    this.equipoSvc.delete(id).subscribe({
+      next: () => {
+        this.notify.success('Equipo eliminado');
+        this.resetForm(true);
+        this.cargar();
+      },
+      error: () => this.notify.error('Error al eliminar equipo'),
+      complete: () => this.loading.set(false)
+    });
+  }
+
+  borrarDesdeLista(e: Equipo) {
+    if (!e.id_Equipo) return;
+    if (!confirm(`¿Eliminar el equipo #${e.id_Equipo}?`)) return;
+
+    this.equipoSvc.delete(e.id_Equipo).subscribe({
+      next: () => this.cargar(),
+      error: () => this.notify.error('No se pudo eliminar')
+    });
+  }
+
+  private resetForm(keepId = false) {
+    this.nombre = '';
+    this.idLocalidad = undefined;
+    if (!keepId) this.idCrud = undefined;
   }
 }

@@ -19,7 +19,7 @@ export interface RefreshTokenResponse {
 export interface LoginResponse {
     token: string;
     nombre: string;
-    refreshToken: string;
+    refresToken: string;
     expiresIn: number;
     role: {
         nombre: string;

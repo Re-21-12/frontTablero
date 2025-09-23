@@ -15,7 +15,6 @@ export interface Environment {
 
 export const environment: Environment = {
   production: true,
-<<<<<<< HEAD
   selectedEnvironment: 'dev', // Cambia esto a 'prod', 'dev' o 'local' según el entorno deseado
   prod: {
     apiBaseUrl: 'http://157.180.19.137/api/api',  // ⚡ usar /api sin puerto 8080
@@ -25,8 +24,6 @@ export const environment: Environment = {
   },
   local: {
     apiBaseUrl: 'http://192.168.137.1:8080/api',  // ⚡ usar /api sin puerto 8080
-  },
-=======
-  apiBaseUrl: 'http://localhost:5232/api',  
->>>>>>> origin/stableDani
+  }
+
 };

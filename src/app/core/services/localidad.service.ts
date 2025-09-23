@@ -6,12 +6,8 @@ import { Localidad } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class LocalidadService {
-<<<<<<< HEAD
   private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Localidad`;
-=======
-  private base = `${environment.apiBaseUrl}/Localidad`;
 
->>>>>>> origin/stableDani
   constructor(private http: HttpClient) {}
 
 
@@ -28,12 +24,12 @@ export class LocalidadService {
     return this.getById(id);
   }
 
-  
+
   create(body: { nombre: string }): Observable<Localidad | string> {
     return this.http.post(this.base, body, { responseType: 'text' as const });
   }
 
- 
+
   update(body: { id_Localidad: number; nombre: string }): Observable<Localidad | string> {
     return this.http.put(this.base, body, { responseType: 'text' as const });
   }

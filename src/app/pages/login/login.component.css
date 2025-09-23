@@ -133,7 +133,21 @@
   padding: 0.75rem;
   text-align: center;
 }
-
+.register-help {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin: 0;
+}
+.login-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+.login-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
 .btn {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;

@@ -6,7 +6,7 @@ import { Cuarto } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class CuartoService {
-  private base = `${environment.dev.apiBaseUrl}/Cuarto`;
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Cuarto`;
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Cuarto[]> {

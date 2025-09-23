@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, RegisterRequest } from '../interfaces/auth-interface';
+import { LoginRequest, LoginResponse, RegisterRequest} from '../interfaces/auth-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -21,10 +21,10 @@ export class AuthService {
   }
 
   login(login: LoginRequest): Observable<LoginResponse> {
-      return this._httpClient.post<LoginResponse>(environment.dev.apiBaseUrl + '/Auth/login', login);
+      return this._httpClient.post<LoginResponse>(environment[environment.selectedEnvironment].apiBaseUrl + '/Auth/login', login);
   }
   register(register: RegisterRequest): Observable<string> {
-      return this._httpClient.post<string>(environment.dev.apiBaseUrl + '/Auth/register', register);
+      return this._httpClient.post<string>(environment[environment.selectedEnvironment].apiBaseUrl + '/Auth/register', register);
   }
   saveLoginData(response: LoginResponse): void {
     localStorage.setItem(this.tokenKey, response.token);
@@ -37,7 +37,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
-    this._router.navigate(['/login']);
+    this._router.navigate(['/inicio_sesion']);
   }
 
   isAuthenticated(): boolean {

@@ -16,7 +16,7 @@ export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
         case 401:
           // Token expirado o no válido
           authService.logout();
-          router.navigate(['/login']);
+          router.navigate(['/inicio_sesion']);
           errorMessage = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
           break;
         case 403:

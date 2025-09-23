@@ -6,7 +6,7 @@ import { Localidad } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class LocalidadService {
-  private base = `${environment.dev.apiBaseUrl}/Localidad`;
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Localidad`;
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<Localidad[]> {

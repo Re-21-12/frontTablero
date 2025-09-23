@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
   }
   logout() {
     this._authService.logout();
-    this._router.navigate(['/login']);
+    this._router.navigate(['/inicio_sesion']);
   }
   toggleTheme() {
     this.isDarkMode.update(current => !current);

@@ -9,13 +9,24 @@ export const routes: Routes = [
         .then((m) => m.HomePageComponent),
     title: 'Marcador'
   },
+  {
+    path: 'inicio_sesion',
+    loadComponent: () =>  import ("./pages/login/login.component").then((m) => m.LoginComponent),
+    title: 'Inicio_sesion',
 
+  },
+  {
+    path : 'registro',
+    loadComponent: () => import ("./pages/register/register.component").then((m) => m.RegisterComponent),
+    title: 'Registro',
+  },
   {
     path: 'admin',
     loadComponent: () =>
       import('./pages/admin/admin-page.component')
         .then((m) => m.AdminPageComponent),
     title: 'Administración',
+    canActivateChild: [AuthGuard],
     children: [
       { path: '', redirectTo: 'localidades', pathMatch: 'full' },
 

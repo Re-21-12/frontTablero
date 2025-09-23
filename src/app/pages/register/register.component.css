@@ -1,4 +1,4 @@
-.login-page {
+.register-page {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -6,7 +6,7 @@
   padding: 1rem;
 }
 
-.login-container {
+.register-container {
   background: white;
   border-radius: 12px;
   padding: 2.5rem;
@@ -26,25 +26,25 @@
   }
 }
 
-.login-header {
+.register-header {
   text-align: center;
   margin-bottom: 2rem;
 }
 
-.login-title {
+.register-title {
   font-size: 1.75rem;
   font-weight: bold;
   color: #1e3c72;
   margin: 0 0 0.5rem 0;
 }
 
-.login-subtitle {
+.register-subtitle {
   color: #6b7280;
   margin: 0;
   font-size: 0.95rem;
 }
 
-.login-form {
+.register-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -76,24 +76,25 @@
   font-size: 1rem;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   background: #fafafa;
-  color: #374151; /* Color del texto */
+  color: #374151;
 }
 
 .form-input:focus {
   outline: none;
+  border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
   background: white;
-  color: #111827; /* Color del texto más oscuro al hacer focus */
+  color: #111827;
 }
 
 .form-input.error {
   border-color: #dc2626;
   background: #fef2f2;
-  color: #374151; /* Mantener color del texto en error */
+  color: #374151;
 }
 
 .form-input::placeholder {
-  color: #9ca3af; /* Color del placeholder */
+  color: #9ca3af;
 }
 
 .input-icon {
@@ -143,15 +144,15 @@
   transition: all 0.2s ease;
   border: none;
   font-size: 1rem;
+}
+
+.btn-primary {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
-.btn-primary {
-  color: white;
-}
-
 .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
   transform: translateY(-1px);
 }
 
@@ -161,7 +162,7 @@
   transform: none;
 }
 
-.btn-login {
+.btn-register {
   margin-top: 0.5rem;
   min-height: 48px;
   display: flex;
@@ -190,25 +191,37 @@
   }
 }
 
-.login-footer {
+.register-footer {
   margin-top: 2rem;
   text-align: center;
 }
 
-.login-help {
+.register-help {
   color: #6b7280;
   font-size: 0.875rem;
   margin: 0;
 }
 
+.login-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.login-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
-  .login-container {
+  .register-container {
     padding: 2rem;
     margin: 1rem;
   }
 
-  .login-title {
+  .register-title {
     font-size: 1.5rem;
   }
 }

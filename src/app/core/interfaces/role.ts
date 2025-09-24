@@ -1,7 +1,7 @@
 
 export interface Rol {
   Id_Rol: number;
-  Nombre: string;
+  nombre: string;
   Permisos?: Permiso[];
 }
 

@@ -24,10 +24,10 @@ export class UsuarioService {
 
   update(id: number, data: Partial<Usuario>): Observable<Usuario> {
     const body: Partial<Usuario> = {
-      Id_Usuario: id,
-      Nombre: data.Nombre ?? '',
-      Id_Rol: data.Id_Rol ?? 0,
-      Contrasena: data.Contrasena || undefined
+      id_Usuario: id,
+      nombre: data.nombre ?? '',
+      id_Rol: data.id_Rol ?? 0,
+      contrasena: data.contrasena || undefined
     };
 
     return this.http.put<Usuario>(`${this.base}/${id}`, body);
@@ -39,9 +39,9 @@ export class UsuarioService {
 
   register(data: Partial<Usuario>): Observable<any> {
     const body: any = {
-      Nombre: data.Nombre ?? '',
-      Contrasena: data.Contrasena ?? '',
-      Id_Rol: data.Id_Rol ?? 0
+      Nombre: data.nombre ?? '',
+      Contrasena: data.contrasena ?? '',
+      Id_Rol: data.id_Rol ?? 0
     };
     return this.http.post<any>(`${this.base}/register`, body);
   }

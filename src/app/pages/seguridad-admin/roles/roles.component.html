@@ -42,20 +42,20 @@
   </thead>
   <tbody>
     <tr *ngFor="let r of filtrados()">
-      <td>{{ r.Id_Rol }}</td>
-      <td>{{ r.Nombre }}</td>
+      <td>{{ r.id_Rol }}</td>
+      <td>{{ r.nombre }}</td>
       <td>
-        <div class="chips" *ngIf="r.Permisos?.length; else sinPermisos">
-          <span class="chip" *ngFor="let p of r.Permisos">
-            {{ p.Nombre }}
-            <button title="Quitar" class="chip-x" (click)="quitarPermiso(r, p.Id_Permiso)">×</button>
+        <div class="chips" *ngIf="r.permisos?.length; else sinPermisos">
+          <span class="chip" *ngFor="let p of r.permisos">
+            {{ p.nombre }}
+            <button title="Quitar" class="chip-x" (click)="quitarPermiso(r, p.id_Permiso)">×</button>
           </span>
         </div>
         <ng-template #sinPermisos>—</ng-template>
       </td>
       <td class="actions">
         <button class="btn" (click)="editar(r)">Editar</button>
-        <button class="btn warn" (click)="borrar(r.Id_Rol)">Borrar</button>
+        <button class="btn warn" (click)="borrar(r.id_Rol)">Borrar</button>
       </td>
     </tr>
   </tbody>

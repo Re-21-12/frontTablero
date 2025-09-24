@@ -1,9 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { AuthService } from './auth.service';
-import { NavigationSection, NavigationItem } from '../interfaces/navigation.interface';
+import {
+  NavigationSection,
+  NavigationItem,
+} from '../interfaces/navigation.interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NavigationService {
   private authService = inject(AuthService);
@@ -14,8 +17,8 @@ export class NavigationService {
       items: [
         { label: 'Selección', route: '/seleccion' },
         { label: 'Marcador', route: '/tablero' },
-        { label: 'Resultado', route: '/resultado' }
-      ]
+        { label: 'Resultado', route: '/resultado' },
+      ],
     },
     {
       title: 'Gestión de Entidades',
@@ -23,24 +26,24 @@ export class NavigationService {
         {
           label: 'Localidades',
           route: '/admin/localidades',
-          requiredPermissions: ['Localidad:Consultar']
+          requiredPermissions: ['Localidad:Consultar'],
         },
         {
           label: 'Equipos',
           route: '/admin/equipos',
-          requiredPermissions: ['Equipo:Consultar']
+          requiredPermissions: ['Equipo:Consultar'],
         },
         {
           label: 'Partidos',
           route: '/admin/partidos',
-          requiredPermissions: ['Partido:Consultar']
+          requiredPermissions: ['Partido:Consultar'],
         },
         {
           label: 'Jugadores',
           route: '/admin/jugadores',
-          requiredPermissions: ['Jugador:Consultar']
-        }
-      ]
+          requiredPermissions: ['Jugador:Consultar'],
+        },
+      ],
     },
     {
       title: 'Administración',
@@ -48,9 +51,13 @@ export class NavigationService {
         {
           label: 'Seguridad',
           route: '/admin/seguridad',
-          requiredPermissions: ['Usuario:Consultar', 'Rol:Consultar', 'Permiso:Consultar']
-        }
-      ]
+          requiredPermissions: [
+            'Usuario:Consultar',
+            'Rol:Consultar',
+            'Permiso:Consultar',
+          ],
+        },
+      ],
     },
     {
       title: 'Recursos',
@@ -58,10 +65,10 @@ export class NavigationService {
         {
           label: 'Imágenes',
           route: '/recursos/imagenes',
-          requiredPermissions: ['Imagen:Consultar']
-        }
-      ]
-    }
+          requiredPermissions: ['Imagen:Consultar'],
+        },
+      ],
+    },
   ];
 
   getFilteredNavigation(): NavigationSection[] {
@@ -72,11 +79,11 @@ export class NavigationService {
     }
 
     const filteredNavigation = this.navigationConfig
-      .map(section => ({
+      .map((section) => ({
         ...section,
-        items: section.items.filter(item => this.canShowItem(item))
+        items: section.items.filter((item) => this.canShowItem(item)),
       }))
-      .filter(section => section.items.length > 0);
+      .filter((section) => section.items.length > 0);
 
     console.log('Navegación filtrada basada en permisos:', filteredNavigation);
     return filteredNavigation;
@@ -87,7 +94,12 @@ export class NavigationService {
     if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
       return true;
     }
-    console.log('Verificando acceso para item:', item.label, 'con permisos requeridos:', item.requiredPermissions);
+    console.log(
+      'Verificando acceso para item:',
+      item.label,
+      'con permisos requeridos:',
+      item.requiredPermissions,
+    );
     // Verificar si el usuario tiene al menos uno de los permisos requeridos
     return this.authService.hasAnyPermission(item.requiredPermissions);
   }
@@ -111,7 +123,7 @@ export class NavigationService {
       'Localidad:Agregar',
       'Localidad:Editar',
       'Localidad:Eliminar',
-      'Localidad:Consultar'
+      'Localidad:Consultar',
     ]);
   }
 
@@ -120,7 +132,7 @@ export class NavigationService {
       'Equipo:Agregar',
       'Equipo:Editar',
       'Equipo:Eliminar',
-      'Equipo:Consultar'
+      'Equipo:Consultar',
     ]);
   }
 
@@ -129,7 +141,7 @@ export class NavigationService {
       'Partido:Agregar',
       'Partido:Editar',
       'Partido:Eliminar',
-      'Partido:Consultar'
+      'Partido:Consultar',
     ]);
   }
 
@@ -138,7 +150,7 @@ export class NavigationService {
       'Jugador:Agregar',
       'Jugador:Editar',
       'Jugador:Eliminar',
-      'Jugador:Consultar'
+      'Jugador:Consultar',
     ]);
   }
 
@@ -147,7 +159,7 @@ export class NavigationService {
       'Usuario:Agregar',
       'Usuario:Editar',
       'Usuario:Eliminar',
-      'Usuario:Consultar'
+      'Usuario:Consultar',
     ]);
   }
 
@@ -156,7 +168,7 @@ export class NavigationService {
       'Imagen:Agregar',
       'Imagen:Editar',
       'Imagen:Eliminar',
-      'Imagen:Consultar'
+      'Imagen:Consultar',
     ]);
   }
 
@@ -165,7 +177,7 @@ export class NavigationService {
       'Rol:Agregar',
       'Rol:Editar',
       'Rol:Eliminar',
-      'Rol:Consultar'
+      'Rol:Consultar',
     ]);
   }
 
@@ -174,7 +186,7 @@ export class NavigationService {
       'Permiso:Agregar',
       'Permiso:Editar',
       'Permiso:Eliminar',
-      'Permiso:Consultar'
+      'Permiso:Consultar',
     ]);
   }
 
@@ -196,12 +208,17 @@ export class NavigationService {
   }
 
   // Método para obtener los permisos disponibles para un módulo específico
-  getModulePermissions(module: string): { canView: boolean; canCreate: boolean; canEdit: boolean; canDelete: boolean } {
+  getModulePermissions(module: string): {
+    canView: boolean;
+    canCreate: boolean;
+    canEdit: boolean;
+    canDelete: boolean;
+  } {
     return {
       canView: this.canViewModule(module),
       canCreate: this.canCreateIn(module),
       canEdit: this.canEditIn(module),
-      canDelete: this.canDeleteFrom(module)
+      canDelete: this.canDeleteFrom(module),
     };
   }
 
@@ -211,7 +228,7 @@ export class NavigationService {
       `${module}:Consultar`,
       `${module}:Agregar`,
       `${module}:Editar`,
-      `${module}:Eliminar`
+      `${module}:Eliminar`,
     ]);
   }
 
@@ -219,8 +236,8 @@ export class NavigationService {
   getAvailableRoutes(): string[] {
     const availableRoutes: string[] = [];
 
-    this.getFilteredNavigation().forEach(section => {
-      section.items.forEach(item => {
+    this.getFilteredNavigation().forEach((section) => {
+      section.items.forEach((item) => {
         availableRoutes.push(item.route);
       });
     });

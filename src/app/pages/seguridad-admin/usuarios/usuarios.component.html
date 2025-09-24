@@ -2,8 +2,8 @@
 
 <div class="toolbar">
   <input class="input"
-         [ngModel]="q()"
-         (ngModelChange)="q.set($event)"
+         [ngModel]="busqueda()"
+         (ngModelChange)="busqueda.set($event)"
          placeholder="Buscar por nombre, id o rol">
   <button class="btn" (click)="nuevo()">Nuevo</button>
 </div>
@@ -14,12 +14,14 @@
            [ngModel]="formNombre()"
            (ngModelChange)="formNombre.set($event)"
            placeholder="Nombre de usuario">
-
-    <input class="input"
-           type="number"
-           [ngModel]="formIdRol()"
-           (ngModelChange)="formIdRol.set($event)"
-           placeholder="Id del Rol (Id_Rol)">
+    <select class="input"
+            [ngModel]="formIdRol()"
+            (ngModelChange)="formIdRol.set($event)">
+      <option value="" disabled>Seleccione un rol</option>
+      <option *ngFor="let r of roles()" [value]="r.id_Rol">
+        {{ r.id_Rol }} - {{ r.nombre }}
+      </option>
+    </select>
 
     <input class="input"
            type="password"
@@ -45,15 +47,17 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let u of filtrados()">
-      <td>{{ u.Id_Usuario }}</td>
-      <td>{{ u.Nombre }}</td>
-      <td>{{ u.Id_Rol }}</td>
-      <td class="actions">
-        <button class="btn" (click)="editar(u)">Editar</button>
-        <button class="btn warn" (click)="borrar(u.Id_Usuario)">Borrar</button>
-      </td>
-    </tr>
+    @for (u of filtrados(); track $index) {
+      <tr>
+        <td class="text-white">{{ u.id_Usuario }}</td>
+        <td class="text-white">{{ u.nombre }}</td>
+        <td class="text-white">{{ u.id_Rol }}</td>
+        <td class="actions">
+          <button class="btn" (click)="editar(u)">Editar</button>
+          <button class="btn warn" (click)="borrar(u.id_Usuario)">Borrar</button>
+        </td>
+      </tr>
+    }
   </tbody>
 </table>
 

@@ -1,8 +1,11 @@
 export interface Usuario {
-  Id_Usuario: number;   
-  Nombre: string;
-  Id_Rol: number;
-  Contrasena?: string;  
-  CreatedAt?: string;
-  UpdatedAt?: string;
+  id_Usuario: number;
+  nombre: string;
+  id_Rol: number;
+  contrasena?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: number;
+  updatedBy?: number;
+
 }

@@ -26,14 +26,12 @@
 <table class="table" *ngIf="!cargando() && filtrados().length">
   <thead>
     <tr>
-      <th style="width:80px;">ID</th>
       <th>Nombre</th>
       <th style="width:180px;">Acciones</th>
     </tr>
   </thead>
   <tbody>
     <tr *ngFor="let p of filtrados()">
-      <td>{{ getId(p) || '—' }}</td>
       <td>{{ getNombre(p) }}</td>
       <td class="actions">
         <button class="btn" (click)="editar(p)">Editar</button>

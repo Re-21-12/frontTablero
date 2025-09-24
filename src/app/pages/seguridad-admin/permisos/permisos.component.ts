@@ -2,6 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PermissionService } from '../../../core/services/permission.service';
+import { Permiso } from '../../../core/interfaces/auth-interface';
 
 @Component({
   standalone: true,
@@ -13,7 +14,7 @@ import { PermissionService } from '../../../core/services/permission.service';
 export class PermisosComponent {
   private svc = inject(PermissionService);
 
-  permisos = signal<any[]>([]);
+  permisos = signal<Permiso[]>([]);
   cargando = signal(false);
   error = signal<string | null>(null);
 
@@ -21,7 +22,7 @@ export class PermisosComponent {
   editingId = signal<number | null>(null);
   formNombre = signal<string>('');
 
- 
+
   getId = (p: any): number | null =>
     (p?.Id_Permiso ?? p?.id ?? p?.Id ?? null);
 
@@ -77,7 +78,7 @@ export class PermisosComponent {
   }
 
   borrar(id: number | null) {
-    if (!id) return; 
+    if (!id) return;
     if (!confirm('¿Eliminar este permiso?')) return;
     this.cargando.set(true);
     this.error.set(null);

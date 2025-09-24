@@ -60,7 +60,13 @@ export interface Permiso{
   id_Permiso: number;
   nombre: string;
 }
-export interface Rol{
+export interface Rol {
   id_Rol: number;
-  nombre:string;
+  nombre: string;
+  createdAt?: string;
+  createdBy?: number;
+  updatedAt?: string | null;
+  updatedBy?: number;
+  usuarios?: any[];
+  permisos?: Permiso[];
 }

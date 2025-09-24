@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
     // El NavigationService ya maneja internamente la verificación de autenticación
     const filteredNavigation = this._navigationService.getFilteredNavigation();
     this.navigationSections.set(filteredNavigation);
-
+    console.log('Navegación filtrada:', filteredNavigation);
     if (filteredNavigation.length > 0) {
       console.log('Navegación cargada:', filteredNavigation);
     } else {

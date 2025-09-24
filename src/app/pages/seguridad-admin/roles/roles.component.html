@@ -1,0 +1,66 @@
+<h3>Roles</h3>
+
+<div class="toolbar">
+  <input class="input"
+         [ngModel]="q()"
+         (ngModelChange)="q.set($event)"
+         placeholder="Buscar rol o permiso">
+  <button class="btn" (click)="nuevo()">Nuevo</button>
+</div>
+<div class="card form">
+  <div class="row">
+    <input class="input"
+           [ngModel]="formNombre()"
+           (ngModelChange)="formNombre.set($event)"
+           placeholder="Nombre del rol">
+    <button class="btn primary" (click)="guardar()">
+      {{ editingId() ? 'Guardar cambios' : 'Agregar' }}
+    </button>
+  </div>
+
+  <div class="row hint" *ngIf="editingId()">
+    <span>Asignación de permisos (reemplaza todos): IDs separados por coma</span>
+    <input class="input"
+           [ngModel]="permisosInput()"
+           (ngModelChange)="permisosInput.set($event)"
+           placeholder="Ej: 1,2,5">
+    <button class="btn" (click)="asignarPermisos()">Asignar permisos</button>
+  </div>
+</div>
+
+<div *ngIf="cargando()" class="hint">Cargando…</div>
+<div *ngIf="error()" class="error">{{ error() }}</div>
+
+<table class="table" *ngIf="!cargando() && filtrados().length">
+  <thead>
+    <tr>
+      <th style="width:80px;">ID</th>
+      <th>Nombre</th>
+      <th>Permisos</th>
+      <th style="width:210px;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let r of filtrados()">
+      <td>{{ r.Id_Rol }}</td>
+      <td>{{ r.Nombre }}</td>
+      <td>
+        <div class="chips" *ngIf="r.Permisos?.length; else sinPermisos">
+          <span class="chip" *ngFor="let p of r.Permisos">
+            {{ p.Nombre }}
+            <button title="Quitar" class="chip-x" (click)="quitarPermiso(r, p.Id_Permiso)">×</button>
+          </span>
+        </div>
+        <ng-template #sinPermisos>—</ng-template>
+      </td>
+      <td class="actions">
+        <button class="btn" (click)="editar(r)">Editar</button>
+        <button class="btn warn" (click)="borrar(r.Id_Rol)">Borrar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!cargando() && !filtrados().length" class="hint">
+  No hay roles para mostrar.
+</div>

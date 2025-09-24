@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './core/guards/auth.guard';
+import { PermissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
   {path: 'login', loadComponent: () => 
@@ -13,43 +13,56 @@ export const routes: Routes = [
         .then((m) => m.HomePageComponent),
     title: 'Marcador'
   },
-
+  {
+    path: 'inicio_sesion',
+    loadComponent: () => import('./pages/login/login.component').then((m) => m.LoginComponent),
+    title: 'Inicio_sesion'
+  },
+  {
+    path: 'registro',
+    loadComponent: () => import('./pages/register/register.component').then((m) => m.RegisterComponent),
+    title: 'Registro'
+  },
   {
     path: 'admin',
     loadComponent: () =>
       import('./pages/admin/admin-page.component')
         .then((m) => m.AdminPageComponent),
     title: 'Administración',
+    canActivate: [PermissionGuard],
+    data: { requiredPermissions: ['Localidad:Consultar', 'Equipo:Consultar', 'Partido:Consultar', 'Jugador:Consultar'] },
     children: [
       { path: '', redirectTo: 'localidades', pathMatch: 'full' },
-
       {
         path: 'localidades',
         loadComponent: () =>
           import('./pages/localidades/localidades-page.component')
-            .then((m) => m.LocalidadesPageComponent)
+            .then((m) => m.LocalidadesPageComponent),
+        data: { requiredPermissions: ['Localidad:Consultar'] }
       },
       {
         path: 'equipos',
         loadComponent: () =>
           import('./pages/equipos/equipos-page.component')
-            .then((m) => m.EquiposPageComponent)
+            .then((m) => m.EquiposPageComponent),
+        data: { requiredPermissions: ['Equipo:Consultar'] }
       },
       {
         path: 'partidos',
         loadComponent: () =>
           import('./pages/partidos/partidos-page.component')
-            .then((m) => m.PartidosPageComponent)
+            .then((m) => m.PartidosPageComponent),
+        data: { requiredPermissions: ['Partido:Consultar'] }
       },
       {
         path: 'jugadores',
         loadComponent: () =>
           import('./pages/jugadores/jugadores-page.component')
-          .then((m) =>m.JugadoresPageComponent)
+            .then((m) => m.JugadoresPageComponent),
+        data: { requiredPermissions: ['Jugador:Consultar'] }
       }
     ]
   },
-
   {
     path: 'seleccion',
     loadComponent: () =>
@@ -57,7 +70,6 @@ export const routes: Routes = [
         .then((m) => m.SeleccionComponent),
     title: 'Selección'
   },
-
   {
     path: 'resultado',
     loadComponent: () =>
@@ -65,6 +77,34 @@ export const routes: Routes = [
         .then((m) => m.ResultadoPageComponent),
     title: 'Resultado'
   },
-
+  {
+    path: 'admin/seguridad',
+    loadComponent: () =>
+      import('./pages/seguridad-admin/seguridad-admin-page/seguridad-admin-page.component')
+        .then(m => m.SeguridadAdminPageComponent),
+    title: 'Administración (Seguridad)',
+    canActivate: [PermissionGuard],
+    data: { requiredPermissions: ['Usuario:Consultar', 'Rol:Consultar', 'Permiso:Consultar'] }
+  },
+  {
+    path: 'recursos',
+    loadComponent: () =>
+      import('./pages/recursos/recursos-page.component')
+        .then(m => m.RecursosPageComponent),
+    title: 'Recursos',
+    canActivate: [PermissionGuard],
+    data: { requiredPermissions: ['Imagen:Consultar'] },
+    children: [
+      { path: '', redirectTo: 'imagenes', pathMatch: 'full' },
+      {
+        path: 'imagenes',
+        loadComponent: () =>
+          import('./pages/recursos/imagenes/imagenes.component')
+            .then(m => m.ImagenesComponent),
+        title: 'Imágenes',
+        data: { requiredPermissions: ['Imagen:Consultar'] }
+      }
+    ]
+  },
   { path: '**', redirectTo: 'seleccion' }
 ];

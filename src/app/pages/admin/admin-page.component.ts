@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { EquipoService } from '../../core/services/equipo.service';
 import { PartidoService } from '../../core/services/partido.service';
+import { PermisoService } from '../../core/services/permiso.service';
 import { Localidad, Equipo } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
 import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
@@ -11,11 +12,13 @@ import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 @Component({
   standalone: true,
   selector: 'app-admin-page',
-  imports: [RouterModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterModule, RouterLink, RouterLinkActive],
   templateUrl: './admin-page.component.html',
   styleUrls: ['./admin-page.component.css']
 })
 export class AdminPageComponent implements OnInit {
+  private readonly _permisoService = inject(PermisoService);
+
   localidades = signal<Localidad[]>([]);
   equipos = signal<Equipo[]>([]);
   partidos = signal<any[]>([]);
@@ -29,6 +32,14 @@ export class AdminPageComponent implements OnInit {
   partLocalId?: number;
   partVisitId?: number;
 
+  // Signals para permisos
+  canViewLocalidades = signal(false);
+  canViewEquipos = signal(false);
+  canViewPartidos = signal(false);
+  canViewJugadores = signal(false);
+  canViewUsuarios = signal(false);
+  canViewRoles = signal(false);
+
   loadingLoc = signal(false);
   loadingEq  = signal(false);
   loadingPar = signal(false);
@@ -38,7 +49,11 @@ export class AdminPageComponent implements OnInit {
   private partSvc = inject(PartidoService);
   private notify  = inject(NotifyService);
 
-  ngOnInit(){ this.loadAll(); }
+  ngOnInit(){
+    this.loadAll();
+  }
+
+
 
   loadAll(){
     this.locSvc.getAll().subscribe({
@@ -97,7 +112,7 @@ export class AdminPageComponent implements OnInit {
 
     const payload = {
       fechaHora: this.toLocalIso(this.fechaHoraLocal),
-      id_Localidad: idLoc,
+      id: idLoc,
       id_Local: idLocal,
       id_Visitante: idVisit
     };

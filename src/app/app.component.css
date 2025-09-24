@@ -10,7 +10,9 @@
   --accent: #2b78e4;
   --accent-2: #215fb8;
   --chip: #1a2133;
-  --sidebar-bg: #0c0f17;
+  --sidebar-bg: linear-gradient(145deg, #0a0d16 0%, #0f1422 50%, #1a2133 100%);
+  --sidebar-header-bg: rgba(15, 20, 34, 0.8);
+  --sidebar-border: rgba(44, 54, 84, 0.6);
   --overlay-bg: rgba(0, 0, 0, 0.5);
 }
 
@@ -22,7 +24,9 @@
   --accent: #3b82f6;
   --accent-2: #2563eb;
   --chip: #f8fafc;
-  --sidebar-bg: #ffffff;
+  --sidebar-bg: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+  --sidebar-header-bg: rgba(248, 250, 252, 0.9);
+  --sidebar-border: rgba(226, 232, 240, 0.8);
   --overlay-bg: rgba(0, 0, 0, 0.3);
 }
 
@@ -32,11 +36,11 @@
   top: 0;
   z-index: 1000;
   background: radial-gradient(
-      1200px 360px at 50% -220px,
-      rgba(43, 120, 228, 0.18),
-      transparent 60%
-    ),
-    linear-gradient(180deg, var(--bg), rgba(12, 15, 23, 0.72));
+    1200px 360px at 50% -220px,
+    rgba(43, 120, 228, 0.18),
+    transparent 60%
+  ),
+  linear-gradient(180deg, var(--bg), rgba(12, 15, 23, 0.72));
   border-bottom: 1px solid var(--border);
   backdrop-filter: saturate(140%) blur(8px);
 }
@@ -156,20 +160,24 @@
   bottom: 0;
   background: var(--overlay-bg);
   z-index: 1100;
+  backdrop-filter: blur(2px);
 }
 
 .sidebar {
   position: fixed;
   top: 0;
-  left: -320px;
-  width: 320px;
+  left: -340px;
+  width: 340px;
   height: 100vh;
   background: var(--sidebar-bg);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--sidebar-border);
   z-index: 1200;
-  transition: left 0.3s ease;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
-  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    4px 0 24px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
 }
 
 .sidebar.is-open {
@@ -180,14 +188,33 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px;
-  border-bottom: 1px solid var(--border);
+  padding: 32px 24px 24px;
+  background: var(--sidebar-header-bg);
+  border-bottom: 1px solid var(--sidebar-border);
+  backdrop-filter: blur(8px);
+  position: relative;
+}
+
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(43, 120, 228, 0.4),
+    transparent
+  );
 }
 
 .sidebar-header h3 {
   margin: 0;
   color: var(--text);
-  font: 600 18px/1 "Inter", system-ui, sans-serif;
+  font: 600 20px/1 "Inter", system-ui, sans-serif;
+  letter-spacing: -0.025em;
 }
 
 .sidebar-close {
@@ -195,49 +222,118 @@
   border: none;
   color: var(--muted);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sidebar-close:hover {
   color: var(--text);
-  background: var(--chip);
+  background: rgba(43, 120, 228, 0.1);
+  transform: scale(1.05);
 }
 
 .sidebar-nav {
-  padding: 24px 0;
+  padding: 32px 0 24px;
 }
 
 .nav-section {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.nav-section:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 24px;
+  right: 24px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--sidebar-border),
+    transparent
+  );
 }
 
 .nav-section h4 {
   color: var(--muted);
-  font: 600 12px/1 "Inter", system-ui, sans-serif;
+  font: 600 11px/1 "Inter", system-ui, sans-serif;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 16px 24px;
+  letter-spacing: 1px;
+  margin: 0 0 20px 24px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.nav-section h4::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
 }
 
 .nav-section a {
-  display: block;
-  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  padding: 14px 24px 14px 36px;
   color: var(--text);
   text-decoration: none;
-  font: 500 14px/1 "Inter", system-ui, sans-serif;
-  transition: all 0.2s ease;
+  font: 500 15px/1.2 "Inter", system-ui, sans-serif;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border-left: 3px solid transparent;
+  position: relative;
+  margin: 2px 0;
+}
+
+.nav-section a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(43, 120, 228, 0.1),
+    rgba(43, 120, 228, 0.05)
+  );
+  transition: width 0.2s ease;
 }
 
 .nav-section a:hover {
-  background: var(--chip);
+  background: rgba(43, 120, 228, 0.08);
   border-left-color: var(--accent);
+  transform: translateX(4px);
+  color: var(--accent);
+}
+
+.nav-section a:hover::before {
+  width: 100%;
 }
 
 .nav-section a.active {
-  background: var(--chip);
+  background: linear-gradient(
+    90deg,
+    rgba(43, 120, 228, 0.15),
+    rgba(43, 120, 228, 0.05)
+  );
   border-left-color: var(--accent);
   color: var(--accent);
+  font-weight: 600;
+  transform: translateX(4px);
+}
+
+.nav-section a.active::before {
+  width: 100%;
 }
 
 /* Líneas de cancha (doble línea) */
@@ -274,6 +370,24 @@
   padding: 24px 24px 48px;
 }
 
+/* Scrollbar personalizado para el sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(43, 120, 228, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(43, 120, 228, 0.5);
+}
+
 /* Responsive */
 @media (max-width: 720px) {
   .pro-appbar__inner {
@@ -297,6 +411,25 @@
     padding: 8px;
   }
 
+  .sidebar {
+    width: 300px;
+    left: -300px;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 20px;
+  }
+
+  .nav-section h4 {
+    margin-left: 20px;
+  }
+
+  .nav-section a {
+    padding: 12px 20px 12px 32px;
+  }
+}
+
+@media (max-width: 480px) {
   .sidebar {
     width: 280px;
     left: -280px;

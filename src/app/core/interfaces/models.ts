@@ -17,18 +17,18 @@ export interface Cuarto {
 export interface Local {
   id_Equipo:    number;
   nombre:       string;
-  id_Localidad: number;
+  id: number;
   localidad:    Localidad;
 }
 
 export interface Localidad {
-  id_Localidad: number;
+  id: number;
   nombre:       string;
 }
 
 export interface Partido {
   fechaHora:    Date;
-  id_Localidad: number;
+  id: number;
   id_Local:     number;
   id_Visitante: number;
 }
@@ -36,7 +36,8 @@ export interface Partido {
 export interface Equipo {
   id_Equipo:    number;
   nombre:       string;
-  id_Localidad: number;
+  localidad: number;
+  id_localidad: number;
 }
 
 export interface Resultado {
@@ -54,4 +55,12 @@ export interface Jugador{
   apellido: string;
   edad: number;
   id_Equipo: number;
+}
+export interface Permiso{
+  id_Permiso: number;
+  nombre: string;
+}
+export interface Rol{
+  id_Rol: number;
+  nombre:string;
 }

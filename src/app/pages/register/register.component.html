@@ -1,0 +1,104 @@
+<div class="register-page">
+  <div class="register-container">
+    <div class="register-header">
+      <h1 class="register-title">🏀 Tablero Deportivo</h1>
+      <p class="register-subtitle">Crea tu cuenta para comenzar</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <!-- Campo Nombre -->
+      <div class="form-group">
+        <label for="nombre" class="form-label">Nombre de Usuario</label>
+        <div class="input-wrapper">
+          <input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            class="form-input"
+            [class.error]="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched"
+            placeholder="Ingresa tu nombre de usuario"
+            autocomplete="username"
+          >
+          <span class="input-icon">👤</span>
+        </div>
+        <div class="error-message" *ngIf="getFieldError('nombre')">
+          {{ getFieldError('nombre') }}
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="form-group">
+        <label for="contrasena" class="form-label">Contraseña</label>
+        <div class="input-wrapper">
+          <input
+            id="contrasena"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="contrasena"
+            class="form-input"
+            [class.error]="registerForm.get('contrasena')?.invalid && registerForm.get('contrasena')?.touched"
+            placeholder="Crea una contraseña segura"
+            autocomplete="new-password"
+          >
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          >
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <div class="error-message" *ngIf="getFieldError('contrasena')">
+          {{ getFieldError('contrasena') }}
+        </div>
+      </div>
+
+      <!-- Campo Rol -->
+      <div class="form-group">
+        <label for="rol" class="form-label">Rol</label>
+        <div class="input-wrapper">
+          <select
+            id="rol"
+            formControlName="rol"
+            class="form-input"
+            [class.error]="registerForm.get('rol')?.invalid && registerForm.get('rol')?.touched"
+          >
+            <option value="">Selecciona un rol</option>
+          @for (item of roles; track $index) {
+            <option [value]="item.id_Rol">{{ item.nombre }}</option>
+          }
+          </select>
+          <span class="input-icon">👥</span>
+        </div>
+        <div class="error-message" *ngIf="getFieldError('rol')">
+          {{ getFieldError('rol') }}
+        </div>
+      </div>
+
+      <!-- Error general -->
+      <div class="error-message error-message--general" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botón de envío -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-register"
+        [disabled]="isLoading || registerForm.invalid"
+      >
+        <span *ngIf="!isLoading">Crear Cuenta</span>
+        <span *ngIf="isLoading" class="loading">
+          <span class="spinner"></span>
+          Creando cuenta...
+        </span>
+      </button>
+    </form>
+
+    <div class="register-footer">
+      <p class="register-help">
+        ¿Ya tienes cuenta?
+        <a routerLink="/inicio_sesion" class="login-link">Inicia sesión aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

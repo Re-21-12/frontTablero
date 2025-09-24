@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PartidoService {
-  private base = `${environment.apiBaseUrl}/Partido`;
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Partido`;
   constructor(private http: HttpClient) {}
 
   getAll(): Observable<any[]> {

@@ -8,22 +8,21 @@
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <!-- Campo Usuario -->
       <div class="form-group">
-        <label for="Usuario" class="form-label">Usuario</label>
+        <label for="nombre" class="form-label">Usuario</label>
         <div class="input-wrapper">
           <input
-            id="Usuario"
+            id="nombre"
             type="text"
-            style="color: black"
             formControlName="nombre"
             class="form-input"
-            [class.error]="loginForm.get('Usuario')?.invalid && loginForm.get('Usuario')?.touched"
+            [class.error]="loginForm.get('nombre')?.invalid && loginForm.get('nombre')?.touched"
             placeholder="Ingresa tu usuario"
-            autocomplete="Usuario"
+            autocomplete="nombre"
           >
           <span class="input-icon">👤</span>
         </div>
-        <div class="error-message" *ngIf="getFieldError('Usuario')">
-          {{ getFieldError('Usuario') }}
+        <div class="error-message" *ngIf="getFieldError('nombre')">
+          {{ getFieldError('nombre') }}
         </div>
       </div>
 
@@ -35,7 +34,6 @@
             id="contrasena"
             [type]="showPassword ? 'text' : 'password'"
             formControlName="contrasena"
-            style="color: black"
             class="form-input"
             [class.error]="loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched"
             placeholder="Ingresa tu contraseña"
@@ -75,7 +73,7 @@
     </form>
 
     <div class="login-footer">
-      <p class="login-help">¿Problemas para acceder? Contacta al administrador</p>
+      <p class="login-help">¿No posees una cuenta todavía? <a class="login-link" routerLink="/registro">Registrarse</a></p>
     </div>
   </div>
 </div>

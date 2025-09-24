@@ -14,7 +14,7 @@
       <label class="label">Localidad</label>
       <select class="input" [(ngModel)]="partLocalidadId">
         <option [ngValue]="null">Seleccionar</option>
-        <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">
+        <option *ngFor="let l of localidades()" [ngValue]="l.id">
           {{ l.nombre }}
         </option>
       </select>
@@ -22,9 +22,10 @@
 
     <div class="field">
       <label class="label">Equipo Local</label>
-      <select class="input" [(ngModel)]="partLocalId">
+      <select class="input" [(ngModel)]="equipoLocal">
+
         <option [ngValue]="null">Seleccionar</option>
-        <option *ngFor="let e of equipos()" [ngValue]="e.id_Equipo">
+        <option *ngFor="let e of equipos()" [ngValue]="e">
           {{ e.nombre }}
         </option>
       </select>
@@ -32,10 +33,10 @@
 
     <div class="field">
       <label class="label">Equipo Visitante</label>
-      <select class="input" [(ngModel)]="partVisitId">
+      <select class="input" [(ngModel)]="equipoVisitante">
         <option [ngValue]="null">Seleccionar</option>
         <ng-container *ngFor="let e of equipos()">
-          <option *ngIf="e.id_Equipo !== partLocalId" [ngValue]="e.id_Equipo">
+          <option  [ngValue]="e">
             {{ e.nombre }}
           </option>
         </ng-container>
@@ -48,8 +49,7 @@
         class="btn"
         (click)="crearPartido()"
         [disabled]="
-          !fechaHoraLocal || !partLocalidadId || !partLocalId || !partVisitId ||
-          partLocalId === partVisitId
+          !fechaHoraLocal || !partLocalidadId || !equipoLocal() || !equipoVisitante()
         "
       >
         Crear
@@ -58,7 +58,7 @@
   </div>
 
   <small class="form-hint error"
-         *ngIf="partLocalId && partVisitId && partLocalId === partVisitId">
+         *ngIf="equipoLocal() && equipoVisitante() && equipoLocal()?.id_Equipo === equipoVisitante()?.id_Equipo">
     El equipo local y visitante no pueden ser el mismo.
   </small>
 
@@ -67,9 +67,9 @@
       <li class="row-item" *ngFor="let p of partidos()">
         <span class="mono">#{{ p.id_Partido }}</span>
         <span class="name">{{ p.fechaHora }}</span>
-        <span class="muted">Localidad: {{ p.id_Localidad }}</span>
+        <span class="muted">Localidad: {{ p.localidad }}</span>
         <span class="muted">|</span>
-        <span class="muted">{{ p.id_Local }} vs {{ p.id_Visitante }}</span>
+        <span class="muted">{{ p.local }} vs {{ p.visitante }}</span>
       </li>
     </ul>
   </div>

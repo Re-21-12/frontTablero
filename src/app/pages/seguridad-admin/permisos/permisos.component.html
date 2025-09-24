@@ -1,0 +1,48 @@
+<h3>Permisos</h3>
+
+<div class="toolbar">
+  <input class="input"
+         [ngModel]="q()"
+         (ngModelChange)="q.set($event)"
+         placeholder="Buscar permiso">
+  <button class="btn" (click)="nuevo()">Nuevo</button>
+</div>
+
+<div class="card form">
+  <div class="row">
+    <input class="input"
+           [ngModel]="formNombre()"
+           (ngModelChange)="formNombre.set($event)"
+           placeholder="Nombre del permiso (ej: users.read)">
+    <button class="btn primary" (click)="guardar()">
+      {{ editingId() ? 'Guardar cambios' : 'Agregar' }}
+    </button>
+  </div>
+</div>
+
+<div *ngIf="cargando()" class="hint">Cargando…</div>
+<div *ngIf="error()" class="error">{{ error() }}</div>
+
+<table class="table" *ngIf="!cargando() && filtrados().length">
+  <thead>
+    <tr>
+      <th style="width:80px;">ID</th>
+      <th>Nombre</th>
+      <th style="width:180px;">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let p of filtrados()">
+      <td>{{ getId(p) || '—' }}</td>
+      <td>{{ getNombre(p) }}</td>
+      <td class="actions">
+        <button class="btn" (click)="editar(p)">Editar</button>
+        <button class="btn warn" (click)="borrar(getId(p))" [disabled]="!getId(p)">Borrar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!cargando() && !filtrados().length" class="hint">
+  No hay permisos para mostrar.
+</div>

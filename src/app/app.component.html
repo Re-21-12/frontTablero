@@ -1,12 +1,12 @@
 <header class="pro-appbar">
   <div class="pro-appbar__inner">
-    <!-- Botón del sidebar -->
+    <!-- Botón del sidebar - Solo mostrar si hay navegación disponible -->
     <button
+      *ngIf="shouldShowNavigation"
       class="sidebar-toggle"
       (click)="toggleSidebar()"
       aria-label="Abrir menú"
-      title="Menú de navegación"
-    >
+      title="Menú de navegación">
       <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
       </svg>
@@ -15,7 +15,7 @@
     <a class="pro-brand" routerLink="/seleccion" aria-label="Inicio">
       <span class="pro-brand__title">Tablero</span>
       <span class="pro-brand__section">
-        {{ router.url.startsWith('/admin') ? 'Administración' : 'Marcador' }}
+        {{ getCurrentSectionName() }}
       </span>
     </a>
 
@@ -25,8 +25,7 @@
         class="theme-toggle"
         (click)="toggleTheme()"
         [attr.aria-label]="isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
-        [title]="isDarkMode() ? 'Modo claro' : 'Modo oscuro'"
-      >
+        [title]="isDarkMode() ? 'Modo claro' : 'Modo oscuro'">
         <svg *ngIf="isDarkMode()" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
           <path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.166a.75.75 0 00-1.06-1.06l-1.591 1.59a.75.75 0 101.06 1.061l1.591-1.59zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.834 18.894a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 10-1.061 1.06l1.59 1.591zM12 18a.75.75 0 01.75.75V21a.75.75 0 01-1.5 0v-2.25A.75.75 0 0112 18zM7.758 17.303a.75.75 0 00-1.061-1.06l-1.591 1.59a.75.75 0 001.06 1.061l1.591-1.59zM6 12a.75.75 0 01-.75.75H3a.75.75 0 010-1.5h2.25A.75.75 0 016 12zM6.697 7.757a.75.75 0 001.06-1.06l-1.59-1.591a.75.75 0 00-1.061 1.06l1.59 1.591z"/>
         </svg>
@@ -36,20 +35,45 @@
       </button>
 
       <nav class="pro-nav" role="navigation" aria-label="Principal">
-        <a
-          routerLink="/seleccion"
-          class="pro-chip"
-          routerLinkActive="is-active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          [class.is-hidden]="router.url.startsWith('/seleccion')"
-        >Marcador</a>
+        <!-- Navegación condicional basada en autenticación -->
+        <ng-container *ngIf="!isAuthenticated">
+          <!-- Links para usuarios no autenticados -->
+          <a
+            routerLink="/seleccion"
+            class="pro-chip"
+            routerLinkActive="is-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            [class.is-hidden]="_router.url.startsWith('/seleccion')"
+          >Marcador</a>
+          <a
+            routerLink="/inicio_sesion"
+            class="pro-chip"
+            routerLinkActive="is-active"
+            [class.is-hidden]="_router.url.startsWith('/inicio_sesion')"
+          >Iniciar sesión</a>
+          <a
+            routerLink="/registro"
+            class="pro-chip"
+            routerLinkActive="is-active"
+            [class.is-hidden]="_router.url.startsWith('/registro')"
+          >Registrarse</a>
+        </ng-container>
 
-        <a
-          routerLink="/admin"
-          class="pro-chip"
-          routerLinkActive="is-active"
-          [class.is-hidden]="router.url.startsWith('/admin')"
-        >Admin</a>
+        <ng-container *ngIf="isAuthenticated">
+          <!-- Links para usuarios autenticados -->
+          <a
+            routerLink="/seleccion"
+            class="pro-chip"
+            routerLinkActive="is-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            [class.is-hidden]="_router.url.startsWith('/seleccion')"
+          >Marcador</a>
+          <button
+            class="pro-chip"
+            (click)="logout()"
+            type="button"
+          >Cerrar sesión</button>
+        </ng-container>
       </nav>
     </div>
   </div>
@@ -59,10 +83,11 @@
     <i></i><i></i>
   </div>
 </header>
+<app-global-loader></app-global-loader>
 
-<!-- Sidebar -->
+<!-- Sidebar - Solo mostrar si hay navegación disponible -->
 <div class="sidebar-overlay" *ngIf="sidebarOpen()" (click)="closeSidebar()"></div>
-<aside class="sidebar" [class.is-open]="sidebarOpen()" (click)="onSidebarClick($event)">
+<aside class="sidebar" [class.is-open]="sidebarOpen()" (click)="onSidebarClick($event)" *ngIf="shouldShowNavigation">
   <div class="sidebar-header">
     <h3>Navegación</h3>
     <button class="sidebar-close" (click)="closeSidebar()" aria-label="Cerrar menú">
@@ -73,33 +98,15 @@
   </div>
 
   <nav class="sidebar-nav">
-    <div class="nav-section">
-      <h4>Tablero</h4>
-      <a routerLink="/seleccion" (click)="closeSidebar()">Selección</a>
-      <a routerLink="/tablero" (click)="closeSidebar()">Marcador</a>
-      <a routerLink="/resultado" (click)="closeSidebar()">Resultado</a>
-    </div>
-
-    <div class="nav-section">
-      <h4>Administración</h4>
-      <a routerLink="/admin" (click)="closeSidebar()">Panel Admin</a>
-      <a routerLink="/admin/usuarios" (click)="closeSidebar()">Usuarios</a>
-      <a routerLink="/admin/roles" (click)="closeSidebar()">Roles</a>
-      <a routerLink="/admin/permisos" (click)="closeSidebar()">Permisos</a>
-    </div>
-
-    <div class="nav-section">
-      <h4>Gestión</h4>
-      <a routerLink="/admin/equipos" (click)="closeSidebar()">Equipos</a>
-      <a routerLink="/admin/localidades" (click)="closeSidebar()">Localidades</a>
-      <a routerLink="/admin/partidos" (click)="closeSidebar()">Partidos</a>
-      <a routerLink="/admin/cuartos" (click)="closeSidebar()">Cuartos</a>
-      <a routerLink="/login" (click)= "closeSidebar()" >Login</a>
-    </div>
-
-    <div class="nav-section">
-      <h4>Recursos</h4>
-      <a routerLink="/admin/imagenes" (click)="closeSidebar()">Imágenes</a>
+    <div class="nav-section" *ngFor="let section of navigationSections()">
+      <h4>{{ section.title }}</h4>
+      <a
+        *ngFor="let item of section.items"
+        [routerLink]="item.route"
+        (click)="closeSidebar()"
+        routerLinkActive="active">
+        {{ item.label }}
+      </a>
     </div>
   </nav>
 </aside>

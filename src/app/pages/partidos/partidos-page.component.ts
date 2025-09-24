@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, model, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EquipoService } from '../../core/services/equipo.service';
@@ -16,12 +16,12 @@ import { NotifyService } from '../shared/notify.service';
 })
 export class PartidosPageComponent implements OnInit {
   fechaHoraLocal = '';
-  partLocalidadId?: number;
-  partLocalId?: number;
-  partVisitId?: number;
+  partLocalidadId = model<number>();
 
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
+  equipoLocal = model<Equipo>();
+  equipoVisitante = model<Equipo>();
   partidos = signal<any[]>([]);
 
   private eqService   = inject(EquipoService);
@@ -47,26 +47,34 @@ export class PartidosPageComponent implements OnInit {
   }
 
   crearPartido() {
-    if (!this.fechaHoraLocal || !this.partLocalidadId || !this.partLocalId || !this.partVisitId) {
+    if (!this.fechaHoraLocal || !this.partLocalidadId ) {
       this.notify.info('Completa todos los campos'); return;
     }
-    if (this.partLocalId === this.partVisitId) {
+
+    const eqLocal = this.equipoLocal();
+    const eqVisitante = this.equipoVisitante();
+
+    if (!eqLocal || !eqVisitante) {
+      this.notify.info('Selecciona ambos equipos'); return;
+    }
+
+    if (eqLocal.id_Equipo === eqVisitante.id_Equipo) {
       this.notify.info('El equipo local y visitante no pueden ser el mismo'); return;
     }
 
     const payload = {
       fechaHora: this.toLocalIso(this.fechaHoraLocal),
-      id_Localidad: this.partLocalidadId,
-      id_Local: this.partLocalId,
-      id_Visitante: this.partVisitId
+      id: this.partLocalidadId,
+      id_Local: eqLocal.id_Equipo,
+      id_Visitante: eqVisitante.id_Equipo
     };
 
     this.partService.create(payload).subscribe({
       next: () => {
         this.fechaHoraLocal = '';
-        this.partLocalidadId = undefined;
-        this.partLocalId = undefined;
-        this.partVisitId = undefined;
+        this.partLocalidadId.set(undefined);
+        this.equipoLocal.set(undefined);
+        this.equipoVisitante.set(undefined);
         this.notify.success('Agregado correctamente');
         this.cargar();
       },

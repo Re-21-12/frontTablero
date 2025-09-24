@@ -4,10 +4,12 @@
   </div>
 
   <nav class="toolbar nav">
-    <a routerLink="localidades" routerLinkActive="active"class="btn">Localidades</a>
-    <a routerLink="equipos" routerLinkActive="active" class="btn">Equipos</a>
-    <a routerLink="partidos" routerLinkActive="active" class="btn">Partidos</a>
-    <a routerLink="jugadores" routerLinkActive="active" class="btn">Jugadores</a>
+    <a *ngIf="canViewLocalidades()" routerLink="localidades" routerLinkActive="active" class="btn">Localidades</a>
+    <a *ngIf="canViewEquipos()" routerLink="equipos" routerLinkActive="active" class="btn">Equipos</a>
+    <a *ngIf="canViewPartidos()" routerLink="partidos" routerLinkActive="active" class="btn">Partidos</a>
+    <a *ngIf="canViewJugadores()" routerLink="jugadores" routerLinkActive="active" class="btn">Jugadores</a>
+    <a *ngIf="canViewUsuarios()" routerLink="usuarios" routerLinkActive="active" class="btn">Usuarios</a>
+    <a *ngIf="canViewRoles()" routerLink="roles" routerLinkActive="active" class="btn">Roles</a>
   </nav>
 </header>
 

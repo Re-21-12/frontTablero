@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class TableroService {
-  private base = `${environment.apiBaseUrl}/Tablero`;
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Tablero`;
 
   private _equiposSeleccionados: Equipo[] = [];
   id_partido: string = '';

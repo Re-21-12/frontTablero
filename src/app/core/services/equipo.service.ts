@@ -6,7 +6,7 @@ import { Equipo } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class EquipoService {
-  private base = `${environment.apiBaseUrl}/Equipo`;
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Equipo`;
 
   constructor(private http: HttpClient) {}
 
@@ -35,7 +35,7 @@ export class EquipoService {
   }
 
 
-  getByLocalidad(id_Localidad: number): Observable<Equipo[]> {
-    return this.http.get<Equipo[]>(`${this.base}/Localidad/${id_Localidad}`);
+  getByLocalidad(id: number): Observable<Equipo[]> {
+    return this.http.get<Equipo[]>(`${this.base}/Localidad/${id}`);
   }
 }

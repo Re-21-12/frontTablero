@@ -97,7 +97,7 @@ export class HomePageComponent implements OnInit {
 
   getLocalidad(){
     const s = this._tableroService.getEquiposSeleccionados() ?? [];
-    const localidadId = s[0]?.id_Localidad;
+    const localidadId = s[0]?.id_localidad;
     if (localidadId) { this._localidadService.get(localidadId).subscribe(loc => this.locNombre = loc.nombre); }
     this.equipoLocalNombre = s[0]?.nombre ?? '';
     this.equipoVisitNombre = s[1]?.nombre ?? '';
@@ -307,10 +307,10 @@ export class HomePageComponent implements OnInit {
       return;
     }
     const payload: Itabler = {
-      localidad: { id_Localidad: 0, nombre: this.locNombre.trim() },
-      local:     { id_Equipo:0, nombre: this.equipoLocalNombre.trim(), id_Localidad:0, localidad: { id_Localidad:0, nombre: this.locNombre.trim() } },
-      visitante: { id_Equipo:0, nombre: this.equipoVisitNombre.trim(), id_Localidad:0, localidad: { id_Localidad:0, nombre: this.locNombre.trim() } },
-      partido:   { fechaHora: new Date(this.fechaHoraLocal), id_Localidad: 0, id_Local: 0, id_Visitante: 0 },
+      localidad: { id: 0, nombre: this.locNombre.trim() },
+      local:     { id_Equipo:0, nombre: this.equipoLocalNombre.trim(), id:0, localidad: { id:0, nombre: this.locNombre.trim() } },
+      visitante: { id_Equipo:0, nombre: this.equipoVisitNombre.trim(), id:0, localidad: { id:0, nombre: this.locNombre.trim() } },
+      partido:   { fechaHora: new Date(this.fechaHoraLocal), id: 0, id_Local: 0, id_Visitante: 0 },
       cuartos: this.cuartos.map(q => ({
         id_Cuarto: 0, no_Cuarto: q.no_Cuarto, total_Punteo: Number(q.total_Punteo)||0,
         total_Faltas: Number(q.total_Faltas)||0, id_Partido: 0, id_Equipo: 0, duenio: q.duenio

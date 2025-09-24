@@ -55,3 +55,11 @@ export interface Jugador{
   edad: number;
   id_Equipo: number;
 }
+export interface Permiso{
+  id_Permiso: number;
+  nombre: string;
+}
+export interface Rol{
+  id_Rol: number;
+  nombre:string;
+}

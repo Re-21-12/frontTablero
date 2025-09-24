@@ -46,3 +46,13 @@ export const Rol = [
   'Rol:Eliminar',
   'Rol:Consultar'
 ]
+export const Permisos = [
+  ...Localidad,
+  ...Equipo,
+  ...Partido,
+  ...Jugador,
+  ...Usuario,
+  ...Imagen,
+  ...Cuarto,
+  ...Rol
+]

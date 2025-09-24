@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { JugadorService, Jugador } from '../../core/services/jugador.service';
 import { EquipoService } from '../../core/services/equipo.service';
 import { PaisService } from '../../core/services/country.service';
+import { NotifyService } from '../shared/notify.service';
 
 @Component({
   standalone: true,
@@ -26,13 +27,14 @@ export class JugadoresPageComponent implements OnInit {
   nacionalidad = '';
   edad?: number;
   idEquipo?: number;
-
+  errorNombre = '';
   idCrud?: number;
   loading = signal(false);
 
   private jugSvc = inject(JugadorService);
   private eqSvc  = inject(EquipoService);
   private paisSvc = inject(PaisService);
+  private notify = inject(NotifyService);
 
   ngOnInit(): void {
     this.cargarEquipos();

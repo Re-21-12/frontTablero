@@ -23,7 +23,6 @@
   color: #d6e6ff; border-radius: 10px; padding: 8px 12px; cursor: pointer;
 }
 .btn.primary { background: #1ee9c9; color: #062126; font-weight: 700; }
-.btn.warn { background: #e14b4b1f; border-color: #e14b4b66; color: #ffbcbc; }
 
 .table {
   width: 100%; border-collapse: collapse; overflow: hidden;
@@ -35,7 +34,10 @@
 }
 .table tbody td { padding: 10px; border-top: 1px solid rgba(255,255,255,0.05); }
 .table tbody tr:hover { background: rgba(255,255,255,0.03); }
-.actions { display: flex; gap: 8px; }
 
-.hint { opacity: .8; font-size: .95rem; margin: 8px 0; }
-.error { color: #ffbcbc; }
+.thumb {
+  max-width: 120px;
+  max-height: 70px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+}

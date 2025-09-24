@@ -80,6 +80,22 @@ export const routes: Routes = [
   title: 'Administración (Seguridad)'
 },
 
-
+{
+  path: 'recursos',
+  loadComponent: () =>
+    import('./pages/recursos/recursos-page.component')
+      .then(m => m.RecursosPageComponent),
+  title: 'Recursos',
+  children: [
+    { path: '', redirectTo: 'imagenes', pathMatch: 'full' },
+    {
+      path: 'imagenes',
+      loadComponent: () =>
+        import('./pages/recursos/imagenes/imagenes.component')
+          .then(m => m.ImagenesComponent),
+      title: 'Imágenes'
+    }
+  ]
+},
   { path: '**', redirectTo: 'seleccion' }
 ];

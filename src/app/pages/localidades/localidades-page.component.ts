@@ -15,6 +15,8 @@ import { NotifyService } from '../shared/notify.service';
 export class LocalidadesPageComponent implements OnInit {
 
   locNombre = '';
+  errorNombre = '';
+
   idCrud?: number;
 
   localidades = signal<Localidad[]>([]);
@@ -109,5 +111,21 @@ export class LocalidadesPageComponent implements OnInit {
   private resetForm(keepId = false) {
     this.locNombre = '';
     if (!keepId) this.idCrud = undefined;
+  }
+
+  validarNombre(valor: string) {
+
+    if (!valor.trim()) {
+      this.errorNombre = 'El nombre no puede estar vacío.';
+      this.notify.error(this.errorNombre);
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
+      this.errorNombre = 'El nombre solo puede contener letras y espacios.';
+      this.notify.error(this.errorNombre);
+    } else {
+      this.errorNombre = '';
+
+    }
+
+
   }
 }

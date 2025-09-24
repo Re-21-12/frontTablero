@@ -6,12 +6,12 @@
   <div class="toolbar form">
     <div class="field">
       <label class="label">Nombre</label>
-      <input class="input" [(ngModel)]="nombre" placeholder="Nombre" />
+      <input class="input" [(ngModel)]="nombre" placeholder="Nombre" (keyup)="validarNombre(nombre)" />
     </div>
 
     <div class="field">
       <label class="label">Apellido</label>
-      <input class="input" [(ngModel)]="apellido" placeholder="Apellido" />
+      <input class="input" [(ngModel)]="apellido" placeholder="Apellido" (keyup)="validarNombre(apellido)" />
     </div>
 
     <div class="field">
@@ -89,3 +89,5 @@
     </ul>
   </div>
 </section>
+
+

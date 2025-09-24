@@ -2,6 +2,10 @@ import { Routes } from '@angular/router';
 import { PermissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
+  {path: 'login', loadComponent: () => 
+    import ('../app/pages/login/login.component') .then((m => m.LoginComponent))
+    , title: 'Login'
+  },
   {
     path: 'tablero',
     loadComponent: () =>

@@ -6,7 +6,7 @@
 
   <div class="toolbar toolbar--one-row">
     <label class="label inline">Nombre</label>
-    <input class="input" placeholder="Nombre" [(ngModel)]="nombre" />
+    <input class="input" placeholder="Nombre" [(ngModel)]="nombre" (keyup)="validarNombre(nombre)" />
 
     <label class="label inline">Localidad</label>
 
@@ -37,4 +37,5 @@
       </li>
     </ul>
   </div>
+
 </section>

@@ -18,7 +18,7 @@ export class EquiposPageComponent implements OnInit {
   nombre = '';
   idLocalidad?: number;
   idCrud?: number;
-
+  errorNombre = '';
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
   loading = signal(false);
@@ -135,5 +135,19 @@ export class EquiposPageComponent implements OnInit {
     this.nombre = '';
     this.idLocalidad = undefined;
     if (!keepId) this.idCrud = undefined;
+  }
+
+  validarNombre(valor: string) {
+
+    if (!valor.trim()) {
+      this.errorNombre = 'El nombre no puede estar vacío.';
+      this.notify.error(this.errorNombre);
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/.test(valor)) {
+      this.errorNombre = 'El nombre solo puede contener letras y espacios.';
+      this.notify.error(this.errorNombre);
+    } else {
+      this.errorNombre = '';
+
+    }
   }
 }

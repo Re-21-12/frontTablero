@@ -7,39 +7,27 @@
 
   <div class="grid">
     @for (equipo of equipos; track equipo) {
-      <div
-        class="card equipo-card"
-        (click)="seleccionarEquipo(equipo)"
-        [class.is-selected]="estaSeleccionado(equipo)"
-        [class.is-disabled]="equiposSeleccionados.length === 2 && !estaSeleccionado(equipo)"
-        [attr.aria-pressed]="estaSeleccionado(equipo)"
-        role="button"
-        tabindex="0"
-      >
-        <div class="equipo-card__top">
-          <h3 class="equipo-titulo">{{ equipo.nombre }}</h3>
+    <div class="card equipo-card" (click)="seleccionarEquipo(equipo)" [class.is-selected]="estaSeleccionado(equipo)"
+      [class.is-disabled]="equiposSeleccionados.length === 2 && !estaSeleccionado(equipo)"
+      [attr.aria-pressed]="estaSeleccionado(equipo)" role="button" tabindex="0">
+      <div class="equipo-card__top">
+        <h3 class="equipo-titulo">{{ equipo.nombre }}</h3>
 
-          <!-- etiquetas de rol cuando está seleccionado -->
-          <span
-            class="chip chip--primary"
-            *ngIf="equiposSeleccionados[0]?.id_Equipo === equipo.id_Equipo"
-          >
-            Local
-          </span>
-          <span
-            class="chip chip--warning"
-            *ngIf="equiposSeleccionados[1]?.id_Equipo === equipo.id_Equipo"
-          >
-            Visitante
-          </span>
-        </div>
-
-        <div class="meta"><span class="k">Localidad ID:</span> {{ equipo.localidad }}</div>
-
-        <div *ngIf="estaSeleccionado(equipo)" class="badge badge-selected">
-          ✓ Seleccionado
-        </div>
+        <!-- etiquetas de rol cuando está seleccionado -->
+        <span class="chip chip--primary" *ngIf="equiposSeleccionados[0]?.id_Equipo === equipo.id_Equipo">
+          Local
+        </span>
+        <span class="chip chip--warning" *ngIf="equiposSeleccionados[1]?.id_Equipo === equipo.id_Equipo">
+          Visitante
+        </span>
       </div>
+
+      <div class="meta"><span class="k">Localidad ID:</span> {{ equipo.localidad }}</div>
+
+      <div *ngIf="estaSeleccionado(equipo)" class="badge badge-selected">
+        ✓ Seleccionado
+      </div>
+    </div>
     }
   </div>
 
@@ -48,18 +36,47 @@
     <div class="picked">
       <div class="picked__item" *ngIf="equiposSeleccionados[0] as l">
         <span class="tag tag--primary">Local</span> {{ l.nombre }}
+
+
       </div>
+
       <div class="picked__item" *ngIf="equiposSeleccionados[1] as v">
         <span class="tag tag--warning">Visitante</span> {{ v.nombre }}
+
       </div>
+
     </div>
 
-    <button
-      class="btn btn-primary btn-lg"
-      (click)="createPartido()"
-      [disabled]="equiposSeleccionados.length !== 2"
-    >
+    <button class="btn btn-primary btn-lg" (click)="createPartido()" [disabled]="equiposSeleccionados.length !== 2">
       Subir
     </button>
+
+  </div>
+
+  <br>
+  <div *ngIf="equiposSeleccionados[0] || equiposSeleccionados[1]" class="card" role="region"
+    aria-label="Cuadro con dos listas lado a lado">
+    <div class="side-by-side">
+      <div *ngIf="equiposSeleccionados[0]" class="col" role="group" aria-label="Lista B">
+        <h3>Jugadores, {{equiposSeleccionados[0].nombre}} </h3>
+        <div class="jugadores">
+          <div class="card equipo-card" role="region" *ngFor="let a of locales()">
+            {{ a.nombre }}  {{a.apellido}}, Estatura: {{a.estatura}}, Posición: {{a.posicion}}, Edad: {{a.edad}}
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="equiposSeleccionados[1]" class="col" role="group" aria-label="Lista B">
+        <h3>Jugadores, {{equiposSeleccionados[1].nombre}}</h3>
+        <div class="jugadores">
+          <div class="card equipo-card" role="region" *ngFor="let a of visitantes()">
+            {{ a.nombre }}  {{a.apellido}}, Estatura: {{a.estatura}}, Posición: {{a.posicion}}, Edad: {{a.edad}}
+          </div>
+        </div>
+      </div>
+
+
+    </div>
   </div>
 </div>

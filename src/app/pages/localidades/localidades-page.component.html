@@ -3,27 +3,25 @@
     <h2 class="panel__title">Localidades</h2>
   </header>
 
-<div class="toolbar toolbar--one-row">
-  <!-- Nombre -->
-  <label class="label inline">Nombre</label>
-  <input class="input" placeholder="Nombre" [(ngModel)]="locNombre" />
+  
+  <div class="toolbar toolbar--one-row">
+    <label class="label">Nombre</label>
+    <input class="input" placeholder="Nombre" [(ngModel)]="locNombre" (keyup)="validarNombre(locNombre)" />
 
-  <!-- Agregar -->
-  <button class="btn"
-          (click)="crearLocalidad()"
-          [disabled]="!locNombre.trim() || loading()">
-    {{ loading() ? 'Guardando…' : 'Agregar' }}
-  </button>
+    <!-- Agregar -->
+    <button class="btn" (click)="crearLocalidad()" [disabled]="!locNombre.trim() || loading()||errorNombre">
+      {{ loading() ? 'Guardando…' : 'Agregar' }}
+    </button>
 
-  <!-- ID -->
-  <label class="label inline">ID</label>
-  <input class="input input--id" type="number" [(ngModel)]="idCrud" placeholder="#ID" />
+    <!-- ID -->
+    <label class="label inline">ID</label>
+    <input class="input input--id" type="number" [(ngModel)]="idCrud" placeholder="#ID" />
 
-  <!-- Acciones -->
-  <button class="btn btn--ghost" (click)="buscarPorId()"  [disabled]="!idCrud || loading()">Buscar</button>
-  <button class="btn btn--ghost" (click)="editarLocalidad()"
-          [disabled]="!idCrud || !locNombre.trim() || loading()">Editar</button>
-  <button class="btn btn--ghost danger" (click)="borrarPorId()" [disabled]="!idCrud || loading()">Borrar</button>
+    <!-- Acciones -->
+    <button class="btn btn--ghost" (click)="buscarPorId()" [disabled]="!idCrud || loading()">Buscar</button>
+    <button class="btn btn--ghost" (click)="editarLocalidad()"
+      [disabled]="!idCrud || !locNombre.trim() || loading()">Editar</button>
+    <button class="btn btn--ghost danger" (click)="borrarPorId()" [disabled]="!idCrud || loading()">Borrar</button>
   </div>
 
 
@@ -36,4 +34,5 @@
       </li>
     </ul>
   </div>
+
 </section>

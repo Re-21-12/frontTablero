@@ -24,4 +24,5 @@ export class JugadorService {
   create(body: Jugador){ return this.http.post(this.base, body); }
   update(body: Jugador){ return this.http.put(this.base, body); }
   delete(id: number)   { return this.http.delete(`${this.base}/${id}`); }
+  getByTeam(id_Equipo: number){return this.http.get<Jugador[]>(`${this.base}/byTeam/${id_Equipo}`);}
 }

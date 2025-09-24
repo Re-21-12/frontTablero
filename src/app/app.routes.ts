@@ -72,6 +72,30 @@ export const routes: Routes = [
         .then((m) => m.ResultadoPageComponent),
     title: 'Resultado'
   },
+  {
+  path: 'admin/seguridad',
+  loadComponent: () =>
+    import('./pages/seguridad-admin/seguridad-admin-page/seguridad-admin-page.component')
+      .then(m => m.SeguridadAdminPageComponent),
+  title: 'Administración (Seguridad)'
+},
 
+{
+  path: 'recursos',
+  loadComponent: () =>
+    import('./pages/recursos/recursos-page.component')
+      .then(m => m.RecursosPageComponent),
+  title: 'Recursos',
+  children: [
+    { path: '', redirectTo: 'imagenes', pathMatch: 'full' },
+    {
+      path: 'imagenes',
+      loadComponent: () =>
+        import('./pages/recursos/imagenes/imagenes.component')
+          .then(m => m.ImagenesComponent),
+      title: 'Imágenes'
+    }
+  ]
+},
   { path: '**', redirectTo: 'seleccion' }
 ];

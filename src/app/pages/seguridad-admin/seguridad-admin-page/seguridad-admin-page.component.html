@@ -1,0 +1,14 @@
+<section class="card">
+  <h2>Administración Seguridad</h2>
+  <div class="tabs">
+    <button (click)="setTab('usuarios')"  [class.active]="active()==='usuarios'">Usuarios</button>
+    <button (click)="setTab('roles')"     [class.active]="active()==='roles'">Roles</button>
+    <button (click)="setTab('permisos')"  [class.active]="active()==='permisos'">Permisos</button>
+  </div>
+</section>
+
+<section class="card">
+  <app-usuarios *ngIf="active()==='usuarios'"></app-usuarios>
+  <app-roles    *ngIf="active()==='roles'"></app-roles>
+  <app-permisos *ngIf="active()==='permisos'"></app-permisos>
+</section>

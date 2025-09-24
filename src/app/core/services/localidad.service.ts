@@ -30,7 +30,7 @@ export class LocalidadService {
   }
 
 
-  update(body: { id_Localidad: number; nombre: string }): Observable<Localidad | string> {
+  update(body: { id: number; nombre: string }): Observable<Localidad | string> {
     return this.http.put(this.base, body, { responseType: 'text' as const });
   }
 

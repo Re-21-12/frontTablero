@@ -27,7 +27,7 @@ export class TableroFacade {
           switchMap(() => this.locSvc.getAll()),
           map(list => {
             const l = list.find(x => x.nombre.toLowerCase() === nombreLoc.toLowerCase());
-            if (!l) throw new Error('No se pudo resolver id_Localidad');
+            if (!l) throw new Error('No se pudo resolver id');
             return l;
           })
         );
@@ -38,7 +38,7 @@ export class TableroFacade {
             map(list => list.find(x => x.nombre.toLowerCase() === e.nombre.toLowerCase())),
             switchMap(found => {
               if (found) return of(found);
-              return this.eqSvc.create({ nombre: e.nombre, id_Localidad: loc.id_Localidad }).pipe(
+              return this.eqSvc.create({ nombre: e.nombre, id_Localidad: loc.id }).pipe(
                 switchMap(() => this.eqSvc.getAll()),
                 map(list => {
                   const eq = list.find(x => x.nombre.toLowerCase() === e.nombre.toLowerCase());
@@ -61,7 +61,7 @@ export class TableroFacade {
         const fechaISO = new Date(it.partido.fechaHora).toISOString();
         const body = {
           fechaHora: fechaISO,
-          id_Localidad: loc.id_Localidad,
+          id: loc.id,
           id_Local: localTeam.id_Equipo,
           id_Visitante: visitTeam.id_Equipo
         };

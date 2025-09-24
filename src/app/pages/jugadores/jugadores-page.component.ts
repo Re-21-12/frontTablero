@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { JugadorService, Jugador } from '../../core/services/jugador.service';
 import { EquipoService } from '../../core/services/equipo.service';
+import { PaisService } from '../../core/services/country.service';
 
 @Component({
   standalone: true,
@@ -15,38 +16,55 @@ export class JugadoresPageComponent implements OnInit {
 
   jugadores = signal<Jugador[]>([]);
   equipos   = signal<{ id_Equipo: number; nombre: string }[]>([]);
+  paises    = signal<{ codigo: string; nombre: string }[]>([]);
 
-
+  // Campos del formulario
   nombre = '';
   apellido = '';
+  estatura?: number;
+  posicion = '';
+  nacionalidad = '';
   edad?: number;
   idEquipo?: number;
 
- 
   idCrud?: number;
-
   loading = signal(false);
 
   private jugSvc = inject(JugadorService);
   private eqSvc  = inject(EquipoService);
+  private paisSvc = inject(PaisService);
 
   ngOnInit(): void {
     this.cargarEquipos();
     this.cargarJugadores();
+    this.cargarPaises();
   }
 
   cargarEquipos()   { this.eqSvc.getAll().subscribe(e => this.equipos.set(e)); }
   cargarJugadores() { this.jugSvc.getAll().subscribe(j => this.jugadores.set(j)); }
+  cargarPaises() { this.paisSvc.getPaises().subscribe((p: any[]) => this.paises.set(p)); }
 
   crear() {
     const nombre = this.nombre.trim();
     const apellido = this.apellido.trim();
+    const estatura = Number(this.estatura);
+    const posicion = this.posicion.trim();
+    const nacionalidad = this.nacionalidad;
     const edad = Number(this.edad);
     const id_Equipo = Number(this.idEquipo);
 
-    if (!nombre || !apellido || !edad || !id_Equipo) return;
+    if (!nombre || !apellido || !estatura || !posicion || !nacionalidad || !edad || !id_Equipo) return;
 
-    const payload: Jugador = { nombre, apellido, edad, id_Equipo };
+    const payload: Jugador = {
+      nombre,
+      apellido,
+      estatura,
+      posicion,
+      nacionalidad,
+      edad,
+      id_Equipo
+    };
+
     this.loading.set(true);
     this.jugSvc.create(payload).subscribe({
       next: () => { this.resetForm(); this.cargarJugadores(); },
@@ -54,41 +72,54 @@ export class JugadoresPageComponent implements OnInit {
     });
   }
 
-
   buscarPorId() {
     const id = Number(this.idCrud);
     if (!id) return;
     this.loading.set(true);
     this.jugSvc.getById(id).subscribe({
       next: (j) => {
-
-        this.nombre   = j.nombre;
+        this.nombre = j.nombre;
         this.apellido = j.apellido;
-        this.edad     = j.edad;
+        this.estatura = j.estatura;
+        this.posicion = j.posicion;
+        this.nacionalidad = j.nacionalidad;
+        this.edad = j.edad;
         this.idEquipo = j.id_Equipo;
       },
       complete: () => this.loading.set(false)
     });
   }
 
-
   editar() {
     const id = Number(this.idCrud);
     if (!id) return;
     const nombre = this.nombre.trim();
     const apellido = this.apellido.trim();
+    const estatura = Number(this.estatura);
+    const posicion = this.posicion.trim();
+    const nacionalidad = this.nacionalidad;
     const edad = Number(this.edad);
     const id_Equipo = Number(this.idEquipo);
-    if (!nombre || !apellido || !edad || !id_Equipo) return;
 
-    const payload: Jugador = { id_Jugador: id, nombre, apellido, edad, id_Equipo };
+    if (!nombre || !apellido || !estatura || !posicion || !nacionalidad || !edad || !id_Equipo) return;
+
+    const payload: Jugador = {
+      id_Jugador: id,
+      nombre,
+      apellido,
+      estatura,
+      posicion,
+      nacionalidad,
+      edad,
+      id_Equipo
+    };
+
     this.loading.set(true);
     this.jugSvc.update(payload).subscribe({
       next: () => { this.resetForm(); this.cargarJugadores(); },
       complete: () => this.loading.set(false)
     });
   }
-
 
   borrarPorId() {
     const id = Number(this.idCrud);
@@ -102,7 +133,6 @@ export class JugadoresPageComponent implements OnInit {
     });
   }
 
-
   borrar(j: Jugador) {
     if (!j.id_Jugador) return;
     if (!confirm(`¿Eliminar jugador #${j.id_Jugador}?`)) return;
@@ -112,6 +142,9 @@ export class JugadoresPageComponent implements OnInit {
   private resetForm(keepId = false) {
     this.nombre = '';
     this.apellido = '';
+    this.estatura = undefined;
+    this.posicion = '';
+    this.nacionalidad = '';
     this.edad = undefined;
     this.idEquipo = undefined;
     if (!keepId) this.idCrud = undefined;

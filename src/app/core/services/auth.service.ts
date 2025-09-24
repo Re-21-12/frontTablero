@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, timer, of, throwError } from 'rxjs';
 import { switchMap, tap, catchError, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, RegisterRequest, RefreshTokenRequest, RefreshTokenResponse } from '../interfaces/auth-interface';
+import { LoginRequest, LoginResponse, RegisterRequest, RefreshTokenRequest, RefreshTokenResponse, Permiso } from '../interfaces/auth-interface';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,8 @@ export class AuthService {
   private readonly refreshTokenKey = 'refresh_token';
   private readonly userKey = 'auth_user';
   private readonly expirationKey = 'token_expiration';
+  private readonly permissionsKey = 'auth_permissions';
+  private readonly roleKey = 'auth_role';
 
   private refreshTokenInProgress = false;
   private refreshTokenSubject = new BehaviorSubject<string | null>(null);
@@ -51,18 +53,38 @@ export class AuthService {
   saveLoginData(response: LoginResponse): void {
     if (!this.isBrowser()) return;
 
-    const expirationTime = Date.now() + (response.expiresIn * 1000);
+    // Validar que expiresIn sea un número válido
+    const expiresIn = Number(response.expiresIn);
+    if (isNaN(expiresIn) || expiresIn <= 0) {
+      console.error('Invalid expiresIn value:', response.expiresIn);
+      return;
+    }
 
+    // Convertir expiresIn de minutos a millisegundos
+    const expirationTime = Date.now() + (expiresIn * 60 * 1000);
+
+    // Guardar información básica del usuario
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refresToken);
     localStorage.setItem(this.expirationKey, expirationTime.toString());
+
+    // Guardar información del usuario
     localStorage.setItem(
       this.userKey,
       JSON.stringify({
-        nombre: response.nombre,
-        rol: response.role?.nombre
+        nombre: response.nombre
       })
     );
+
+    // Guardar rol completo
+    if (response.rol) {
+      localStorage.setItem(this.roleKey, JSON.stringify(response.rol));
+    }
+
+    // Guardar permisos
+    if (response.permisos && response.permisos.length > 0) {
+      localStorage.setItem(this.permissionsKey, JSON.stringify(response.permisos));
+    }
   }
 
   private startTokenRefreshTimer(): void {
@@ -115,12 +137,9 @@ export class AuthService {
       refreshRequest
     ).pipe(
       tap(response => {
-        const loginResponse: LoginResponse = {
+        const loginResponse: any = {
           token: response.token,
           refresToken: response.refreshToken,
-          nombre: this.getUsername() || '',
-          role: { nombre: this.getRole() || '' },
-          expiresIn: 3600 // Valor por defecto, ajustar según API
         };
         this.handleAuthSuccess(loginResponse);
       }),
@@ -144,6 +163,8 @@ export class AuthService {
       localStorage.removeItem(this.refreshTokenKey);
       localStorage.removeItem(this.userKey);
       localStorage.removeItem(this.expirationKey);
+      localStorage.removeItem(this.permissionsKey);
+      localStorage.removeItem(this.roleKey);
     }
 
     this.refreshTokenSubject.next(null);
@@ -207,10 +228,69 @@ export class AuthService {
   }
 
   getRole(): string | null {
-    return this.getUser()?.rol ?? null;
+    const role = this.getRoleComplete();
+    return role?.nombre ?? null;
   }
 
-  private getUser(): { nombre: string; rol: string } | null {
+  getRoleId(): number | null {
+    const role = this.getRoleComplete();
+    return role?.id_rol ?? null;
+  }
+
+  getRoleComplete(): { id_rol: number; nombre: string } | null {
+    if (!this.isBrowser()) return null;
+
+    const roleData = localStorage.getItem(this.roleKey);
+    return roleData ? JSON.parse(roleData) : null;
+  }
+
+  getPermissions(): Permiso[] {
+    if (!this.isBrowser()) return [];
+
+    const permissionsData: Permiso[] = JSON.parse(localStorage.getItem(this.permissionsKey) || '[]');
+
+    // Eliminar todos los espacios en blanco de los nombres de los permisos
+    const cleanedPermissions = permissionsData.map(permission => ({
+      ...permission,
+      nombre: permission.nombre.replace(/\s+/g, '')
+    }));
+
+    console.log('Permisos del usuario obtenidos (espacios eliminados):', cleanedPermissions);
+    return cleanedPermissions;
+  }
+
+  hasPermission(permissionName: string): boolean {
+    const permissions = this.getPermissions();
+    return permissions.some(permission => {
+      console.log('Verificando permiso:', permission.nombre, 'contra', permissionName);
+      return permission.nombre === permissionName.replace(' ', '')
+    });
+  }
+
+  hasAnyPermission(permissionNames: string[]): boolean {
+    console.log('Verificando permisos:', permissionNames);
+    const permissions = this.getPermissions();
+    console.log('Permisos del usuario:', permissions);
+    const anyPermissions = permissionNames.some(permissionName =>{
+      console.log('Verificando permiso:', permissionName.trim());
+      return permissions.some(permission => permission.nombre.trim() === permissionName.trim())
+    }
+    );
+    console.log('Resultado de verificación de permisos:', anyPermissions);
+    return anyPermissions;
+  }
+
+  getPermissionsByAction(action: string): Permiso[] {
+    const permissions = this.getPermissions();
+    return permissions.filter(permission => permission.nombre.includes(action));
+  }
+
+  getPermissionsByModule(module: string): Permiso[] {
+    const permissions = this.getPermissions();
+    return permissions.filter(permission => permission.nombre.startsWith(module + ':'));
+  }
+
+  private getUser(): { nombre: string } | null {
     if (!this.isBrowser()) return null;
 
     const raw = localStorage.getItem(this.userKey);
@@ -239,5 +319,16 @@ export class AuthService {
     if (!expiration) return 0;
 
     return Math.max(0, expiration - Date.now());
+  }
+
+  // Método para obtener información completa del usuario autenticado
+  getCurrentUser(): { nombre: string; rol: { id_rol: number; nombre: string } | null; permisos: Permiso[] } | null {
+    if (!this.isAuthenticated()) return null;
+
+    return {
+      nombre: this.getUsername() || '',
+      rol: this.getRoleComplete(),
+      permisos: this.getPermissions()
+    };
   }
 }

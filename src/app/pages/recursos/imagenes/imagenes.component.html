@@ -2,6 +2,7 @@
 
 <div class="toolbar">
   <input class="input" [ngModel]="q()" (ngModelChange)="q.set($event)" placeholder="Buscar por URL">
+  <button class="btn" (click)="load()">Recargar</button>
 </div>
 
 <div class="card form">
@@ -9,31 +10,45 @@
     <input class="input"
            [ngModel]="formUrl()"
            (ngModelChange)="formUrl.set($event)"
-           placeholder="URL de la imagen">
+           placeholder="URL directa de imagen (ej: https://picsum.photos/400/300)">
     <button class="btn primary" (click)="guardar()">Agregar</button>
+  </div>
+  <div class="examples">
+    <small class="hint">
+      <strong>URLs válidas de ejemplo:</strong><br>
+      • https://picsum.photos/400/300<br>
+      • https://via.placeholder.com/400x300<br>
+      • https://images.unsplash.com/photo-xxx.jpg<br>
+      <strong>❌ No usar:</strong> Enlaces de Google Images, redirects, o URLs sin extensión de imagen
+    </small>
   </div>
 </div>
 
 <div *ngIf="cargando()" class="hint">Cargando…</div>
 <div *ngIf="error()" class="error">{{ error() }}</div>
 
-<table class="table" *ngIf="!cargando() && filtradas().length">
-  <thead>
-    <tr>
-      <th style="width:80px;">ID</th>
-      <th>URL</th>
-      <th style="width:150px;">Vista previa</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let i of filtradas()">
-      <td>{{ i.id_Imagen }}</td>
-      <td>{{ i.url }}</td>
-      <td><img [src]="i.url" alt="img" class="thumb"></td>
-    </tr>
-  </tbody>
-</table>
+<div class="cards-grid" *ngIf="!cargando() && filtradas().length">
+  <div class="image-card" *ngFor="let i of filtradas()">
+    <div class="card-header">
+      <span class="card-id">ID: {{ i.id_Imagen }}</span>
+    </div>
+    <div class="card-image">
+      <img [src]="sanitizeUrl(i.url)"
+           alt="Imagen"
+           class="image-preview"
+           (load)="onImageLoad($event)"
+           (error)="onImageError($event)"
+           *ngIf="sanitizeUrl(i.url)">
+      <div class="no-image" *ngIf="!sanitizeUrl(i.url)">
+        <span>URL inválida</span>
+      </div>
+    </div>
+    <div class="card-content">
+      <p class="image-url" [title]="i.url">{{ i.url }}</p>
+    </div>
+  </div>
+</div>
 
 <div *ngIf="!cargando() && !filtradas().length" class="hint">
-  No hay imágenes para mostrar.
+  No hay imágenes válidas para mostrar.
 </div>

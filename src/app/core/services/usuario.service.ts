@@ -2,11 +2,13 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { Usuario } from '../interfaces/usuario';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UsuarioService {
   private http = inject(HttpClient);
-  private base = '/api/Usuario'; 
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Usuario`;
+
 
   getAll(): Observable<Usuario[]> {
     return this.http.get<{ usuarios: Usuario[] }>(this.base).pipe(

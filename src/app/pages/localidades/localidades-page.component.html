@@ -30,7 +30,7 @@
   <div class="list-scroll">
     <ul class="list">
       <li class="row-item" *ngFor="let l of localidades()">
-        <span class="mono">#{{ l.id_Localidad }}</span>
+        <span class="mono">#{{ l.id }}</span>
         <span class="name">{{ l.nombre }}</span>
         <button class="btn btn--ghost" (click)="borrarDesdeLista(l)">Eliminar</button>
       </li>

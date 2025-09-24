@@ -6,6 +6,7 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import { AuthInterceptor } from './app/core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './app/core/interceptors/error.interceptor';
+import { loadingInterceptor } from './app/core/interceptors/loading.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -14,9 +15,10 @@ bootstrapApplication(AppComponent, {
       withFetch(),
       withInterceptors([
         AuthInterceptor,
-        ErrorInterceptor
+        ErrorInterceptor,
+        loadingInterceptor
       ])
     ),
-    provideNoopAnimations()
+    provideNoopAnimations(),
   ]
 }).catch(err => console.error(err));

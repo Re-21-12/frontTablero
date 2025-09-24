@@ -6,6 +6,9 @@ export interface Jugador {
   id_Jugador?: number;
   nombre: string;
   apellido: string;
+  estatura: number;
+  posicion: string;
+  nacionalidad: string;
   edad: number;
   id_Equipo: number;
 }

@@ -21,7 +21,13 @@ export interface LoginResponse {
     nombre: string;
     refresToken: string;
     expiresIn: number;
-    role: {
+    rol: {
+        id_rol: number;
         nombre: string;
     };
+    permisos: Permiso[];
+}
+export interface Permiso{
+    nombre: string;
+    id_Rol: number;
 }

@@ -13,7 +13,7 @@ import { NotifyService } from '../shared/notify.service';
   styleUrls: ['./localidades-page.component.css']
 })
 export class LocalidadesPageComponent implements OnInit {
-  
+
   locNombre = '';
   idCrud?: number;
 
@@ -70,7 +70,7 @@ export class LocalidadesPageComponent implements OnInit {
     if (!nombre) { this.notify.info('Ingresa el nuevo nombre'); return; }
 
     this.loading.set(true);
-    this.locService.update({ id_Localidad: id, nombre }).subscribe({
+    this.locService.update({ id: id, nombre }).subscribe({
       next: () => {
         this.notify.success('Actualizado correctamente');
         this.resetForm();
@@ -99,9 +99,9 @@ export class LocalidadesPageComponent implements OnInit {
   }
 
   borrarDesdeLista(l: Localidad) {
-    if (!l.id_Localidad) return;
-    if (!confirm(`¿Eliminar la localidad #${l.id_Localidad}?`)) return;
-    this.locService.delete(l.id_Localidad).subscribe({
+    if (!l.id) return;
+    if (!confirm(`¿Eliminar la localidad #${l.id}?`)) return;
+    this.locService.delete(l.id).subscribe({
       next: () => this.cargar()
     });
   }

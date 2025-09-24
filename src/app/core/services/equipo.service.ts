@@ -35,7 +35,7 @@ export class EquipoService {
   }
 
 
-  getByLocalidad(id_Localidad: number): Observable<Equipo[]> {
-    return this.http.get<Equipo[]>(`${this.base}/Localidad/${id_Localidad}`);
+  getByLocalidad(id: number): Observable<Equipo[]> {
+    return this.http.get<Equipo[]>(`${this.base}/Localidad/${id}`);
   }
 }

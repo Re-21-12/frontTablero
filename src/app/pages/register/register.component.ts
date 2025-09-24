@@ -1,8 +1,9 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import {Router, RouterModule} from '@angular/router';
 import {AuthService} from '../../core/services/auth.service';
+import { RolService } from '../../core/services/rol.service';
 
 @Component({
   selector: 'app-register',
@@ -10,13 +11,17 @@ import {AuthService} from '../../core/services/auth.service';
   templateUrl: './register.component.html',
   styleUrl: './register.component.css'
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnInit {
   private readonly authService = inject(AuthService);
+  private readonly rolService = inject(RolService);
   private readonly router = inject(Router);
   registerForm: FormGroup;
   isLoading = false;
+
+
   showPassword = false;
   errorMessage = '';
+  roles: any[] = [];
 
   constructor(private fb: FormBuilder) {
     this.registerForm = this.fb.group({
@@ -25,11 +30,21 @@ export class RegisterComponent {
       rol: ['', Validators.required]
     });
   }
+  ngOnInit(): void {
+    this.getRol();
+  }
+
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
-
+  getRol(){
+    this.rolService.getAll().subscribe({
+      next: (response: any) => {
+        this.roles = response;
+      }
+    });
+  }
   getFieldError(fieldName: string): string {
     const field = this.registerForm.get(fieldName);
     if (field && field.errors && field.touched) {
@@ -54,8 +69,8 @@ export class RegisterComponent {
         nombre: formValue.nombre,
         contrasena: formValue.contrasena,
         rol: {
-          id_rol: parseInt(formValue.rol),
-          nombre: formValue.rol === '16' ? 'Admin' : 'Usuario'
+          id_rol: 1,
+          nombre: formValue.rol === '1' ? 'Admin' : 'Usuario'
         }
       };
 

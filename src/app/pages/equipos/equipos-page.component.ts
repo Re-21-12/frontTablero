@@ -5,11 +5,11 @@ import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { Equipo, Localidad } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
-
+import {MatSelectModule} from '@angular/material/select';
 @Component({
   standalone: true,
   selector: 'app-equipos-page',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatSelectModule],
   templateUrl: './equipos-page.component.html',
   styleUrls: ['./equipos-page.component.css']
 })
@@ -41,7 +41,10 @@ export class EquiposPageComponent implements OnInit {
 
   cargarLocalidades() {
     this.locSvc.getAll().subscribe({
-      next: d => this.localidades.set(d),
+      next: d => {
+        console.log(d);
+        this.localidades.set(d);
+      },
       error: () => this.notify.error('No se pudieron cargar localidades')
     });
   }
@@ -53,7 +56,7 @@ export class EquiposPageComponent implements OnInit {
     if (!id_Localidad) { this.notify.info('Selecciona una localidad'); return; }
 
     this.loading.set(true);
-    this.equipoSvc.create({ nombre, id_Localidad }).subscribe({
+    this.equipoSvc.create({ nombre, id_Localidad: id_Localidad }).subscribe({
       next: () => {
         this.resetForm();
         this.notify.success('Equipo agregado');
@@ -72,7 +75,7 @@ export class EquiposPageComponent implements OnInit {
     this.equipoSvc.getById(id).subscribe({
       next: (e) => {
         this.nombre = e?.nombre ?? '';
-        this.idLocalidad = e?.id_Localidad;
+        this.idLocalidad = e?.localidad;
         this.notify.info('Equipo cargado en el formulario');
       },
       error: () => this.notify.error('No se encontró el equipo'),
@@ -83,14 +86,14 @@ export class EquiposPageComponent implements OnInit {
   editar() {
     const id_Equipo = Number(this.idCrud);
     const nombre = this.nombre.trim();
-    const id_Localidad = Number(this.idLocalidad);
+    const id = Number(this.idLocalidad);
 
     if (!id_Equipo) { this.notify.info('Ingresa el ID a editar'); return; }
     if (!nombre) { this.notify.info('Ingresa el nombre'); return; }
-    if (!id_Localidad) { this.notify.info('Selecciona una localidad'); return; }
+    if (!id) { this.notify.info('Selecciona una localidad'); return; }
 
     this.loading.set(true);
-    this.equipoSvc.update({ id_Equipo, nombre, id_Localidad }).subscribe({
+    this.equipoSvc.update({ id_Equipo, nombre, id_Localidad: id }).subscribe({
       next: () => {
         this.notify.success('Equipo actualizado');
         this.resetForm();

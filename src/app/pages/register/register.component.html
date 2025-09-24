@@ -64,8 +64,9 @@
             [class.error]="registerForm.get('rol')?.invalid && registerForm.get('rol')?.touched"
           >
             <option value="">Selecciona un rol</option>
-            <option value="16">Admin</option>
-            <option value="17">Usuario</option>
+          @for (item of roles; track $index) {
+            <option [value]="item.id_Rol">{{ item.nombre }}</option>
+          }
           </select>
           <span class="input-icon">👥</span>
         </div>

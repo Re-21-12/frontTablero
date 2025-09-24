@@ -1,0 +1,26 @@
+<div class="loader-overlay" *ngIf="loading$ | async" [@fadeInOut]>
+  <div class="loader-container">
+    <div class="loader-content">
+      <!-- Spinner principal -->
+      <div class="spinner-wrapper">
+        <div class="spinner"></div>
+        <div class="spinner-glow"></div>
+      </div>
+
+      <!-- Texto de carga -->
+      <div class="loading-text">
+        <span class="text-primary">Cargando</span>
+        <span class="dots">
+          <span class="dot" [style.animation-delay]="'0s'">.</span>
+          <span class="dot" [style.animation-delay]="'0.2s'">.</span>
+          <span class="dot" [style.animation-delay]="'0.4s'">.</span>
+        </span>
+      </div>
+
+      <!-- Barra de progreso decorativa -->
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+    </div>
+  </div>
+</div>

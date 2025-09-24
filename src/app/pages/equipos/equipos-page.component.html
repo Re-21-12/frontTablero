@@ -9,11 +9,11 @@
     <input class="input" placeholder="Nombre" [(ngModel)]="nombre" />
 
     <label class="label inline">Localidad</label>
+
     <select class="input" [(ngModel)]="idLocalidad">
       <option [ngValue]="null">Seleccionar</option>
-      <option *ngFor="let l of localidades()" [ngValue]="l.id_Localidad">{{ l.nombre }}</option>
+      <option *ngFor="let l of localidades()" [ngValue]="l.id">{{ l.nombre }}</option>
     </select>
-
     <button class="btn" (click)="crear()" [disabled]="!nombre.trim() || !idLocalidad || loading()">
       {{ loading() ? 'Guardando…' : 'Agregar' }}
     </button>
@@ -32,7 +32,7 @@
       <li class="row-item" *ngFor="let e of equipos()">
         <span class="mono">#{{ e.id_Equipo }}</span>
         <span class="name">{{ e.nombre }}</span>
-        <span class="muted">Loc: {{ e.id_Localidad }}</span>
+        <span class="muted">Loc: {{ e.localidad }}</span>
         <button class="btn btn--ghost" (click)="borrarDesdeLista(e)">Eliminar</button>
       </li>
     </ul>

@@ -2,11 +2,13 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImagenDto, CreateImagenDto } from '../interfaces/imagen';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ImagenService {
   private http = inject(HttpClient);
-  private base = '/api/Imagen';
+  private base = `${environment[environment.selectedEnvironment].apiBaseUrl}/Imagen`;
+
 
   getAll(): Observable<ImagenDto[]> {
     return this.http.get<ImagenDto[]>(this.base);

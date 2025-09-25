@@ -6,6 +6,7 @@ import { NavigationService } from './core/services/navigation.service';
 import { NavigationSection } from './core/interfaces/navigation.interface';
 import { GlobalLoaderComponent } from './shared/components/global-loader/global-loader.component';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,

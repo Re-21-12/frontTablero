@@ -188,6 +188,7 @@ export class HomePageComponent implements OnInit {
   // AJUSTADO: enviar datos al resultado
   finish(){
     this.pause();
+    this._advancePeriod();
 
     const state: ResultadoState = {
       locNombre: this.locNombre,

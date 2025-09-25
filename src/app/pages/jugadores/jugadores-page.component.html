@@ -78,16 +78,25 @@
 
   <div class="list-scroll">
     <ul class="list">
-      <li class="row-item" *ngFor="let j of jugadores(); let i = index">
-        <span class="mono">#{{ j.id_Jugador ?? (i + 1) }}</span>
+      <li class="row-item" *ngFor="let j of items(); let i = index">
+        <span class="name">{{j.id_Jugador}}</span>
         <span class="name">{{ j.nombre }} {{ j.apellido }}</span>
         <span class="muted">{{ j.estatura }}m - {{ j.posicion }}</span>
         <span class="muted">{{ j.nacionalidad }} - Edad: {{ j.edad }}</span>
         <span class="muted">Equipo: {{ j.id_Equipo }}</span>
         <button class="btn btn--ghost" (click)="borrar(j)">Eliminar</button>
       </li>
+      
     </ul>
   </div>
+
+
+  <mat-paginator
+  [length]="totalRegistros()"
+  [pageSize]="tamanio"
+  [pageSizeOptions]="[5, 10, 25]"
+  (page)="cambiarPagina($event)">
+</mat-paginator>
 </section>
 
 

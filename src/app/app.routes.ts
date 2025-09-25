@@ -96,6 +96,10 @@ export const routes: Routes = [
       ),
     title: 'Resultado',
   },
+  {path: 'historial', loadComponent: () =>
+      import('./pages/historial/historial.component')
+        .then((m) => m.HistorialComponent),
+    title: 'Resultado'},
   {
     path: 'admin/seguridad',
     loadComponent: () =>

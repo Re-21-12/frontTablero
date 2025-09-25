@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Localidad } from '../interfaces/models';
+import { Pagina } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class LocalidadService {
@@ -38,4 +39,7 @@ export class LocalidadService {
   delete(id: number): Observable<void | string> {
     return this.http.delete(`${this.base}/${id}`, { responseType: 'text' as const });
   }
+
+  getPaginado(pagina: number, tamanio: number){return this.http.get<Pagina<any>>(`${this.base}/Paginado?pagina=${pagina}&tamanio=${tamanio}`)}
+    
 }

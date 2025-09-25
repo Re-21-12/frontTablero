@@ -40,15 +40,20 @@ export interface Equipo {
   id_localidad: number;
 }
 
-export interface Resultado {
-  nombreLocal: string;
-  nombreVisitante: string;
-  localidad: string;
-  totalFaltasLocal: number;
-  totalFaltasVisitante: number;
-  totalPunteoLocal: number;
-  totalPunteoVisitante: number;
+export interface PartidoResultado {
+  id_Partido: number
+  local: string
+  visitante: string
+  resultado: Resultado
+  fechaHora: Date
 }
+
+export interface Resultado {
+  id_Partido: number
+  puntaje_local: number
+  puntaje_visitante: number
+}
+
 
 export interface Jugador{
   nombre: string;
@@ -69,4 +74,25 @@ export interface Rol {
   updatedBy?: number;
   usuarios?: any[];
   permisos?: Permiso[];
+}
+
+export interface Pagina<T> {
+  items: T[]
+  totalRegistros: number
+  paginaActual: number
+  totalPaginas: number
+}
+
+
+export interface Item<T> {
+  data: T
+}
+
+export interface PartidoPagina {
+  fechaHora: Date
+  id_Localidad: number
+  id_Local: number
+  id_Visitante: number
+  local: string
+  visitante: string
 }

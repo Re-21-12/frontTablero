@@ -18,7 +18,8 @@ export class NavigationService {
         { label: 'Selección', route: '/seleccion' },
         { label: 'Marcador', route: '/tablero' },
         { label: 'Resultado', route: '/resultado' },
-      ],
+        {label: 'Historial', route:'/historial'}
+      ]
     },
     {
       title: 'Gestión de Entidades',

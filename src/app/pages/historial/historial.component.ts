@@ -4,42 +4,40 @@ import { FormsModule } from '@angular/forms';
 import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { PartidoService } from '../../core/services/partido.service';
-import { Equipo, Localidad, Partido, Pagina, PartidoResultado, PartidoPagina } from '../../core/interfaces/models';
+import { Equipo, Localidad } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PartidoResultado, Resultado } from '../../core/interfaces/models';
+
+
+
 
 @Component({
-  standalone: true,
-  selector: 'app-partidos-page',
-  imports: [CommonModule, FormsModule, MatPaginator],
-  templateUrl: './partidos-page.component.html',
-  styleUrls: ['./partidos-page.component.css']
+  selector: 'app-historial',
+  imports: [CommonModule, FormsModule],
+  templateUrl: './historial.component.html',
+  styleUrl: './historial.component.css'
 })
-export class PartidosPageComponent implements OnInit {
-  fechaHoraLocal = '';
+export class HistorialComponent {
+fechaHoraLocal = '';
   partLocalidadId = model<number>();
 
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
   equipoLocal = model<Equipo>();
   equipoVisitante = model<Equipo>();
-  partidos = signal<any[]>([]);
-      totalRegistros =signal(0);
-    tamanio = 5;
-    pagina = 1;
-    items = signal<PartidoPagina[]>([]);
+  partidos = signal<PartidoResultado[]>([]);
 
   private eqService   = inject(EquipoService);
   private locService  = inject(LocalidadService);
   private partService = inject(PartidoService);
   private notify  = inject(NotifyService);
 
-  ngOnInit() { this.cargar(); this.cargarPagina(); console.log(this.items())}
+  ngOnInit() { this.cargar(); }
 
   cargar() {
     this.eqService.getAll().subscribe({ next: d => this.equipos.set(d) });
     this.locService.getAll().subscribe({ next: d => this.localidades.set(d) });
-    this.partService.getAll().subscribe({
+    this.partService.getPartidoResultados().subscribe({
       next: d => this.partidos.set(d),
       error: () => this.notify.error('No se pudieron cargar partidos')
     });
@@ -82,23 +80,9 @@ export class PartidosPageComponent implements OnInit {
         this.equipoVisitante.set(undefined);
         this.notify.success('Agregado correctamente');
         this.cargar();
-        this.cargarPagina();
       },
       error: () => this.notify.error('Error al agregar partido')
     });
   }
-      cambiarPagina(event: PageEvent) {
-      this.pagina = event.pageIndex + 1; 
-      this.tamanio = event.pageSize;
-      this.cargarPagina();
-    }
-    cargarPagina() {
-      this.partService.getPaginado(this.pagina, this.tamanio)
-        .subscribe((res: Pagina<PartidoPagina>) => {
-          this.items.set(res.items);             
-          this.totalRegistros.set(res.totalRegistros);
-          console.log(res)
-        });
-     
-    }
+
 }

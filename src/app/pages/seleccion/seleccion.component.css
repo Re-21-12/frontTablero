@@ -191,34 +191,32 @@
   align-items: center;
 }
 
-/* Lo que tu hiciste empieza debajo */
 
-/* Lo que tu hiciste empieza debajo */
 
 .side-by-side {
   display: flex;
-  gap: 16px; /* más espacio entre las listas */
+  gap: 16px; 
   align-items: flex-start;
   justify-content: space-between;
-  flex-wrap: wrap; /* responsivo: bajan en pantallas pequeñas */
+  flex-wrap: wrap; 
 }
 
 .col {
-  flex: 1 1 300px; /* crecer, encoger, base 300px */
+  flex: 1 1 300px; 
   min-width: 220px;
-  background: linear-gradient(180deg, #161a25, #10141f); /* fondo tipo tarjeta */
-  border: 1px solid #2a3451; /* borde similar a tus tarjetas */
-  border-radius: 16px; /* mismo radio que tus tarjetas */
-  padding: 16px; /* más espacio interno */
+  background: linear-gradient(180deg, #161a25, #10141f); 
+  border: 1px solid #2a3451; 
+  border-radius: 16px; 
+  padding: 16px; 
   box-sizing: border-box;
-  color: #cfd7ea; /* texto claro */
+  color: #cfd7ea; 
   transition: transform .06s, box-shadow .15s, border-color .15s, background .15s;
 }
 
 .col h3 {
   margin: 0 0 8px 0;
   font-size: 1.05rem;
-  color: #eaf4ff; /* título más visible sobre el fondo oscuro */
+  color: #eaf4ff; 
 }
 
 .col ul {
@@ -232,7 +230,7 @@
   line-height: 1.4;
 }
 
-/* Hover opcional, como tus equipo-card */
+
 .col:hover {
   transform: translateY(-1px);
   box-shadow: 0 14px 28px rgba(0, 0, 0, .42);
@@ -242,5 +240,5 @@
 .jugadores {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px; /* espacio entre tarjetas */
+  gap: 12px; 
 }

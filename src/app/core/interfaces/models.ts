@@ -40,15 +40,20 @@ export interface Equipo {
   id_localidad: number;
 }
 
-export interface Resultado {
-  nombreLocal: string;
-  nombreVisitante: string;
-  localidad: string;
-  totalFaltasLocal: number;
-  totalFaltasVisitante: number;
-  totalPunteoLocal: number;
-  totalPunteoVisitante: number;
+export interface PartidoResultado {
+  id_Partido: number
+  local: string
+  visitante: string
+  resultado: Resultado
+  fechaHora: Date
 }
+
+export interface Resultado {
+  id_Partido: number
+  puntaje_local: number
+  puntaje_visitante: number
+}
+
 
 export interface Jugador{
   nombre: string;

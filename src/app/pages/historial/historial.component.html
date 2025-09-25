@@ -1,0 +1,22 @@
+<!-- ========== PARTIDOS ========== -->
+<section class="panel">
+  <header class="panel__header">
+    <h2 class="panel__title">Historial de Partidos</h2>
+  </header>
+
+  
+
+  
+
+  <div class="list-scroll">
+    <ul class="list">
+      <li class="row-item" *ngFor="let p of partidos()">
+        <span class="mono">#{{ p.id_Partido }}</span>
+        <span>Partido, {{ p.local }} vs {{ p.visitante }} </span>
+        <span class="name">{{ p.fechaHora }}</span>
+        
+        <span class="name"> Resultados: {{ p.local }}: {{p.resultado.puntaje_local}} || {{ p.visitante }}: {{p.resultado.puntaje_visitante}}</span>
+      </li>
+    </ul>
+  </div>
+</section>

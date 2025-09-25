@@ -14,4 +14,7 @@ export class PartidoService {
   create(body: { fechaHora: string; id_Local: number; id_Visitante: number }): Observable<string> {
     return this.http.post(this.base, body, { responseType: 'text' as const });
   }
+  getPartidoResultados(): Observable<any[]>{
+    return this.http.get<any[]>(`${this.base}/Resultado`);
+  }
 }

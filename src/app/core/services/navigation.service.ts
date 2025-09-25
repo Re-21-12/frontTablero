@@ -14,7 +14,8 @@ export class NavigationService {
       items: [
         { label: 'Selección', route: '/seleccion' },
         { label: 'Marcador', route: '/tablero' },
-        { label: 'Resultado', route: '/resultado' }
+        { label: 'Resultado', route: '/resultado' },
+        {label: 'Historial', route:'/historial'}
       ]
     },
     {

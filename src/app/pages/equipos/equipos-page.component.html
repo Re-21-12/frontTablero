@@ -29,7 +29,7 @@
 
   <div class="list-scroll">
     <ul class="list">
-      <li class="row-item" *ngFor="let e of equipos()">
+      <li class="row-item" *ngFor="let e of items()">
         <span class="mono">#{{ e.id_Equipo }}</span>
         <span class="name">{{ e.nombre }}</span>
         <span class="muted">Loc: {{ e.localidad }}</span>
@@ -37,5 +37,11 @@
       </li>
     </ul>
   </div>
+    <mat-paginator
+  [length]="totalRegistros()"
+  [pageSize]="tamanio"
+  [pageSizeOptions]="[5, 10, 25]"
+  (page)="cambiarPagina($event)">
+</mat-paginator>
 
 </section>

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Equipo } from '../interfaces/models';
+import { Equipo, Pagina } from '../interfaces/models';
 
 @Injectable({ providedIn: 'root' })
 export class EquipoService {
@@ -38,4 +38,6 @@ export class EquipoService {
   getByLocalidad(id: number): Observable<Equipo[]> {
     return this.http.get<Equipo[]>(`${this.base}/Localidad/${id}`);
   }
+  getPaginado(pagina: number, tamanio: number){return this.http.get<Pagina<any>>(`${this.base}/Paginado?pagina=${pagina}&tamanio=${tamanio}`)}
+    
 }

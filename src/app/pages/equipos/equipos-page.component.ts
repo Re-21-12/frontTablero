@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
-import { Equipo, Localidad } from '../../core/interfaces/models';
+import { Equipo, Localidad, Item, Pagina } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
 import {MatSelectModule} from '@angular/material/select';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 @Component({
   standalone: true,
   selector: 'app-equipos-page',
-  imports: [CommonModule, FormsModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, MatSelectModule, MatPaginator],
   templateUrl: './equipos-page.component.html',
   styleUrls: ['./equipos-page.component.css']
 })
@@ -22,6 +23,10 @@ export class EquiposPageComponent implements OnInit {
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
   loading = signal(false);
+    totalRegistros =signal(0);
+    tamanio = 5;
+    pagina = 1;
+    items = signal<Equipo[]>([]);
 
   private equipoSvc = inject(EquipoService);
   private locSvc = inject(LocalidadService);
@@ -30,6 +35,7 @@ export class EquiposPageComponent implements OnInit {
   ngOnInit() {
     this.cargar();
     this.cargarLocalidades();
+    this.cargarPagina();
   }
 
   cargar() {
@@ -61,10 +67,12 @@ export class EquiposPageComponent implements OnInit {
         this.resetForm();
         this.notify.success('Equipo agregado');
         this.cargar();
+        this.cargarPagina();
       },
       error: () => this.notify.error('Error al agregar equipo'),
       complete: () => this.loading.set(false)
     });
+    
   }
 
   buscarPorId() {
@@ -149,5 +157,19 @@ export class EquiposPageComponent implements OnInit {
       this.errorNombre = '';
 
     }
+  }
+  
+    cambiarPagina(event: PageEvent) {
+    this.pagina = event.pageIndex + 1; 
+    this.tamanio = event.pageSize;
+    this.cargarPagina();
+  }
+  cargarPagina() {
+    this.equipoSvc.getPaginado(this.pagina, this.tamanio)
+      .subscribe((res: Pagina<Equipo>) => {
+        this.items.set(res.items);             
+        this.totalRegistros.set(res.totalRegistros);
+      });
+   
   }
 }

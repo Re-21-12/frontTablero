@@ -5,19 +5,27 @@ import { JugadorService, Jugador } from '../../core/services/jugador.service';
 import { EquipoService } from '../../core/services/equipo.service';
 import { PaisService } from '../../core/services/country.service';
 import { NotifyService } from '../shared/notify.service';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Pagina, Item } from '../../core/interfaces/models';
+
+
+
+
+
 
 @Component({
   standalone: true,
   selector: 'app-jugadores-page',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginator],
   templateUrl: './jugadores-page.component.html',
   styleUrls: ['./jugadores-page.component.css']
 })
 export class JugadoresPageComponent implements OnInit {
 
   jugadores = signal<Jugador[]>([]);
-  equipos   = signal<{ id_Equipo: number; nombre: string }[]>([]);
-  paises    = signal<{ codigo: string; nombre: string }[]>([]);
+  equipos = signal<{ id_Equipo: number; nombre: string }[]>([]);
+  paises = signal<{ codigo: string; nombre: string }[]>([]);
+
 
   // Campos del formulario
   nombre = '';
@@ -30,9 +38,13 @@ export class JugadoresPageComponent implements OnInit {
   errorNombre = '';
   idCrud?: number;
   loading = signal(false);
+  totalRegistros = signal(0);
+  tamanio = 5;
+  pagina = 1;
+  items = signal<Jugador[]>([]);
 
   private jugSvc = inject(JugadorService);
-  private eqSvc  = inject(EquipoService);
+  private eqSvc = inject(EquipoService);
   private paisSvc = inject(PaisService);
   private notify = inject(NotifyService);
 
@@ -40,9 +52,10 @@ export class JugadoresPageComponent implements OnInit {
     this.cargarEquipos();
     this.cargarJugadores();
     this.cargarPaises();
+    this.cargarPagina();
   }
 
-  cargarEquipos()   { this.eqSvc.getAll().subscribe(e => this.equipos.set(e)); }
+  cargarEquipos() { this.eqSvc.getAll().subscribe(e => this.equipos.set(e)); }
   cargarJugadores() { this.jugSvc.getAll().subscribe(j => this.jugadores.set(j)); }
   cargarPaises() { this.paisSvc.getPaises().subscribe((p: any[]) => this.paises.set(p)); }
 
@@ -69,9 +82,11 @@ export class JugadoresPageComponent implements OnInit {
 
     this.loading.set(true);
     this.jugSvc.create(payload).subscribe({
-      next: () => { this.resetForm(); this.cargarJugadores(); },
+      next: () => { this.resetForm(); this.cargarJugadores(); this.cargarPagina();},
       complete: () => this.loading.set(false)
+      
     });
+    this.cargarPagina();
   }
 
   buscarPorId() {
@@ -152,7 +167,7 @@ export class JugadoresPageComponent implements OnInit {
     if (!keepId) this.idCrud = undefined;
   }
 
-   validarNombre(valor: string) {
+  validarNombre(valor: string) {
 
     if (!valor.trim()) {
       this.errorNombre = 'Esto no puede estar vacío.';
@@ -165,5 +180,18 @@ export class JugadoresPageComponent implements OnInit {
 
     }
   }
- 
+  cambiarPagina(event: PageEvent) {
+    this.pagina = event.pageIndex + 1; // Angular usa 0-based
+    this.tamanio = event.pageSize;
+    this.cargarPagina();
+  }
+  cargarPagina() {
+    this.jugSvc.getPaginado(this.pagina, this.tamanio)
+      .subscribe((res: Pagina<Jugador>) => {
+        this.items.set(res.items);             // ojo: es items en minúscula
+        this.totalRegistros.set(res.totalRegistros);
+      });
+    this.loading.set(true);
+  }
+
 }

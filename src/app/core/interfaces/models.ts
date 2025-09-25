@@ -69,3 +69,24 @@ export interface Rol{
   id_Rol: number;
   nombre:string;
 }
+
+export interface Pagina<T> {
+  items: T[]
+  totalRegistros: number
+  paginaActual: number
+  totalPaginas: number
+}
+
+
+export interface Item<T> {
+  data: T
+}
+
+export interface PartidoPagina {
+  fechaHora: Date
+  id_Localidad: number
+  id_Local: number
+  id_Visitante: number
+  local: string
+  visitante: string
+}

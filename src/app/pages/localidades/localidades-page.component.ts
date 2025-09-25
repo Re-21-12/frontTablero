@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { Localidad } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Pagina, Item } from '../../core/interfaces/models';
 
 @Component({
   standalone: true,
   selector: 'app-localidades-page',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginator],
   templateUrl: './localidades-page.component.html',
   styleUrls: ['./localidades-page.component.css']
 })
@@ -21,17 +23,22 @@ export class LocalidadesPageComponent implements OnInit {
 
   localidades = signal<Localidad[]>([]);
   loading = signal(false);
+   totalRegistros = signal(0);
+    tamanio = 5;
+    pagina = 1;
+    items = signal<Localidad[]>([]);
 
   private locService = inject(LocalidadService);
   private notify = inject(NotifyService);
 
-  ngOnInit() { this.cargar(); }
+  ngOnInit() { this.cargar(); this.cargarPagina();}
 
   cargar() {
     this.locService.getAll().subscribe({
       next: d => this.localidades.set(d),
       error: () => this.notify.error('No se pudieron cargar localidades')
     });
+
   }
 
   crearLocalidad() {
@@ -44,6 +51,7 @@ export class LocalidadesPageComponent implements OnInit {
         this.locNombre = '';
         this.notify.success('Agregado correctamente');
         this.cargar();
+        this.cargarPagina();
       },
       error: () => this.notify.error('Error al agregar localidad'),
       complete: () => this.loading.set(false)
@@ -128,4 +136,17 @@ export class LocalidadesPageComponent implements OnInit {
 
 
   }
+
+    cambiarPagina(event: PageEvent) {
+      this.pagina = event.pageIndex + 1; // Angular usa 0-based
+      this.tamanio = event.pageSize;
+      this.cargarPagina();
+    }
+    cargarPagina() {
+      this.locService.getPaginado(this.pagina, this.tamanio)
+        .subscribe((res: Pagina<Localidad>) => {
+          this.items.set(res.items);             // ojo: es items en minúscula
+          this.totalRegistros.set(res.totalRegistros);
+        });
+    }
 }

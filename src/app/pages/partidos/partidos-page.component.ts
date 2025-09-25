@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { PartidoService } from '../../core/services/partido.service';
-import { Equipo, Localidad } from '../../core/interfaces/models';
+import { Equipo, Localidad, Partido, Pagina, PartidoResultado, PartidoPagina } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 
 @Component({
   standalone: true,
   selector: 'app-partidos-page',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatPaginator],
   templateUrl: './partidos-page.component.html',
   styleUrls: ['./partidos-page.component.css']
 })
@@ -23,13 +24,17 @@ export class PartidosPageComponent implements OnInit {
   equipoLocal = model<Equipo>();
   equipoVisitante = model<Equipo>();
   partidos = signal<any[]>([]);
+      totalRegistros =signal(0);
+    tamanio = 5;
+    pagina = 1;
+    items = signal<PartidoPagina[]>([]);
 
   private eqService   = inject(EquipoService);
   private locService  = inject(LocalidadService);
   private partService = inject(PartidoService);
   private notify  = inject(NotifyService);
 
-  ngOnInit() { this.cargar(); }
+  ngOnInit() { this.cargar(); this.cargarPagina(); console.log(this.items())}
 
   cargar() {
     this.eqService.getAll().subscribe({ next: d => this.equipos.set(d) });
@@ -77,8 +82,23 @@ export class PartidosPageComponent implements OnInit {
         this.equipoVisitante.set(undefined);
         this.notify.success('Agregado correctamente');
         this.cargar();
+        this.cargarPagina();
       },
       error: () => this.notify.error('Error al agregar partido')
     });
   }
+      cambiarPagina(event: PageEvent) {
+      this.pagina = event.pageIndex + 1; 
+      this.tamanio = event.pageSize;
+      this.cargarPagina();
+    }
+    cargarPagina() {
+      this.partService.getPaginado(this.pagina, this.tamanio)
+        .subscribe((res: Pagina<PartidoPagina>) => {
+          this.items.set(res.items);             
+          this.totalRegistros.set(res.totalRegistros);
+          console.log(res)
+        });
+     
+    }
 }

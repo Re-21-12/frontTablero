@@ -15,7 +15,7 @@
 
     <!-- ID -->
     <label class="label inline">ID</label>
-    <input class="input input--id" type="number" [(ngModel)]="idCrud" placeholder="#ID" />
+    <input class="input input--id" type="number" [(ngModel)]="idCrud" placeholder="#ID" min="1"/>
 
     <!-- Acciones -->
     <button class="btn btn--ghost" (click)="buscarPorId()" [disabled]="!idCrud || loading()">Buscar</button>

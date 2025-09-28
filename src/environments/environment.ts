@@ -15,15 +15,14 @@ export interface Environment {
 
 export const environment: Environment = {
   production: true,
-  selectedEnvironment: 'dev', // Cambia esto a 'prod', 'dev' o 'local' según el entorno deseado
+  selectedEnvironment: 'prod', // Cambia esto a 'prod', 'dev' o 'local' según el entorno deseado
   prod: {
-    apiBaseUrl: 'http://157.180.19.137/api/api',  // ⚡ usar /api sin puerto 8080
+    apiBaseUrl: 'http://157.180.19.137/api/api', // ⚡ usar /api sin puerto 8080
   },
   dev: {
-    apiBaseUrl: 'http://localhost:5232/api',  // ⚡ usar /api sin puerto 8080
+    apiBaseUrl: 'http://localhost:5000/api', // ⚡ usar /api sin puerto 8080
   },
   local: {
-    apiBaseUrl: 'http://192.168.137.1:8080/api',  // ⚡ usar /api sin puerto 8080
-  }
-
+    apiBaseUrl: 'http://192.168.137.1:8080/api', // ⚡ usar /api sin puerto 8080
+  },
 };

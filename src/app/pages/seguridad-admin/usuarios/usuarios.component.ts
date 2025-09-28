@@ -11,7 +11,7 @@ import { Rol } from '../../../core/interfaces/models';
   selector: 'app-usuarios',
   imports: [CommonModule, FormsModule],
   templateUrl: './usuarios.component.html',
-  styleUrls: ['./usuarios.component.css']
+  styleUrls: ['./usuarios.component.css'],
 })
 export class UsuariosComponent implements OnInit {
   private svc = inject(UsuarioService);
@@ -35,10 +35,11 @@ export class UsuariosComponent implements OnInit {
   filtrados = computed(() => {
     const t = this.busqueda().trim().toLowerCase();
     if (!t) return this.usuarios();
-    return this.usuarios().filter(u =>
-      (u.nombre ?? '').toLowerCase().includes(t) ||
-      String(u.id_Usuario ?? '').includes(t) ||
-      String(u.id_Rol ?? '').includes(t)
+    return this.usuarios().filter(
+      (u) =>
+        (u.nombre ?? '').toLowerCase().includes(t) ||
+        String(u.id_Usuario ?? '').includes(t) ||
+        String(u.id_Rol ?? '').includes(t),
     );
   });
 
@@ -49,8 +50,12 @@ export class UsuariosComponent implements OnInit {
   }
   loadRoles() {
     this.roleSvc.getAll().subscribe({
-      next: (arr: any[]) => { this.roles.set(arr); },
-      error: e => { console.error('Error cargando roles:', e); }
+      next: (arr: any[]) => {
+        this.roles.set(arr);
+      },
+      error: (e) => {
+        console.error('Error cargando roles:', e);
+      },
     });
   }
   load() {
@@ -58,20 +63,20 @@ export class UsuariosComponent implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
     this.svc.getAll().subscribe({
-      next: list => {
-        console.log('Usuarios recibidos:', list);
+      next: (list) => {
+        // console.log('Usuarios recibidos:', list);
         this.usuarios.set(list);
         this.cargando.set(false);
-        console.log('Signal usuarios actualizado:', this.usuarios());
-        console.log('Filtrados computed:', this.filtrados());
+        // console.log('Signal usuarios actualizado:', this.usuarios());
+        // console.log('Filtrados computed:', this.filtrados());
       },
-      error: e => {
+      error: (e) => {
         this.error.set('No se pudieron cargar los usuarios');
         this.cargando.set(false);
         console.error('Error cargando usuarios:', e);
-      }
+      },
     });
-    console.log('Filtrados computed:', this.filtrados());
+    // console.log('Filtrados computed:', this.filtrados());
   }
 
   nuevo() {
@@ -99,27 +104,61 @@ export class UsuariosComponent implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
 
+    const rol = this.roles().find((r) => r.id_Rol === idRol);
+    if (!rol) {
+      this.error.set('Rol no válido seleccionado');
+      this.cargando.set(false);
+      return;
+    }
+
+    const submitRol = {
+      Id_rol: rol.id_Rol.toString(),
+      Nombre: rol.nombre.toString(),
+    };
+
     if (id) {
       // UPDATE
-      this.svc.update(id, {
-        nombre: nombre,
-        id_Rol: idRol,
-        contrasena: contrasena || undefined
-      }).subscribe({
-        next: _ => { this.nuevo(); this.load(); },
-        error: e => { this.error.set('No se pudo actualizar el usuario'); this.cargando.set(false); console.error(e); }
-      });
+      this.svc
+        .update(id, {
+          Nombre: nombre,
+          Rol: submitRol,
+          Contrasena: contrasena || undefined,
+        })
+        .subscribe({
+          next: (_) => {
+            this.nuevo();
+            this.load();
+          },
+          error: (e) => {
+            this.error.set('No se pudo actualizar el usuario');
+            this.cargando.set(false);
+            console.error(e);
+          },
+        });
     } else {
       // CREATE (register)
-      if (!contrasena) { this.error.set('La contraseña es requerida para registrar'); this.cargando.set(false); return; }
-      this.svc.register({
-        nombre: nombre,
-        contrasena: contrasena,
-        id_Rol: idRol
-      }).subscribe({
-        next: _ => { this.nuevo(); this.load(); },
-        error: e => { this.error.set('No se pudo registrar el usuario'); this.cargando.set(false); console.error(e); }
-      });
+      if (!contrasena) {
+        this.error.set('La contraseña es requerida para registrar');
+        this.cargando.set(false);
+        return;
+      }
+      this.svc
+        .register({
+          Nombre: nombre,
+          Contrasena: contrasena,
+          Rol: submitRol,
+        })
+        .subscribe({
+          next: (_) => {
+            this.nuevo();
+            this.load();
+          },
+          error: (e) => {
+            this.error.set('No se pudo registrar el usuario');
+            this.cargando.set(false);
+            console.error(e);
+          },
+        });
     }
   }
 
@@ -128,8 +167,12 @@ export class UsuariosComponent implements OnInit {
     this.cargando.set(true);
     this.error.set(null);
     this.svc.remove(id).subscribe({
-      next: _ => this.load(),
-      error: e => { this.error.set('No se pudo eliminar el usuario'); this.cargando.set(false); console.error(e); }
+      next: (_) => this.load(),
+      error: (e) => {
+        this.error.set('No se pudo eliminar el usuario');
+        this.cargando.set(false);
+        console.error(e);
+      },
     });
   }
 }

@@ -2,9 +2,13 @@ import { Routes } from '@angular/router';
 import { PermissionGuard } from './core/guards/permission.guard';
 
 export const routes: Routes = [
-  {path: 'login', loadComponent: () => 
-    import ('../app/pages/login/login.component') .then((m => m.LoginComponent))
-    , title: 'Login'
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('../app/pages/login/login.component').then(
+        (m) => m.LoginComponent,
+      ),
+    title: 'Login',
   },
   {
     path: 'tablero',
@@ -96,10 +100,14 @@ export const routes: Routes = [
       ),
     title: 'Resultado',
   },
-  {path: 'historial', loadComponent: () =>
-      import('./pages/historial/historial.component')
-        .then((m) => m.HistorialComponent),
-    title: 'Resultado'},
+  {
+    path: 'historial',
+    loadComponent: () =>
+      import('./pages/historial/historial.component').then(
+        (m) => m.HistorialComponent,
+      ),
+    title: 'Resultado',
+  },
   {
     path: 'admin/seguridad',
     loadComponent: () =>
@@ -138,5 +146,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'seleccion' },
+  { path: '**', redirectTo: 'inicio_sesion' },
 ];

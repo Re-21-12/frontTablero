@@ -18,8 +18,8 @@ export class NavigationService {
         { label: 'Selección', route: '/seleccion' },
         { label: 'Marcador', route: '/tablero' },
         { label: 'Resultado', route: '/resultado' },
-        {label: 'Historial', route:'/historial'}
-      ]
+        { label: 'Historial', route: '/historial' },
+      ],
     },
     {
       title: 'Gestión de Entidades',
@@ -95,12 +95,7 @@ export class NavigationService {
     if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
       return true;
     }
-    console.log(
-      'Verificando acceso para item:',
-      item.label,
-      'con permisos requeridos:',
-      item.requiredPermissions,
-    );
+
     // Verificar si el usuario tiene al menos uno de los permisos requeridos
     return this.authService.hasAnyPermission(item.requiredPermissions);
   }

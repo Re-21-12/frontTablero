@@ -5,17 +5,17 @@ import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { Equipo, Localidad, Item, Pagina } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
-import {MatSelectModule} from '@angular/material/select';
+import { MatSelectModule } from '@angular/material/select';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { RolService } from '../../core/services/rol.service';
 @Component({
   standalone: true,
   selector: 'app-equipos-page',
   imports: [CommonModule, FormsModule, MatSelectModule, MatPaginator],
   templateUrl: './equipos-page.component.html',
-  styleUrls: ['./equipos-page.component.css']
+  styleUrls: ['./equipos-page.component.css'],
 })
 export class EquiposPageComponent implements OnInit {
-
   nombre = '';
   idLocalidad?: number;
   idCrud?: number;
@@ -23,10 +23,10 @@ export class EquiposPageComponent implements OnInit {
   equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
   loading = signal(false);
-    totalRegistros =signal(0);
-    tamanio = 5;
-    pagina = 1;
-    items = signal<Equipo[]>([]);
+  totalRegistros = signal(0);
+  tamanio = 5;
+  pagina = 1;
+  items = signal<Equipo[]>([]);
 
   private equipoSvc = inject(EquipoService);
   private locSvc = inject(LocalidadService);
@@ -40,26 +40,32 @@ export class EquiposPageComponent implements OnInit {
 
   cargar() {
     this.equipoSvc.getAll().subscribe({
-      next: d => this.equipos.set(d),
-      error: () => this.notify.error('No se pudieron cargar equipos')
+      next: (d) => this.equipos.set(d),
+      error: () => this.notify.error('No se pudieron cargar equipos'),
     });
   }
 
   cargarLocalidades() {
     this.locSvc.getAll().subscribe({
-      next: d => {
+      next: (d) => {
         console.log(d);
         this.localidades.set(d);
       },
-      error: () => this.notify.error('No se pudieron cargar localidades')
+      error: () => this.notify.error('No se pudieron cargar localidades'),
     });
   }
 
   crear() {
     const nombre = this.nombre.trim();
     const id_Localidad = Number(this.idLocalidad);
-    if (!nombre) { this.notify.info('Ingresa un nombre de equipo'); return; }
-    if (!id_Localidad) { this.notify.info('Selecciona una localidad'); return; }
+    if (!nombre) {
+      this.notify.info('Ingresa un nombre de equipo');
+      return;
+    }
+    if (!id_Localidad) {
+      this.notify.info('Selecciona una localidad');
+      return;
+    }
 
     this.loading.set(true);
     this.equipoSvc.create({ nombre, id_Localidad: id_Localidad }).subscribe({
@@ -70,14 +76,16 @@ export class EquiposPageComponent implements OnInit {
         this.cargarPagina();
       },
       error: () => this.notify.error('Error al agregar equipo'),
-      complete: () => this.loading.set(false)
+      complete: () => this.loading.set(false),
     });
-    
   }
 
   buscarPorId() {
     const id = Number(this.idCrud);
-    if (!id) { this.notify.info('Ingresa un ID'); return; }
+    if (!id) {
+      this.notify.info('Ingresa un ID');
+      return;
+    }
 
     this.loading.set(true);
     this.equipoSvc.getById(id).subscribe({
@@ -87,7 +95,7 @@ export class EquiposPageComponent implements OnInit {
         this.notify.info('Equipo cargado en el formulario');
       },
       error: () => this.notify.error('No se encontró el equipo'),
-      complete: () => this.loading.set(false)
+      complete: () => this.loading.set(false),
     });
   }
 
@@ -96,9 +104,18 @@ export class EquiposPageComponent implements OnInit {
     const nombre = this.nombre.trim();
     const id = Number(this.idLocalidad);
 
-    if (!id_Equipo) { this.notify.info('Ingresa el ID a editar'); return; }
-    if (!nombre) { this.notify.info('Ingresa el nombre'); return; }
-    if (!id) { this.notify.info('Selecciona una localidad'); return; }
+    if (!id_Equipo) {
+      this.notify.info('Ingresa el ID a editar');
+      return;
+    }
+    if (!nombre) {
+      this.notify.info('Ingresa el nombre');
+      return;
+    }
+    if (!id) {
+      this.notify.info('Selecciona una localidad');
+      return;
+    }
 
     this.loading.set(true);
     this.equipoSvc.update({ id_Equipo, nombre, id_Localidad: id }).subscribe({
@@ -108,13 +125,16 @@ export class EquiposPageComponent implements OnInit {
         this.cargar();
       },
       error: () => this.notify.error('Error al actualizar equipo'),
-      complete: () => this.loading.set(false)
+      complete: () => this.loading.set(false),
     });
   }
 
   borrarPorId() {
     const id = Number(this.idCrud);
-    if (!id) { this.notify.info('Ingresa el ID a borrar'); return; }
+    if (!id) {
+      this.notify.info('Ingresa el ID a borrar');
+      return;
+    }
     if (!confirm(`¿Eliminar el equipo #${id}?`)) return;
 
     this.loading.set(true);
@@ -125,7 +145,7 @@ export class EquiposPageComponent implements OnInit {
         this.cargar();
       },
       error: () => this.notify.error('Error al eliminar equipo'),
-      complete: () => this.loading.set(false)
+      complete: () => this.loading.set(false),
     });
   }
 
@@ -135,7 +155,7 @@ export class EquiposPageComponent implements OnInit {
 
     this.equipoSvc.delete(e.id_Equipo).subscribe({
       next: () => this.cargar(),
-      error: () => this.notify.error('No se pudo eliminar')
+      error: () => this.notify.error('No se pudo eliminar'),
     });
   }
 
@@ -146,7 +166,6 @@ export class EquiposPageComponent implements OnInit {
   }
 
   validarNombre(valor: string) {
-
     if (!valor.trim()) {
       this.errorNombre = 'El nombre no puede estar vacío.';
       this.notify.error(this.errorNombre);
@@ -155,21 +174,20 @@ export class EquiposPageComponent implements OnInit {
       this.notify.error(this.errorNombre);
     } else {
       this.errorNombre = '';
-
     }
   }
-  
-    cambiarPagina(event: PageEvent) {
-    this.pagina = event.pageIndex + 1; 
+
+  cambiarPagina(event: PageEvent) {
+    this.pagina = event.pageIndex + 1;
     this.tamanio = event.pageSize;
     this.cargarPagina();
   }
   cargarPagina() {
-    this.equipoSvc.getPaginado(this.pagina, this.tamanio)
+    this.equipoSvc
+      .getPaginado(this.pagina, this.tamanio)
       .subscribe((res: Pagina<Equipo>) => {
-        this.items.set(res.items);             
+        this.items.set(res.items);
         this.totalRegistros.set(res.totalRegistros);
       });
-   
   }
 }

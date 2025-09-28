@@ -4,10 +4,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, timer, of, throwError } from 'rxjs';
 import { switchMap, tap, catchError, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, RegisterRequest, RefreshTokenRequest, RefreshTokenResponse, Permiso } from '../interfaces/auth-interface';
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
+  Permiso,
+} from '../interfaces/auth-interface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
   private readonly _httpClient = inject(HttpClient);
@@ -29,18 +36,19 @@ export class AuthService {
   }
 
   login(login: LoginRequest): Observable<LoginResponse> {
-    return this._httpClient.post<LoginResponse>(
-      environment[environment.selectedEnvironment].apiBaseUrl + '/Auth/login',
-      login
-    ).pipe(
-      tap(response => this.handleAuthSuccess(response))
-    );
+    return this._httpClient
+      .post<LoginResponse>(
+        environment[environment.selectedEnvironment].apiBaseUrl + '/Auth/login',
+        login,
+      )
+      .pipe(tap((response) => this.handleAuthSuccess(response)));
   }
 
   register(register: RegisterRequest): Observable<string> {
     return this._httpClient.post<string>(
-      environment[environment.selectedEnvironment].apiBaseUrl + '/Auth/register',
-      register
+      environment[environment.selectedEnvironment].apiBaseUrl +
+        '/Auth/register',
+      register,
     );
   }
 
@@ -61,7 +69,7 @@ export class AuthService {
     }
 
     // Convertir expiresIn de minutos a millisegundos
-    const expirationTime = Date.now() + (expiresIn * 60 * 1000);
+    const expirationTime = Date.now() + expiresIn * 60 * 1000;
 
     // Guardar información básica del usuario
     localStorage.setItem(this.tokenKey, response.token);
@@ -72,8 +80,8 @@ export class AuthService {
     localStorage.setItem(
       this.userKey,
       JSON.stringify({
-        nombre: response.nombre
-      })
+        nombre: response.nombre,
+      }),
     );
 
     // Guardar rol completo
@@ -83,7 +91,10 @@ export class AuthService {
 
     // Guardar permisos
     if (response.permisos && response.permisos.length > 0) {
-      localStorage.setItem(this.permissionsKey, JSON.stringify(response.permisos));
+      localStorage.setItem(
+        this.permissionsKey,
+        JSON.stringify(response.permisos),
+      );
     }
   }
 
@@ -94,7 +105,7 @@ export class AuthService {
     if (!expirationTime) return;
 
     const now = Date.now();
-    const timeUntilRefresh = expirationTime - now - (5 * 60 * 1000); // 5 minutos antes
+    const timeUntilRefresh = expirationTime - now - 5 * 60 * 1000; // 5 minutos antes
 
     if (timeUntilRefresh > 0) {
       this.refreshTimer = timer(timeUntilRefresh).subscribe(() => {
@@ -116,9 +127,15 @@ export class AuthService {
     }
 
     if (this.refreshTokenInProgress) {
-      return this.refreshTokenSubject.asObservable().pipe(
-        switchMap(token => token ? of(token) : throwError(() => new Error('Token refresh failed')))
-      );
+      return this.refreshTokenSubject
+        .asObservable()
+        .pipe(
+          switchMap((token) =>
+            token
+              ? of(token)
+              : throwError(() => new Error('Token refresh failed')),
+          ),
+        );
     }
 
     const refreshToken = localStorage.getItem(this.refreshTokenKey);
@@ -132,27 +149,30 @@ export class AuthService {
 
     const refreshRequest: RefreshTokenRequest = { refreshToken };
 
-    return this._httpClient.post<RefreshTokenResponse>(
-      environment[environment.selectedEnvironment].apiBaseUrl + '/Auth/refresh',
-      refreshRequest
-    ).pipe(
-      tap(response => {
-        const loginResponse: any = {
-          token: response.token,
-          refresToken: response.refreshToken,
-        };
-        this.handleAuthSuccess(loginResponse);
-      }),
-      switchMap(response => of(response.token)),
-      catchError(error => {
-        console.error('Error refreshing token:', error);
-        this.logout();
-        return throwError(() => error);
-      }),
-      finalize(() => {
-        this.refreshTokenInProgress = false;
-      })
-    );
+    return this._httpClient
+      .post<RefreshTokenResponse>(
+        environment[environment.selectedEnvironment].apiBaseUrl +
+          '/Auth/refresh',
+        refreshRequest,
+      )
+      .pipe(
+        tap((response) => {
+          const loginResponse: any = {
+            token: response.token,
+            refresToken: response.refreshToken,
+          };
+          this.handleAuthSuccess(loginResponse);
+        }),
+        switchMap((response) => of(response.token)),
+        catchError((error) => {
+          console.error('Error refreshing token:', error);
+          this.logout();
+          return throwError(() => error);
+        }),
+        finalize(() => {
+          this.refreshTokenInProgress = false;
+        }),
+      );
   }
 
   logout(): void {
@@ -186,7 +206,7 @@ export class AuthService {
       const refreshToken = localStorage.getItem(this.refreshTokenKey);
       if (refreshToken) {
         this.refreshToken().subscribe({
-          error: () => this.logout()
+          error: () => this.logout(),
         });
       } else {
         this.logout();
@@ -209,7 +229,7 @@ export class AuthService {
     const timeUntilExpiration = expiration - Date.now();
     if (timeUntilExpiration < 60000 && timeUntilExpiration > 0) {
       this.refreshToken().subscribe({
-        error: () => console.warn('Failed to refresh token automatically')
+        error: () => console.warn('Failed to refresh token automatically'),
       });
     }
 
@@ -247,47 +267,58 @@ export class AuthService {
   getPermissions(): Permiso[] {
     if (!this.isBrowser()) return [];
 
-    const permissionsData: Permiso[] = JSON.parse(localStorage.getItem(this.permissionsKey) || '[]');
-
+    const permissionsData: Permiso[] = JSON.parse(
+      localStorage.getItem(this.permissionsKey) || '[]',
+    );
+    console.log(permissionsData);
     // Eliminar todos los espacios en blanco de los nombres de los permisos
-    const cleanedPermissions = permissionsData.map(permission => ({
+    const cleanedPermissions = permissionsData.map((permission) => ({
       ...permission,
-      nombre: permission.nombre.replace(/\s+/g, '')
+      nombre: permission.nombre.replace(/\s+/g, ''),
     }));
 
-    console.log('Permisos del usuario obtenidos (espacios eliminados):', cleanedPermissions);
+    console.log(
+      'Permisos del usuario obtenidos (espacios eliminados):',
+      cleanedPermissions,
+    );
     return cleanedPermissions;
   }
 
   hasPermission(permissionName: string): boolean {
     const permissions = this.getPermissions();
-    return permissions.some(permission => {
-      console.log('Verificando permiso:', permission.nombre, 'contra', permissionName);
-      return permission.nombre === permissionName.replace(' ', '')
+    return permissions.some((permission) => {
+      console.log(
+        'Verificando permiso:',
+        permission.nombre,
+        'contra',
+        permissionName,
+      );
+      return permission.nombre === permissionName.replace(' ', '');
     });
   }
 
   hasAnyPermission(permissionNames: string[]): boolean {
-    console.log('Verificando permisos:', permissionNames);
     const permissions = this.getPermissions();
-    console.log('Permisos del usuario:', permissions);
-    const anyPermissions = permissionNames.some(permissionName =>{
-      console.log('Verificando permiso:', permissionName.trim());
-      return permissions.some(permission => permission.nombre.trim() === permissionName.trim())
-    }
-    );
-    console.log('Resultado de verificación de permisos:', anyPermissions);
+    const anyPermissions = permissionNames.some((permissionName) => {
+      return permissions.some(
+        (permission) => permission.nombre.trim() === permissionName.trim(),
+      );
+    });
     return anyPermissions;
   }
 
   getPermissionsByAction(action: string): Permiso[] {
     const permissions = this.getPermissions();
-    return permissions.filter(permission => permission.nombre.includes(action));
+    return permissions.filter((permission) =>
+      permission.nombre.includes(action),
+    );
   }
 
   getPermissionsByModule(module: string): Permiso[] {
     const permissions = this.getPermissions();
-    return permissions.filter(permission => permission.nombre.startsWith(module + ':'));
+    return permissions.filter((permission) =>
+      permission.nombre.startsWith(module + ':'),
+    );
   }
 
   private getUser(): { nombre: string } | null {
@@ -310,7 +341,7 @@ export class AuthService {
     if (!expiration) return false;
 
     const timeUntilExpiration = expiration - Date.now();
-    return timeUntilExpiration < (10 * 60 * 1000); // 10 minutos
+    return timeUntilExpiration < 10 * 60 * 1000; // 10 minutos
   }
 
   // Método para obtener el tiempo restante hasta la expiración
@@ -322,13 +353,17 @@ export class AuthService {
   }
 
   // Método para obtener información completa del usuario autenticado
-  getCurrentUser(): { nombre: string; rol: { id_rol: number; nombre: string } | null; permisos: Permiso[] } | null {
+  getCurrentUser(): {
+    nombre: string;
+    rol: { id_rol: number; nombre: string } | null;
+    permisos: Permiso[];
+  } | null {
     if (!this.isAuthenticated()) return null;
 
     return {
       nombre: this.getUsername() || '',
       rol: this.getRoleComplete(),
-      permisos: this.getPermissions()
+      permisos: this.getPermissions(),
     };
   }
 }

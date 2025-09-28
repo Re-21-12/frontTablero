@@ -138,14 +138,14 @@ export class LocalidadesPageComponent implements OnInit {
   }
 
     cambiarPagina(event: PageEvent) {
-      this.pagina = event.pageIndex + 1; // Angular usa 0-based
+      this.pagina = event.pageIndex + 1; 
       this.tamanio = event.pageSize;
       this.cargarPagina();
     }
     cargarPagina() {
       this.locService.getPaginado(this.pagina, this.tamanio)
         .subscribe((res: Pagina<Localidad>) => {
-          this.items.set(res.items);             // ojo: es items en minúscula
+          this.items.set(res.items);            
           this.totalRegistros.set(res.totalRegistros);
         });
     }

@@ -15,12 +15,13 @@ export interface Environment {
 
 export const environment: Environment = {
   production: true,
-  selectedEnvironment: 'prod',
+  selectedEnvironment: 'dev',
   prod: {
     apiBaseUrl: '/api/api', // relativo al mismo dominio
   },
   dev: {
-    apiBaseUrl: 'http://localhost:5000/api', // para desarrollo local
+    apiBaseUrl: 'http://localhost:5232/api', // para desarrollo local
+    // apiBaseUrl: 'http://vmacarioe1_umg.com.gt:5000/api', // para desarrollo local
   },
   local: {
     apiBaseUrl: 'http://192.168.137.1:8080/api', // entorno local

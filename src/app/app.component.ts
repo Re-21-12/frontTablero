@@ -17,6 +17,7 @@ import { GlobalLoaderComponent } from './shared/components/global-loader/global-
 export class AppComponent implements OnInit {
   private readonly _authService = inject(AuthService);
   private readonly _navigationService = inject(NavigationService);
+  
   readonly _router = inject(Router);
 
   title = 'frontTablero';

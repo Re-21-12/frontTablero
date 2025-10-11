@@ -1,0 +1,142 @@
+<div class="user-profile-container">
+  <div class="profile-header">
+    <h2>Perfil de Usuario</h2>
+    <div class="auth-status" [ngClass]="getAuthStatusClass()">
+      {{ getAuthStatusText() }}
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando información del usuario...</p>
+  </div>
+
+  <div *ngIf="!loading && userInfo" class="profile-content">
+
+    <!-- Información Keycloak -->
+    <div *ngIf="isKeycloakAuth" class="profile-section keycloak-section">
+      <h3>🔐 Información de Keycloak</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Usuario:</label>
+          <span>{{ userInfo.keycloak.profile?.username || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Nombre:</label>
+          <span>{{ userInfo.keycloak.profile?.firstName || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Apellido:</label>
+          <span>{{ userInfo.keycloak.profile?.lastName || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ userInfo.keycloak.profile?.email || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Roles:</label>
+          <div class="roles-container">
+            <span
+              *ngFor="let role of userInfo.keycloak.roles"
+              class="role-badge keycloak-role"
+            >
+              {{ role }}
+            </span>
+            <span *ngIf="userInfo.keycloak.roles?.length === 0" class="no-data">
+              Sin roles asignados
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información Local -->
+    <div *ngIf="isLocalAuth" class="profile-section local-section">
+      <h3>🏠 Información Local</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nombre:</label>
+          <span>{{ userInfo.local?.nombre || 'N/A' }}</span>
+        </div>
+        <div class="info-item">
+          <label>Rol:</label>
+          <span class="role-badge local-role">
+            {{ userInfo.local?.rol?.nombre || 'Sin rol' }}
+          </span>
+        </div>
+        <div class="info-item full-width">
+          <label>Permisos:</label>
+          <div class="permissions-container">
+            <span
+              *ngFor="let permiso of userInfo.local?.permisos"
+              class="permission-badge"
+            >
+              {{ permiso.nombre }}
+            </span>
+            <span *ngIf="userInfo.local?.permisos?.length === 0" class="no-data">
+              Sin permisos asignados
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información Híbrida -->
+    <div class="profile-section hybrid-section">
+      <h3>🔄 Vista Consolidada</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nombre Completo:</label>
+          <span>{{ userInfo.hybrid.name }}</span>
+        </div>
+        <div class="info-item">
+          <label>Todos los Roles:</label>
+          <div class="roles-container">
+            <span
+              *ngFor="let role of userInfo.hybrid.roles"
+              class="role-badge hybrid-role"
+            >
+              {{ role }}
+            </span>
+          </div>
+        </div>
+        <div class="info-item full-width">
+          <label>Permisos Totales:</label>
+          <div class="permissions-container">
+            <span
+              *ngFor="let permiso of userInfo.hybrid.permissions"
+              class="permission-badge"
+            >
+              {{ permiso.nombre }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="actions-section">
+      <button class="btn btn-refresh" (click)="refreshUserInfo()" [disabled]="loading">
+        🔄 Actualizar
+      </button>
+      <button
+        *ngIf="isKeycloakAuth"
+        class="btn btn-sync"
+        (click)="syncKeycloak()"
+        [disabled]="loading"
+      >
+        🔗 Sincronizar con Keycloak
+      </button>
+      <button class="btn btn-logout" (click)="logout()">
+        🚪 Cerrar Sesión
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && !userInfo" class="no-info">
+    <p>No se pudo cargar la información del usuario</p>
+    <button class="btn btn-refresh" (click)="refreshUserInfo()">
+      Intentar nuevamente
+    </button>
+  </div>
+</div>

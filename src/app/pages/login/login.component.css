@@ -74,7 +74,9 @@
   border: 2px solid #e5e7eb;
   border-radius: 8px;
   font-size: 1rem;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   background: #fafafa;
   color: #374151; /* Color del texto */
 }
@@ -215,6 +217,156 @@
   margin: 0;
 }
 
+/* ============ KEYCLOAK STYLES ============ */
+
+.auth-method-selector {
+  margin-bottom: 2rem;
+}
+
+.toggle-container {
+  display: flex;
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b7280;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: #1e3c72;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn:hover:not(.active) {
+  color: #374151;
+}
+
+.keycloak-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.keycloak-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.keycloak-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.keycloak-info h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1e3c72;
+  font-weight: 600;
+}
+
+.keycloak-info p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.btn-keycloak {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-keycloak:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.btn-keycloak:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.keycloak-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.keycloak-icon-small {
+  font-size: 1.1rem;
+}
+
+.keycloak-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.benefit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.benefit-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+/* Animación para la transición entre modos */
+.login-form,
+.keycloak-section {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .login-container {
@@ -224,5 +376,18 @@
 
   .login-title {
     font-size: 1.5rem;
+  }
+
+  .toggle-container {
+    flex-direction: column;
+  }
+
+  .keycloak-benefits {
+    gap: 6px;
+  }
+
+  .benefit-item {
+    font-size: 0.8rem;
+    padding: 6px 10px;
   }
 }

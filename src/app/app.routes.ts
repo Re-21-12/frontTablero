@@ -1,5 +1,9 @@
 import { Routes } from '@angular/router';
 import { PermissionGuard } from './core/guards/permission.guard';
+import {
+  canActivateKeycloakAuth,
+  canActivateChildKeycloakAuth,
+} from './core/guards/keycloak-functional.guard';
 
 export const routes: Routes = [
   {
@@ -39,7 +43,7 @@ export const routes: Routes = [
         (m) => m.AdminPageComponent,
       ),
     title: 'Administración',
-    canActivate: [PermissionGuard],
+    canActivateChild: [PermissionGuard, canActivateChildKeycloakAuth],
     data: {
       requiredPermissions: [
         'Localidad:Consultar',

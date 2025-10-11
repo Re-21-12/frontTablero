@@ -5,7 +5,35 @@
       <p class="login-subtitle">Inicia sesión para continuar</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <!-- Selector de método de autenticación -->
+    <div class="auth-method-selector">
+      <div class="toggle-container">
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.active]="!useKeycloak"
+          (click)="useKeycloak = false; errorMessage = ''"
+        >
+          Login Tradicional
+        </button>
+        <button
+          type="button"
+          class="toggle-btn"
+          [class.active]="useKeycloak"
+          (click)="useKeycloak = true; errorMessage = ''"
+        >
+          Login con Keycloak
+        </button>
+      </div>
+    </div>
+
+    <!-- Formulario tradicional (solo si no usa Keycloak) -->
+    <form
+      *ngIf="!useKeycloak"
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      class="login-form"
+    >
       <!-- Campo Usuario -->
       <div class="form-group">
         <label for="nombre" class="form-label">Usuario</label>
@@ -53,12 +81,7 @@
         </div>
       </div>
 
-      <!-- Error general -->
-      <div class="error-message error-message--general" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <!-- Botón de envío -->
+      <!-- Botón de envío para login tradicional -->
       <button
         type="submit"
         class="btn btn-primary btn-login"
@@ -72,8 +95,55 @@
       </button>
     </form>
 
+    <!-- Sección Keycloak -->
+    <div *ngIf="useKeycloak" class="keycloak-section">
+      <div class="keycloak-info">
+        <div class="keycloak-icon">🔐</div>
+        <h3>Autenticación Segura con Keycloak</h3>
+        <p>Utiliza tu cuenta institucional para acceder de forma segura</p>
+      </div>
+
+      <!-- Botón de Keycloak -->
+      <button
+        type="button"
+        class="btn btn-keycloak btn-login"
+        [disabled]="isLoading"
+        (click)="onSubmit()"
+      >
+        <span *ngIf="!isLoading" class="keycloak-btn-content">
+          <span class="keycloak-icon-small">🔑</span>
+          Continuar con Keycloak
+        </span>
+        <span *ngIf="isLoading" class="loading">
+          <span class="spinner"></span>
+          Conectando...
+        </span>
+      </button>
+
+      <div class="keycloak-benefits">
+        <div class="benefit-item">
+          <span class="benefit-icon">✅</span>
+          <span>Autenticación unificada</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🛡️</span>
+          <span>Seguridad empresarial</span>
+        </div>
+        <div class="benefit-item">
+          <span class="benefit-icon">🔄</span>
+          <span>Single Sign-On (SSO)</span>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    <!-- Error general -->
+    <div class="error-message error-message--general" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
     <div class="login-footer">
       <p class="login-help">¿No posees una cuenta todavía? <a class="login-link" routerLink="/registro">Registrarse</a></p>
     </div>
   </div>
-</div>

@@ -1,6 +1,13 @@
 // Definir los tipos para el environment
+export interface KeycloakConfig {
+  url: string;
+  realm: string;
+  clientId: string;
+}
+
 export interface EnvironmentConfig {
   apiBaseUrl: string;
+  keycloak: KeycloakConfig;
 }
 
 export type EnvironmentType = 'prod' | 'dev' | 'local';
@@ -17,13 +24,27 @@ export const environment: Environment = {
   production: true,
   selectedEnvironment: 'dev',
   prod: {
-    apiBaseUrl: '/api/api', // relativo al mismo dominio
+    apiBaseUrl: '/api/api',
+    keycloak: {
+      url: 'https://keycloack:8080.com/auth',
+      realm: 'master',
+      clientId: 'frontend',
+    },
   },
   dev: {
-    apiBaseUrl: 'http://localhost:5232/api', // para desarrollo local
-    // apiBaseUrl: 'http://vmacarioe1_umg.com.gt:5000/api', // para desarrollo local
+    apiBaseUrl: 'http://localhost:5232/api',
+    keycloak: {
+      url: 'http://localhost:8080/auth',
+      realm: 'master',
+      clientId: 'frontend',
+    },
   },
   local: {
-    apiBaseUrl: 'http://192.168.137.1:8080/api', // entorno local
+    apiBaseUrl: 'http://192.168.137.1:8080/api',
+    keycloak: {
+      url: 'http://192.168.137.1:8080/auth',
+      realm: 'master',
+      clientId: 'frontend',
+    },
   },
 };

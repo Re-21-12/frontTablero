@@ -12,13 +12,14 @@ import {
   RefreshTokenResponse,
   Permiso,
 } from '../interfaces/auth-interface';
-
+import Keycloak from 'keycloak-js';
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly _httpClient = inject(HttpClient);
   private readonly _router = inject(Router);
+  private readonly _keycloakService = inject(Keycloak);
 
   private readonly tokenKey = 'auth_token';
   private readonly refreshTokenKey = 'refresh_token';
@@ -365,5 +366,271 @@ export class AuthService {
       rol: this.getRoleComplete(),
       permisos: this.getPermissions(),
     };
+  }
+
+  // ========================= KEYCLOAK METHODS =========================
+
+  /**
+   * Inicializar sesión con Keycloak
+   */
+  async loginWithKeycloak(): Promise<void> {
+    try {
+      await this._keycloakService.login();
+    } catch (error) {
+      console.error('Error al iniciar sesión con Keycloak:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Cerrar sesión con Keycloak
+   */
+  async logoutWithKeycloak(): Promise<void> {
+    try {
+      // Limpiar datos locales primero
+      this.clearLocalStorage();
+
+      // Hacer logout de Keycloak
+      await this._keycloakService.logout();
+    } catch (error) {
+      console.error('Error al cerrar sesión con Keycloak:', error);
+      // Asegurar que se limpien los datos locales incluso si Keycloak falla
+      this.clearLocalStorage();
+      this._router.navigate(['/inicio_sesion']);
+    }
+  }
+
+  /**
+   * Verificar si el usuario está autenticado con Keycloak
+   */
+  async isAuthenticatedWithKeycloak(): Promise<boolean> {
+    try {
+      return await this._keycloakService.authenticated;
+    } catch (error) {
+      console.error('Error al verificar autenticación con Keycloak:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Obtener el token de Keycloak
+   */
+  async getKeycloakToken(): Promise<string> {
+    try {
+      return (await this._keycloakService.token) || '';
+    } catch (error) {
+      console.error('Error al obtener token de Keycloak:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtener información del usuario desde Keycloak
+   */
+  getKeycloakUserProfile(): any {
+    try {
+      return this._keycloakService.profile;
+    } catch (error) {
+      console.error('Error al obtener perfil de usuario de Keycloak:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Obtener roles del usuario desde Keycloak
+   */
+  getKeycloakUserRoles(): string[] {
+    try {
+      const realmRoles = this._keycloakService.realmAccess?.roles || [];
+      const resourceRoles: string[] = [];
+
+      // Obtener roles de recursos si existen
+      if (this._keycloakService.resourceAccess) {
+        Object.values(this._keycloakService.resourceAccess).forEach(
+          (resource) => {
+            resourceRoles.push(...resource.roles);
+          },
+        );
+      }
+
+      // Combinar roles de realm y recursos
+      return [...realmRoles, ...resourceRoles];
+    } catch (error) {
+      console.error('Error al obtener roles de Keycloak:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Verificar si el usuario tiene un rol específico en Keycloak
+   */
+  hasKeycloakRole(role: string): boolean {
+    try {
+      // Verificar primero en roles de realm
+      if (this._keycloakService.hasRealmRole(role)) {
+        return true;
+      }
+
+      // Verificar en roles de recursos (usando clientId por defecto)
+      return this._keycloakService.hasResourceRole(role);
+    } catch (error) {
+      console.error('Error al verificar rol en Keycloak:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Verificar si el usuario tiene un rol específico de realm en Keycloak
+   */
+  hasKeycloakRealmRole(role: string): boolean {
+    try {
+      return this._keycloakService.hasRealmRole(role);
+    } catch (error) {
+      console.error('Error al verificar rol de realm en Keycloak:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Verificar si el usuario tiene un rol específico de recurso en Keycloak
+   */
+  hasKeycloakResourceRole(role: string, resource?: string): boolean {
+    try {
+      return this._keycloakService.hasResourceRole(role, resource);
+    } catch (error) {
+      console.error('Error al verificar rol de recurso en Keycloak:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Actualizar token de Keycloak
+   */
+  async updateKeycloakToken(): Promise<boolean> {
+    try {
+      return await this._keycloakService.updateToken(70);
+    } catch (error) {
+      console.error('Error al actualizar token de Keycloak:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Método híbrido que usa tanto el sistema local como Keycloak
+   */
+  async isFullyAuthenticated(): Promise<boolean> {
+    const localAuth = this.isAuthenticated();
+    const keycloakAuth = await this.isAuthenticatedWithKeycloak();
+
+    return localAuth || keycloakAuth;
+  }
+
+  /**
+   * Login híbrido que intenta primero con Keycloak, luego con el sistema local
+   */
+  async hybridLogin(loginData?: LoginRequest): Promise<void> {
+    try {
+      // Intentar primero con Keycloak
+      const isKeycloakAuth = await this.isAuthenticatedWithKeycloak();
+
+      if (!isKeycloakAuth) {
+        await this.loginWithKeycloak();
+        return;
+      }
+
+      // Si Keycloak está autenticado pero necesitamos datos adicionales del backend
+      if (loginData) {
+        this.login(loginData).subscribe({
+          next: (response) => {
+            console.log('Autenticación híbrida exitosa');
+          },
+          error: (error) => {
+            console.error('Error en login local después de Keycloak:', error);
+          },
+        });
+      }
+    } catch (error) {
+      console.error('Error en login híbrido:', error);
+      // Fallback al login tradicional si se proporciona
+      if (loginData) {
+        this.login(loginData).subscribe({
+          error: (error) => {
+            console.error('Error en fallback login:', error);
+            throw error;
+          },
+        });
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  /**
+   * Logout híbrido que cierra sesión tanto en Keycloak como localmente
+   */
+  async hybridLogout(): Promise<void> {
+    try {
+      // Intentar logout de Keycloak primero
+      const isKeycloakAuth = await this.isAuthenticatedWithKeycloak();
+
+      if (isKeycloakAuth) {
+        await this.logoutWithKeycloak();
+      } else {
+        // Fallback al logout tradicional
+        this.logout();
+      }
+    } catch (error) {
+      console.error('Error en logout híbrido:', error);
+      // Asegurar limpieza local en caso de error
+      this.logout();
+    }
+  }
+
+  /**
+   * Limpiar localStorage
+   */
+  private clearLocalStorage(): void {
+    if (!this.isBrowser()) return;
+
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.refreshTokenKey);
+    localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.expirationKey);
+    localStorage.removeItem(this.permissionsKey);
+    localStorage.removeItem(this.roleKey);
+  }
+
+  /**
+   * Sincronizar datos de Keycloak con el sistema local
+   */
+  async syncKeycloakWithLocal(): Promise<void> {
+    try {
+      const isKeycloakAuth = await this.isAuthenticatedWithKeycloak();
+
+      if (isKeycloakAuth) {
+        const userProfile = this.getKeycloakUserProfile();
+        const userRoles = this.getKeycloakUserRoles();
+        const token = await this.getKeycloakToken();
+
+        // Simular una respuesta de login para guardar en localStorage
+        if (userProfile && token) {
+          const mockLoginResponse: any = {
+            token: token,
+            refresToken: '', // Keycloak maneja esto automáticamente
+            expiresIn: 60, // Valor por defecto, Keycloak maneja la expiración
+            nombre:
+              userProfile.firstName + ' ' + userProfile.lastName ||
+              userProfile.username,
+            rol:
+              userRoles.length > 0 ? { id_rol: 1, nombre: userRoles[0] } : null,
+            permisos: [], // Se pueden mapear desde los roles de Keycloak
+          };
+
+          this.saveLoginData(mockLoginResponse);
+        }
+      }
+    } catch (error) {
+      console.error('Error al sincronizar Keycloak con datos locales:', error);
+    }
   }
 }

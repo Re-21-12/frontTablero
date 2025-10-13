@@ -1,92 +1,73 @@
+import { AuthGuardData, createAuthGuard } from 'keycloak-angular';
 import {
   ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  Router,
-  UrlTree,
   CanActivateFn,
-  CanActivateChildFn,
+  Router,
+  RouterStateSnapshot,
+  UrlTree,
 } from '@angular/router';
 import { inject } from '@angular/core';
-import { createAuthGuard, AuthGuardData } from 'keycloak-angular';
 
-// Guard principal que maneja autenticación y roles múltiples
-const isAccessAllowed = async (
-  route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot,
-  authData: AuthGuardData,
-): Promise<boolean | UrlTree> => {
-  const { authenticated, grantedRoles, keycloak } = authData;
-  const router = inject(Router);
+/**
+ * The logic below is a simple example, please make it more robust when implementing in your application.
+ *
+ * Reason: isAccessGranted is not validating the resource, since it is merging all roles. Two resources might
+ * have the same role name and it makes sense to validate it more granular.
+ */
 
-  // Si no está autenticado, redirigir al login de Keycloak
-  if (!authenticated) {
-    await keycloak.login({
-      redirectUri: window.location.origin + state.url,
-    });
-    return false;
-  }
+const collectRequiredRoles = (route: ActivatedRouteSnapshot): string[] => {
+  const roles: string[] = [];
 
-  // Obtener los roles requeridos desde los datos de la ruta
-  const requiredRoles = route.data['roles'] as string[];
-
-  // Si no se especifican roles, permitir el acceso si está autenticado
-  if (!requiredRoles || requiredRoles.length === 0) {
-    return true;
-  }
-
-  // Verificar si el usuario tiene al menos uno de los roles requeridos
-  const hasRequiredRole = (role: string): boolean => {
-    // Verificar en realm roles
-    if (grantedRoles.realmRoles && grantedRoles.realmRoles.includes(role)) {
-      return true;
+  const pushRole = (r: any) => {
+    if (!r) return;
+    if (Array.isArray(r)) {
+      roles.push(...r.filter((x) => typeof x === 'string'));
+    } else if (typeof r === 'string') {
+      roles.push(r);
     }
-
-    // Verificar en resource roles
-    if (grantedRoles.resourceRoles) {
-      return Object.values(grantedRoles.resourceRoles).some((roles) =>
-        roles.includes(role),
-      );
-    }
-
-    return false;
   };
 
-  const hasAccess = requiredRoles.some((role) => hasRequiredRole(role));
+  // Recurse and collect roles from this route and all children
+  const traverse = (r: ActivatedRouteSnapshot) => {
+    pushRole(r.data?.['role']);
+    for (const child of r.children) {
+      traverse(child);
+    }
+  };
 
-  if (!hasAccess) {
-    // Redirigir a página de acceso denegado
-    return router.parseUrl('/forbidden');
-  }
-
-  return true;
+  traverse(route);
+  // Remove duplicates
+  return Array.from(new Set(roles));
 };
 
-// Guard simplificado para un solo rol (siguiendo el ejemplo proporcionado)
-const isAccessAllowedForSingleRole = async (
+const hasAllRequiredRoles = (
+  requiredRoles: string[],
+  grantedResourceRoles: Record<string, string[]>,
+): boolean => {
+  if (requiredRoles.length === 0) return false;
+
+  const hasRole = (role: string) =>
+    Object.values(grantedResourceRoles).some((roles) => roles.includes(role));
+
+  return requiredRoles.every((role) => hasRole(role));
+};
+
+const isAccessAllowed = async (
   route: ActivatedRouteSnapshot,
-  _: RouterStateSnapshot,
+  __: RouterStateSnapshot,
   authData: AuthGuardData,
 ): Promise<boolean | UrlTree> => {
   const { authenticated, grantedRoles } = authData;
 
-  const requiredRole = route.data['role'];
-  if (!requiredRole) {
+  const requiredRoles = collectRequiredRoles(route);
+  if (requiredRoles.length === 0) {
     return false;
   }
 
-  const hasRequiredRole = (role: string): boolean => {
-    // Verificar en realm roles primero
-    if (grantedRoles.realmRoles && grantedRoles.realmRoles.includes(role)) {
-      return true;
-    }
-
-    // Verificar en resource roles
-    return Object.values(grantedRoles.resourceRoles).some((roles) =>
-      roles.includes(role),
-    );
-  };
-
-  if (authenticated && hasRequiredRole(requiredRole)) {
+  if (
+    authenticated &&
+    hasAllRequiredRoles(requiredRoles, grantedRoles.resourceRoles)
+  ) {
     return true;
   }
 
@@ -94,11 +75,5 @@ const isAccessAllowedForSingleRole = async (
   return router.parseUrl('/forbidden');
 };
 
-// Exportar guards funcionales con tipado correcto
-export const canActivateKeycloakAuth =
+export const canActivateAuthRole =
   createAuthGuard<CanActivateFn>(isAccessAllowed);
-export const canActivateChildKeycloakAuth =
-  createAuthGuard<CanActivateChildFn>(isAccessAllowed);
-export const canActivateAuthRole = createAuthGuard<CanActivateFn>(
-  isAccessAllowedForSingleRole,
-);

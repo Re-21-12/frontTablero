@@ -9,19 +9,16 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LoginRequest } from '../../core/interfaces/auth-interface';
-import Keycloak from 'keycloak-js';
 
 @Component({
   selector: 'app-login',
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
-  providers: [Keycloak],
 })
 export class LoginComponent implements OnInit {
   private readonly _fb = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
-  private readonly _keycloackService = inject(Keycloak);
   private readonly _router = inject(Router);
 
   loginForm: FormGroup;
@@ -69,7 +66,6 @@ export class LoginComponent implements OnInit {
       await this._authService.hybridLogin();
 
       // Configurar eventos de Keycloak
-      this._keycloackService.login();
 
       this._router.navigate(['/seleccion']);
     } catch (error) {

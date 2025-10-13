@@ -16,38 +16,19 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
-
+import { provideKeycloakAngular } from './keycloak.config';
+import { provideAnimations } from '@angular/platform-browser/animations';
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideKeycloak({
-      config: {
-        url: 'https://localhost:8080/',
-        realm: 'master',
-        clientId: 'frontend',
-      },
-      initOptions: {
-        onLoad: 'check-sso',
-        silentCheckSsoRedirectUri:
-          window.location.origin + '/assets/silent-check-sso.html',
-        redirectUri: window.location.origin + '/',
-        checkLoginIframe: false,
-      },
-      features: [
-        withAutoRefreshToken({
-          sessionTimeout: 300000, // 5 minutes
-          onInactivityTimeout: 'logout',
-        }),
-      ],
-
-      providers: [AutoRefreshTokenService, UserActivityService],
-    }),
+    provideKeycloakAngular(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideAnimations(),
     provideHttpClient(
       withFetch(),
       withInterceptors([
         AuthInterceptor,
-        ErrorInterceptor,
+        // ErrorInterceptor,
         loadingInterceptor,
         includeBearerTokenInterceptor,
       ]),

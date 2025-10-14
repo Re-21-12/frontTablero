@@ -1,20 +1,14 @@
 import { Component, OnInit, inject, model, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
+
 import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { PartidoService } from '../../core/services/partido.service';
-import {
-  Equipo,
-  Localidad,
-  Partido,
-  Pagina,
-  PartidoResultado,
-  PartidoPagina,
-} from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { RolService } from '../../core/services/rol.service';
+
+import { Equipo, Localidad, Pagina, PartidoPagina } from '../../core/interfaces/models';
 
 @Component({
   standalone: true,
@@ -24,37 +18,42 @@ import { RolService } from '../../core/services/rol.service';
   styleUrls: ['./partidos-page.component.css'],
 })
 export class PartidosPageComponent implements OnInit {
+  // Form
   fechaHoraLocal = '';
   partLocalidadId = model<number>();
-
-  equipos = signal<Equipo[]>([]);
-  localidades = signal<Localidad[]>([]);
-  equipoLocal = model<Equipo>();
+  equipoLocal     = model<Equipo>();
   equipoVisitante = model<Equipo>();
-  partidos = signal<any[]>([]);
+
+  // Data
+  equipos     = signal<Equipo[]>([]);
+  localidades = signal<Localidad[]>([]);
+  partidos    = signal<any[]>([]);
+
+  // Lista paginada
+  items          = signal<PartidoPagina[]>([]);
   totalRegistros = signal(0);
   tamanio = 5;
-  pagina = 1;
-  items = signal<PartidoPagina[]>([]);
+  pagina  = 1;
 
-  private eqService = inject(EquipoService);
-  private locService = inject(LocalidadService);
+  // UI state
+  expandedIndex = signal<number | null>(null); // <- usamos índice
+
+  // Services
+  private eqService   = inject(EquipoService);
+  private locService  = inject(LocalidadService);
   private partService = inject(PartidoService);
-  private notify = inject(NotifyService);
+  private notify      = inject(NotifyService);
 
   ngOnInit() {
     this.cargar();
     this.cargarPagina();
-    console.log(this.items());
   }
 
   cargar() {
-    this.eqService.getAll().subscribe({ next: (d) => this.equipos.set(d) });
-    this.locService
-      .getAll()
-      .subscribe({ next: (d) => this.localidades.set(d) });
+    this.eqService.getAll().subscribe({ next: d => this.equipos.set(d ?? []) });
+    this.locService.getAll().subscribe({ next: d => this.localidades.set(d ?? []) });
     this.partService.getAll().subscribe({
-      next: (d) => this.partidos.set(d),
+      next: d => this.partidos.set(d ?? []),
       error: () => this.notify.error('No se pudieron cargar partidos'),
     });
   }
@@ -66,29 +65,23 @@ export class PartidosPageComponent implements OnInit {
   }
 
   crearPartido() {
-    if (!this.fechaHoraLocal || !this.partLocalidadId) {
+    if (!this.fechaHoraLocal || !this.partLocalidadId()) {
       this.notify.info('Completa todos los campos');
       return;
     }
-
     const eqLocal = this.equipoLocal();
-    const eqVisitante = this.equipoVisitante();
-
-    if (!eqLocal || !eqVisitante) {
-      this.notify.info('Selecciona ambos equipos');
-      return;
-    }
-
-    if (eqLocal.id_Equipo === eqVisitante.id_Equipo) {
+    const eqVisit = this.equipoVisitante();
+    if (!eqLocal || !eqVisit) { this.notify.info('Selecciona ambos equipos'); return; }
+    if (eqLocal.id_Equipo === eqVisit.id_Equipo) {
       this.notify.info('El equipo local y visitante no pueden ser el mismo');
       return;
     }
 
     const payload = {
-      fechaHora: this.toLocalIso(this.fechaHoraLocal),
-      id: this.partLocalidadId,
-      id_Local: eqLocal.id_Equipo,
-      id_Visitante: eqVisitante.id_Equipo,
+      fechaHora:    this.toLocalIso(this.fechaHoraLocal),
+      id_Localidad: this.partLocalidadId()!,      // <- correcto
+      id_Local:     eqLocal.id_Equipo,
+      id_Visitante: eqVisit.id_Equipo,
     };
 
     this.partService.create(payload).subscribe({
@@ -104,18 +97,47 @@ export class PartidosPageComponent implements OnInit {
       error: () => this.notify.error('Error al agregar partido'),
     });
   }
+
   cambiarPagina(event: PageEvent) {
-    this.pagina = event.pageIndex + 1;
+    this.pagina  = event.pageIndex + 1;
     this.tamanio = event.pageSize;
     this.cargarPagina();
   }
+
   cargarPagina() {
-    this.partService
-      .getPaginado(this.pagina, this.tamanio)
-      .subscribe((res: Pagina<PartidoPagina>) => {
-        this.items.set(res.items);
-        this.totalRegistros.set(res.totalRegistros);
-        console.log(res);
-      });
+    this.partService.getPaginado(this.pagina, this.tamanio).subscribe({
+      next: (res: Pagina<PartidoPagina>) => {
+        this.items.set(res.items ?? []);
+        this.totalRegistros.set(res.totalRegistros ?? 0);
+      },
+    });
   }
+
+  // ---- UI helpers ----
+  logoEquipo(nombre?: string): string {
+    if (!nombre) return 'assets/placeholder-team.svg';
+    const eq = this.equipos().find(e => e?.nombre?.toLowerCase() === nombre.toLowerCase());
+    return (eq as any)?.url || 'assets/placeholder-team.svg';
+  }
+
+  nombreLocalidad(id?: number): string {
+    if (!id) return '';
+    const l = this.localidades().find(x => (x as any).id === id || (x as any).id_Localidad === id);
+    return l?.nombre ?? `Loc: ${id}`;
+  }
+
+  toggleDetallesByIndex(index: number) {
+    this.expandedIndex.set(this.expandedIndex() === index ? null : index);
+  }
+
+  onImgErr(ev: Event) {
+    const img = ev.target as HTMLImageElement | null;
+    if (img) img.src = 'assets/placeholder-team.svg';
+  }
+
+  trackByPartido = (index: number, _p: PartidoPagina) => index; 
+
+  generarReporte() {
+  this.notify?.info?.('Generando reporte…'); 
+}
 }

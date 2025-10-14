@@ -6,22 +6,24 @@
   <div class="toolbar form">
     <div class="field">
       <label class="label">Nombre</label>
-      <input class="input" [(ngModel)]="nombre" placeholder="Nombre" (keyup)="validarNombre(nombre)" />
+      <input class="input" [(ngModel)]="nombre" placeholder="Nombre"
+             (keyup)="validarNombre(nombre)" (keyup.enter)="crear()" />
     </div>
 
     <div class="field">
       <label class="label">Apellido</label>
-      <input class="input" [(ngModel)]="apellido" placeholder="Apellido" (keyup)="validarNombre(apellido)" />
+      <input class="input" [(ngModel)]="apellido" placeholder="Apellido"
+             (keyup)="validarNombre(apellido)" (keyup.enter)="crear()" />
     </div>
 
     <div class="field">
       <label class="label">Estatura (m)</label>
-      <input class="input" type="number" [(ngModel)]="estatura" min="0.1" max="3.0" step="0.01" placeholder="Ej: 1.85" />
+      <input class="input" type="number" [(ngModel)]="estatura" min="0.1" max="3.0" step="0.01" placeholder="1.85" />
     </div>
 
     <div class="field">
       <label class="label">Posición</label>
-      <input class="input" [(ngModel)]="posicion" placeholder="Ej: Delantero, Defensor" />
+      <input class="input" [(ngModel)]="posicion" placeholder="Delantero, Defensor…" />
     </div>
 
     <div class="field">
@@ -45,18 +47,18 @@
       </select>
     </div>
 
-    <!-- CRUD -->
     <div class="field field--actions">
       <label class="label">&nbsp;</label>
-      <button class="btn" (click)="crear()"
-        [disabled]="!nombre.trim() || !apellido.trim() || !estatura || !posicion.trim() || !nacionalidad || !edad || !idEquipo || loading()">
-        {{ loading() ? 'Guardando...' : 'Agregar' }}
+      <button class="btn"
+              (click)="crear()"
+              [disabled]="!nombre.trim() || !apellido.trim() || !estatura || !posicion.trim() || !nacionalidad || !edad || !idEquipo || loading()">
+        {{ loading() ? 'Guardando…' : 'Agregar' }}
       </button>
     </div>
 
     <div class="field id-group">
       <label class="label">ID</label>
-      <input class="input input--id" type="number" [(ngModel)]="idCrud" min="1" placeholder="#ID" />
+      <input class="input input--id" type="number" [(ngModel)]="idCrud" min="1" placeholder="#ID" (keyup.enter)="buscarPorId()" />
     </div>
 
     <div class="field field--actions-sm">
@@ -66,8 +68,11 @@
 
     <div class="field field--actions-sm">
       <label class="label">&nbsp;</label>
-      <button class="btn btn--ghost" (click)="editar()"
-        [disabled]="!idCrud || !nombre.trim() || !apellido.trim() || !estatura || !posicion.trim() || !nacionalidad || !edad || !idEquipo || loading()">Editar</button>
+      <button class="btn btn--ghost"
+              (click)="editar()"
+              [disabled]="!idCrud || !nombre.trim() || !apellido.trim() || !estatura || !posicion.trim() || !nacionalidad || !edad || !idEquipo || loading()">
+        Editar
+      </button>
     </div>
 
     <div class="field field--actions-sm">
@@ -77,26 +82,36 @@
   </div>
 
   <div class="list-scroll">
-    <ul class="list">
-      <li class="row-item" *ngFor="let j of items(); let i = index">
-        <span class="name">{{j.id_Jugador}}</span>
-        <span class="name">{{ j.nombre }} {{ j.apellido }}</span>
-        <span class="muted">{{ j.estatura }}m - {{ j.posicion }}</span>
-        <span class="muted">{{ j.nacionalidad }} - Edad: {{ j.edad }}</span>
-        <span class="muted">Equipo: {{ j.id_Equipo }}</span>
-        <button class="btn btn--ghost" (click)="borrar(j)">Eliminar</button>
+    <ul class="list cards">
+      <li class="card" *ngFor="let j of items(); let i = index">
+        <div class="card__head">
+          <div class="avatar">{{ initials(j) }}</div>
+          <div class="head__meta">
+            <div class="title">{{ j.nombre }} {{ j.apellido }}</div>
+            <div class="subtitle">#{{ j.id_Jugador }}</div>
+          </div>
+          <button class="btn btn--ghost" (click)="borrar(j)">Eliminar</button>
+        </div>
+        
+        <div class="grid">
+          <div class="cell"><span class="tag">Estatura</span><span class="val">{{ j.estatura }} m</span></div>
+          <div class="cell"><span class="tag">Posición</span><span class="val">{{ j.posicion }}</span></div>
+          <div class="cell"><span class="tag">Edad</span><span class="val">{{ j.edad }}</span></div>
+          <div class="cell"><span class="tag">Nacionalidad</span><span class="val">{{ j.nacionalidad }}</span></div>
+          <div class="cell"><span class="tag">Equipo</span><span class="val">ID {{ j.id_Equipo }}</span></div>
+        </div>
       </li>
-      
     </ul>
   </div>
 
-
   <mat-paginator
-  [length]="totalRegistros()"
-  [pageSize]="tamanio"
-  [pageSizeOptions]="[5, 10, 25]"
-  (page)="cambiarPagina($event)">
-</mat-paginator>
+    [length]="totalRegistros()"
+    [pageSize]="tamanio"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="cambiarPagina($event)">
+  </mat-paginator>
+
+  <footer class="panel__footer">
+    <button class="btn" (click)="generarReporte()">Generar reporte</button>
+  </footer>
 </section>
-
-

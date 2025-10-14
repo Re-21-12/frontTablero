@@ -1,22 +1,45 @@
-<!-- ========== PARTIDOS ========== -->
-<section class="panel">
+<section class="panel panel--history">
   <header class="panel__header">
     <h2 class="panel__title">Historial de Partidos</h2>
   </header>
 
-  
-
-  
-
   <div class="list-scroll">
-    <ul class="list">
-      <li class="row-item" *ngFor="let p of partidos()">
-        <span class="mono">#{{ p.id_Partido }}</span>
-        <span>Partido, {{ p.local }} vs {{ p.visitante }} </span>
-        <span class="name">{{ p.fechaHora }}</span>
-        
-        <span class="name"> Resultados: {{ p.local }}: {{p.resultado.puntaje_local}} || {{ p.visitante }}: {{p.resultado.puntaje_visitante}}</span>
+    <ul class="list history">
+      <li class="history__item" *ngFor="let p of partidos()">
+
+        <div class="history__head">
+          <span class="chip chip--id">#{{ p.id_Partido }}</span>
+          <span class="chip chip--date">{{ p.fechaHora }}</span>
+        </div>
+        <div class="history__body">
+          <div class="team team--home">
+            <div class="crest">{{ (p.local | slice:0:3) || '?' }}</div>
+            <span class="team__name">{{ p.local }}</span>
+          </div>
+
+          <div class="score">
+            <span class="score__num">{{ p.resultado.puntaje_local }}</span>
+            <span class="score__sep">–</span>
+            <span class="score__num">{{ p.resultado.puntaje_visitante }}</span>
+          </div>
+
+          <div class="team team--away">
+            <span class="team__name">{{ p.visitante }}</span>
+            <div class="crest">{{ (p.visitante | slice:0:3) || '?' }}</div>
+          </div>
+        </div>
+        <div class="history__foot">
+          <span class="muted">
+            <strong>{{ p.local }}</strong> {{ p.resultado.puntaje_local }}
+            &nbsp;|&nbsp;
+            <strong>{{ p.visitante }}</strong> {{ p.resultado.puntaje_visitante }}
+          </span>
+        </div>
       </li>
     </ul>
   </div>
+
+  <footer class="panel__footer">
+    <button class="btn">Generar reporte</button>
+  </footer>
 </section>

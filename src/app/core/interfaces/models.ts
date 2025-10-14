@@ -38,6 +38,7 @@ export interface Equipo {
   nombre:       string;
   localidad: number;
   id_localidad: number;
+  url?: string;
 }
 
 export interface PartidoResultado {

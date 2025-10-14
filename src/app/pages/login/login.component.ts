@@ -1,32 +1,46 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+=======
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+>>>>>>> main
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LoginRequest } from '../../core/interfaces/auth-interface';
 
 @Component({
+  standalone: true,
   selector: 'app-login',
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
+<<<<<<< HEAD
   styleUrl: './login.component.css',
+=======
+  styleUrls: ['./login.component.css']
+>>>>>>> main
 })
 export class LoginComponent implements OnInit {
   private readonly _fb = inject(FormBuilder);
   private readonly _authService = inject(AuthService);
   private readonly _router = inject(Router);
 
-  loginForm: FormGroup;
+  loginForm: FormGroup = this._fb.group({
+    nombre: ['', [Validators.required, Validators.minLength(3)]],
+    contrasena: ['', [Validators.required, Validators.minLength(1)]],
+  });
+
   isLoading = false;
   errorMessage = '';
   showPassword = false;
   useKeycloak = false; // Opción para alternar entre Keycloak y login tradicional
 
+<<<<<<< HEAD
   constructor() {
     this.loginForm = this._fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
@@ -95,8 +109,30 @@ export class LoginComponent implements OnInit {
         },
       });
     } else {
+=======
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+>>>>>>> main
       this.markFormGroupTouched();
+      return;
     }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const loginData: LoginRequest = this.loginForm.value as LoginRequest;
+
+    this._authService.login(loginData).subscribe({
+      next: () => {
+        // AuthService.login ya guarda el token/usuario y programa el refresh
+        this._router.navigate(['/bienvenida']);
+        this.isLoading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Usuario o contraseña incorrectos';
+        this.isLoading = false;
+      },
+    });
   }
 
   toggleAuthMethod(): void {

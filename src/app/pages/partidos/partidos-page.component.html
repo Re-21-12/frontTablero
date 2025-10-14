@@ -1,4 +1,3 @@
-<!-- ========== PARTIDOS ========== -->
 <section class="panel">
   <header class="panel__header">
     <h2 class="panel__title">Partidos</h2>
@@ -14,20 +13,15 @@
       <label class="label">Localidad</label>
       <select class="input" [(ngModel)]="partLocalidadId">
         <option [ngValue]="null">Seleccionar</option>
-        <option *ngFor="let l of localidades()" [ngValue]="l.id">
-          {{ l.nombre }}
-        </option>
+        <option *ngFor="let l of localidades()" [ngValue]="l.id">{{ l.nombre }}</option>
       </select>
     </div>
 
     <div class="field">
       <label class="label">Equipo Local</label>
       <select class="input" [(ngModel)]="equipoLocal">
-
         <option [ngValue]="null">Seleccionar</option>
-        <option *ngFor="let e of equipos()" [ngValue]="e">
-          {{ e.nombre }}
-        </option>
+        <option *ngFor="let e of equipos()" [ngValue]="e">{{ e.nombre }}</option>
       </select>
     </div>
 
@@ -35,24 +29,16 @@
       <label class="label">Equipo Visitante</label>
       <select class="input" [(ngModel)]="equipoVisitante">
         <option [ngValue]="null">Seleccionar</option>
-        <ng-container *ngFor="let e of equipos()">
-          <option  [ngValue]="e">
-            {{ e.nombre }}
-          </option>
-        </ng-container>
+        <option *ngFor="let e of equipos()" [ngValue]="e">{{ e.nombre }}</option>
       </select>
     </div>
 
-    <div class="field">
+    <div class="field field--actions">
       <label class="label">&nbsp;</label>
-      <button
-        class="btn"
-        (click)="crearPartido()"
-        [disabled]="
-          !fechaHoraLocal || !partLocalidadId || !equipoLocal() || !equipoVisitante()
-        "
-      >
-        Crear
+      <button class="btn"
+              (click)="crearPartido()"
+              [disabled]="!fechaHoraLocal || !partLocalidadId() || !equipoLocal() || !equipoVisitante()">
+        Crear partido
       </button>
     </div>
   </div>
@@ -63,20 +49,49 @@
   </small>
 
   <div class="list-scroll">
-    <ul class="list">
-      <li class="row-item" *ngFor="let p of items()">
+    <ul class="list match-list">
+      <li class="row-item match-card"
+          *ngFor="let p of items(); let i = index; trackBy: trackByPartido">
+        <div class="match-date">
+          <span class="pill pill--date">{{ p.fechaHora }}</span>
+          <span class="pill pill--loc">{{ nombreLocalidad(p.id_Localidad) }}</span>
+        </div>
 
-        <span class="name">{{ p.fechaHora }}</span>
-        <span class="muted">Localidad: {{ p.id_Localidad }}</span>
-        <span class="muted">|</span>
-        <span class="muted">{{ p.local }} vs {{ p.visitante }}</span>
+        <div class="match-body">
+          <div class="team">
+            <img class="crest-img" [src]="logoEquipo(p.local)" (error)="onImgErr($event)" alt="logo local" />
+            <span class="team-name">{{ p.local }}</span>
+          </div>
+
+          <div class="vs">VS</div>
+
+          <div class="team">
+            <img class="crest-img crest--away" [src]="logoEquipo(p.visitante)" (error)="onImgErr($event)" alt="logo visitante" />
+            <span class="team-name">{{ p.visitante }}</span>
+          </div>
+        </div>
+
+        <div class="match-actions">
+          <button class="btn btn--ghost" (click)="toggleDetallesByIndex(i)">Detalles</button>
+        </div>
+        <div class="match-details" *ngIf="expandedIndex() === i">
+          <div class="detail-row"><span class="dt">Fecha/Hora:</span><span class="dd">{{ p.fechaHora }}</span></div>
+          <div class="detail-row"><span class="dt">Localidad:</span><span class="dd">{{ nombreLocalidad(p.id_Localidad) }}</span></div>
+          <div class="detail-row"><span class="dt">Equipos:</span><span class="dd">{{ p.local }} vs {{ p.visitante }}</span></div>
+        </div>
       </li>
     </ul>
   </div>
-        <mat-paginator
-  [length]="totalRegistros()"
-  [pageSize]="tamanio"
-  [pageSizeOptions]="[5, 10, 25]"
-  (page)="cambiarPagina($event)">
-</mat-paginator>
+
+  <mat-paginator
+    [length]="totalRegistros()"
+    [pageSize]="tamanio"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="cambiarPagina($event)">
+  </mat-paginator>
+
+    <footer class="panel__footer">
+    <button class="btn" (click)="generarReporte()">Generar reporte</button>
+  </footer>
 </section>
+

@@ -3,45 +3,106 @@
     <h2 class="panel__title">Equipos</h2>
   </header>
 
-
   <div class="toolbar toolbar--one-row">
     <label class="label inline">Nombre</label>
-    <input class="input" placeholder="Nombre" [(ngModel)]="nombre" (keyup)="validarNombre(nombre)" />
+    <input
+      class="input"
+      placeholder="Nombre"
+      [(ngModel)]="nombre"
+      (keyup)="validarNombre(nombre)"
+      (keyup.enter)="crear()"
+    />
 
     <label class="label inline">Localidad</label>
-
     <select class="input" [(ngModel)]="idLocalidad">
       <option [ngValue]="null">Seleccionar</option>
       <option *ngFor="let l of localidades()" [ngValue]="l.id">{{ l.nombre }}</option>
     </select>
-    <button class="btn" (click)="crear()" [disabled]="!nombre.trim() || !idLocalidad || loading()">
+
+    <button
+      class="btn"
+      (click)="crear()"
+      [disabled]="!nombre.trim() || !idLocalidad || loading()"
+      aria-label="Agregar equipo"
+    >
       {{ loading() ? 'Guardando…' : 'Agregar' }}
     </button>
 
     <label class="label inline">ID</label>
-    <input class="input input--id" type="number" [(ngModel)]="idCrud" placeholder="#ID" />
+    <input
+      class="input input--id"
+      type="number"
+      min="1"
+      [(ngModel)]="idCrud"
+      placeholder="#ID"
+      (keyup.enter)="buscarPorId()"
+    />
 
     <button class="btn btn--ghost" (click)="buscarPorId()" [disabled]="!idCrud || loading()">Buscar</button>
-    <button class="btn btn--ghost" (click)="editar()"
-      [disabled]="!idCrud || !nombre.trim() || !idLocalidad || loading()">Editar</button>
+    <button
+      class="btn btn--ghost"
+      (click)="editar()"
+      [disabled]="!idCrud || !nombre.trim() || !idLocalidad || loading()"
+    >
+      Editar
+    </button>
     <button class="btn btn--ghost danger" (click)="borrarPorId()" [disabled]="!idCrud || loading()">Borrar</button>
+  </div>
+
+  <div class="toolbar toolbar--one-row" style="margin-top:8px">
+    <label class="label inline">Logo URL</label>
+    <input
+      class="input"
+      placeholder="https://mi-cdn.com/logo.png"
+      [(ngModel)]="logoUrl"
+      (keyup.enter)="guardarLogo()"
+    />
+
+    <button
+      class="btn"
+      (click)="guardarLogo()"
+      [disabled]="!idCrud || !logoUrl.trim() || loading()"
+    >
+      Guardar logo
+    </button>
+
+    <img
+      *ngIf="logoUrl"
+      class="team-logo--preview"
+      [src]="imgError ? 'assets/placeholder-team.svg' : logoUrl"
+      (error)="onImgErr($event)"
+      alt="Logo (preview)"
+    />
   </div>
 
   <div class="list-scroll">
     <ul class="list">
-      <li class="row-item" *ngFor="let e of items()">
+      <li class="row-item" *ngFor="let e of items(); trackBy: trackByEquipoId">
         <span class="mono">#{{ e.id_Equipo }}</span>
+
+        <img
+          class="team-logo"
+          [src]="logoOf(e)"
+          (error)="onImgErr($event)"
+          alt="Logo equipo"
+        />
+
         <span class="name">{{ e.nombre }}</span>
-        <span class="muted">Loc: {{ e.localidad }}</span>
+        <span class="muted">Loc: {{ locOf(e) }}</span>
+
         <button class="btn btn--ghost" (click)="borrarDesdeLista(e)">Eliminar</button>
       </li>
     </ul>
   </div>
-    <mat-paginator
-  [length]="totalRegistros()"
-  [pageSize]="tamanio"
-  [pageSizeOptions]="[5, 10, 25]"
-  (page)="cambiarPagina($event)">
-</mat-paginator>
 
+  <div class="toolbar" style="margin: .5rem 0 0; display:flex; justify-content:flex-end;">
+    <button class="btn" type="button">Generar Reporte</button>
+  </div>
+
+  <mat-paginator
+    [length]="totalRegistros()"
+    [pageSize]="tamanio"
+    [pageSizeOptions]="[5, 10, 25]"
+    (page)="cambiarPagina($event)">
+  </mat-paginator>
 </section>

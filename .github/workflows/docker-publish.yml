@@ -52,11 +52,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=sha
             type=raw,value=latest,priority=1000
 
-      - name: Build and push Docker image
+      - name: Build docker image
         uses: docker/build-push-action@v5
         with:
           context: .

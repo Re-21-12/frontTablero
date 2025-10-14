@@ -52,9 +52,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch      # tag por nombre de rama (main)
-            type=sha                   # tag por SHA del commit
-            type=raw,value=latest      # tag latest para Watchtower
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,priority=1000
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5

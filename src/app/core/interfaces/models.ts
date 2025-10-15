@@ -90,6 +90,7 @@ export interface Item<T> {
 }
 
 export interface PartidoPagina {
+  id_Partido: number;
   fechaHora: Date
   id_Localidad: number
   id_Local: number

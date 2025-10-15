@@ -9,6 +9,7 @@ import { EquipoService } from '../../core/services/equipo.service';
 import { PaisService } from '../../core/services/country.service';
 import { NotifyService } from '../shared/notify.service';
 import { Pagina, Equipo } from '../../core/interfaces/models';
+import { ReporteService } from '../../core/services/reporte.service';
 
 @Component({
   standalone: true,
@@ -44,6 +45,7 @@ export class JugadoresPageComponent implements OnInit {
   private eqSvc   = inject(EquipoService);
   private paisSvc = inject(PaisService);
   private notify  = inject(NotifyService);
+  private reporte = inject(ReporteService);
 
   ngOnInit(): void {
     this.cargarEquipos();
@@ -293,10 +295,33 @@ export class JugadoresPageComponent implements OnInit {
     const in2 = a.length > 0 ? a[0] : '';
     return `${in1}${in2}`.toUpperCase();
   }
-  generarReporte(): void {
-  this.notify.info('Generar reporte: en construcción');
+
+  private getJugadorId(j: any): number | null {
+  return (
+    (typeof j?.id_Jugador === 'number' && j.id_Jugador) ||
+    (typeof j?.id === 'number' && j.id) ||
+    (typeof j?.idJugador === 'number' && j.idJugador) ||
+    null
+  );
+}
+  
+  generarReporteDesdeFila(j: any) {
+  const id = this.getJugadorId(j);
+  if (!id) {
+    this.notify.error('No hay jugador seleccionado');
+    return;
+  }
+  this.generarReporteJugador(id);
 }
 
+generarReporteJugador(id: number) {
+  if (!id) { this.notify.error('Ingresa/selecciona un jugador'); return; }
 
+  this.notify.info('Generando reporte de estadísticas…');
+  this.reporte.descargarReporteEstadisticasJugador(id).subscribe({
+    next: () => this.notify.success('Reporte de estadísticas descargado'),
+    error: () => this.notify.error('No se pudo generar el reporte')
+  });
+}
 
 }

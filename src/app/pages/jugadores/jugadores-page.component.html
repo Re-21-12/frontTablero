@@ -91,6 +91,8 @@
             <div class="subtitle">#{{ j.id_Jugador }}</div>
           </div>
           <button class="btn btn--ghost" (click)="borrar(j)">Eliminar</button>
+          <button class="btn" (click)="generarReporteDesdeFila(j)">Estadísticas Jugador
+  </button>
         </div>
         
         <div class="grid">
@@ -111,7 +113,4 @@
     (page)="cambiarPagina($event)">
   </mat-paginator>
 
-  <footer class="panel__footer">
-    <button class="btn" (click)="generarReporte()">Generar reporte</button>
-  </footer>
 </section>

@@ -1,17 +1,25 @@
 import { Injectable, inject } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import {
+  CanActivate,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+} from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { NavigationService } from '../services/navigation.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PermissionGuard implements CanActivate {
   private authService = inject(AuthService);
   private navigationService = inject(NavigationService);
   private router = inject(Router);
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot,
+  ): boolean {
     console.log('PermissionGuard - Verificando acceso a:', state.url);
 
     // Verificar si el usuario está autenticado
@@ -25,9 +33,10 @@ export class PermissionGuard implements CanActivate {
 
     // Obtener permisos requeridos desde los datos de la ruta
     // Limpiar espacios en blanco de los permisos requeridos
-    const requiredPermissions = (route.data['requiredPermissions'] as string[])?.map(permission =>
-      permission.replace(/\s+/g, '')
-    ) || [];
+    const requiredPermissions =
+      (route.data['requiredPermissions'] as string[])?.map((permission) =>
+        permission.replace(/\s+/g, ''),
+      ) || [];
 
     console.log('Permisos requeridos para la ruta:', requiredPermissions);
 
@@ -38,14 +47,15 @@ export class PermissionGuard implements CanActivate {
     }
 
     // Verificar permisos usando AuthService directamente
-    const hasPermission = this.authService.hasAnyPermission(requiredPermissions);
+    const hasPermission =
+      this.authService.hasAnyPermission(requiredPermissions);
 
     console.log('Resultado de verificación de permisos:', hasPermission);
 
     if (!hasPermission) {
       console.log('Acceso denegado, redirigiendo a selección');
       // Redirigir a página de selección (tablero principal)
-      this.router.navigate(['/seleccion']);
+      this.router.navigate(['/inicio_sesion']);
       return false;
     }
 

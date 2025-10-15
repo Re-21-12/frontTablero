@@ -17,7 +17,7 @@ export const provideKeycloakAngular = () =>
   provideKeycloak({
     config: {
       realm: 'master',
-      url: 'http://auth.corazondeseda.lat',
+      url: 'https://auth.corazondeseda.lat',
       clientId: 'frontend',
     },
     initOptions: {

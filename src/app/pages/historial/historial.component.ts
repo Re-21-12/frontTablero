@@ -7,6 +7,7 @@ import { PartidoService } from '../../core/services/partido.service';
 import { Equipo, Localidad } from '../../core/interfaces/models';
 import { NotifyService } from '../shared/notify.service';
 import { PartidoResultado, Resultado } from '../../core/interfaces/models';
+import { ReporteService } from '../../core/services/reporte.service';
 
 
 
@@ -31,6 +32,7 @@ fechaHoraLocal = '';
   private locService  = inject(LocalidadService);
   private partService = inject(PartidoService);
   private notify  = inject(NotifyService);
+  private reporte = inject(ReporteService);
 
   ngOnInit() { this.cargar(); }
 
@@ -85,4 +87,10 @@ fechaHoraLocal = '';
     });
   }
 
+  generarReporte(){
+    this.reporte.descargarReportePartidos().subscribe({
+      next: () => this.notify.success('Reporte de partidos generado correctamente'),
+      error: () => this.notify.error('Error al generar el reporte de partidos')
+    });
+  }
 }

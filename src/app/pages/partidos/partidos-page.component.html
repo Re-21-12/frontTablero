@@ -73,6 +73,7 @@
 
         <div class="match-actions">
           <button class="btn btn--ghost" (click)="toggleDetallesByIndex(i)">Detalles</button>
+          <button class="btn" (click)="generarReporteRosterFromRow(p)">Generar Roster</button>
         </div>
         <div class="match-details" *ngIf="expandedIndex() === i">
           <div class="detail-row"><span class="dt">Fecha/Hora:</span><span class="dd">{{ p.fechaHora }}</span></div>
@@ -90,8 +91,5 @@
     (page)="cambiarPagina($event)">
   </mat-paginator>
 
-    <footer class="panel__footer">
-    <button class="btn" (click)="generarReporte()">Generar reporte</button>
-  </footer>
 </section>
 

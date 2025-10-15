@@ -9,6 +9,7 @@ import { PartidoService } from '../../core/services/partido.service';
 import { NotifyService } from '../shared/notify.service';
 
 import { Equipo, Localidad, Pagina, PartidoPagina } from '../../core/interfaces/models';
+import { ReporteService } from '../../core/services/reporte.service';
 
 @Component({
   standalone: true,
@@ -18,31 +19,31 @@ import { Equipo, Localidad, Pagina, PartidoPagina } from '../../core/interfaces/
   styleUrls: ['./partidos-page.component.css'],
 })
 export class PartidosPageComponent implements OnInit {
-  // Form
+
+
   fechaHoraLocal = '';
   partLocalidadId = model<number>();
   equipoLocal     = model<Equipo>();
   equipoVisitante = model<Equipo>();
 
-  // Data
+
   equipos     = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
-  partidos    = signal<any[]>([]);
-
-  // Lista paginada
-  items          = signal<PartidoPagina[]>([]);
+  partidos    = signal<any[]>([]);           
+  items       = signal<PartidoPagina[]>([]); 
   totalRegistros = signal(0);
+
+
   tamanio = 5;
   pagina  = 1;
+  expandedIndex = signal<number | null>(null);
 
-  // UI state
-  expandedIndex = signal<number | null>(null); // <- usamos índice
 
-  // Services
   private eqService   = inject(EquipoService);
   private locService  = inject(LocalidadService);
   private partService = inject(PartidoService);
   private notify      = inject(NotifyService);
+  private reporte     = inject(ReporteService);
 
   ngOnInit() {
     this.cargar();
@@ -79,7 +80,7 @@ export class PartidosPageComponent implements OnInit {
 
     const payload = {
       fechaHora:    this.toLocalIso(this.fechaHoraLocal),
-      id_Localidad: this.partLocalidadId()!,      // <- correcto
+      id_Localidad: this.partLocalidadId()!,
       id_Local:     eqLocal.id_Equipo,
       id_Visitante: eqVisit.id_Equipo,
     };
@@ -113,7 +114,6 @@ export class PartidosPageComponent implements OnInit {
     });
   }
 
-  // ---- UI helpers ----
   logoEquipo(nombre?: string): string {
     if (!nombre) return 'assets/placeholder-team.svg';
     const eq = this.equipos().find(e => e?.nombre?.toLowerCase() === nombre.toLowerCase());
@@ -135,9 +135,95 @@ export class PartidosPageComponent implements OnInit {
     if (img) img.src = 'assets/placeholder-team.svg';
   }
 
-  trackByPartido = (index: number, _p: PartidoPagina) => index; 
+  trackByPartido = (index: number, _p: PartidoPagina) => index;
 
-  generarReporte() {
-  this.notify?.info?.('Generando reporte…'); 
-}
+  private normTxt(s?: string): string {
+    return (s ?? '')
+      .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+      .toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  private toDate(d: any): Date | null {
+    const x = d instanceof Date ? d : (d ? new Date(d) : null);
+    return (x && !isNaN(+x)) ? x : null;
+  }
+
+  private diffMinutes(a?: any, b?: any): number | null {
+    const da = this.toDate(a), db = this.toDate(b);
+    if (!da || !db) return null;
+    return Math.abs((da.getTime() - db.getTime()) / 60000);
+  }
+
+  
+  private idDirecto(p: any): number | null {
+    if (!p) return null;
+    return (
+      (typeof p.id_Partido === 'number' && p.id_Partido) ||
+      (typeof p.id_partido === 'number' && p.id_partido) ||
+      (typeof p.idPartido === 'number' && p.idPartido) ||
+      (typeof p.partidoId === 'number' && p.partidoId) ||
+      (typeof p.id === 'number' && p.id) ||
+      (p.partido && typeof p.partido.id_Partido === 'number' && p.partido.id_Partido) ||
+      (p.partido && typeof p.partido.id === 'number' && p.partido.id) ||
+      null
+    );
+  }
+
+
+  private idPorCoincidencia(p: any): number | null {
+    const loc  = this.normTxt(p?.local);
+    const vis  = this.normTxt(p?.visitante);
+    const fecha = p?.fechaHora;
+    const candidatos = this.partidos().filter((x: any) => {
+      const l = this.normTxt(x?.local ?? x?.equipoLocal);
+      const v = this.normTxt(x?.visitante ?? x?.equipoVisitante);
+      return l === loc && v === vis;
+    });
+
+    if (!candidatos.length) return null;
+
+    const cerca = candidatos.find((x: any) => {
+      const f = x?.fechaHora ?? x?.fecha_hora ?? x?.fecha;
+      const dm = this.diffMinutes(fecha, f);
+      return dm !== null && dm <= 5;
+    });
+
+    const match = cerca ?? candidatos[0];
+
+    return (
+      (typeof match?.id_Partido === 'number' && match.id_Partido) ||
+      (typeof match?.id_partido === 'number' && match.id_partido) ||
+      (typeof match?.idPartido === 'number' && match.idPartido) ||
+      (typeof match?.partidoId === 'number' && match.partidoId) ||
+      (typeof match?.id === 'number' && match.id) ||
+      null
+    );
+  }
+
+  private resolverIdPartido(p: any): number | null {
+    return this.idDirecto(p) ?? this.idPorCoincidencia(p);
+  }
+  generarReporteRosterFromRow(p: any) {
+    const ejecutar = () => {
+      const id = this.resolverIdPartido(p);
+      if (!id) {
+        this.notify.error('No hay partido seleccionado (no se pudo resolver el ID).');
+        return;
+      }
+      this.notify.info('Generando reporte de roster…');
+      this.reporte.descargarReporteRosterPartido(id).subscribe({
+        next: () => this.notify.success('Reporte de roster descargado'),
+        error: () => this.notify.error('No se pudo generar el reporte de roster')
+      });
+    };
+
+    if (!this.partidos().length) {
+      this.partService.getAll().subscribe({
+        next: d => { this.partidos.set(d ?? []); ejecutar(); },
+        error: () => this.notify.error('No se pudieron cargar partidos')
+      });
+    } else {
+      ejecutar();
+    }
+  }
 }

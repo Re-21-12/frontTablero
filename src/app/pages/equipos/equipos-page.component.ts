@@ -8,6 +8,7 @@ import { NotifyService } from '../shared/notify.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { finalize } from 'rxjs/operators';
+import { ReporteService } from '../../core/services/reporte.service';
 
 @Component({
   standalone: true,
@@ -35,7 +36,7 @@ export class EquiposPageComponent implements OnInit {
   private equipoSvc = inject(EquipoService);
   private locSvc = inject(LocalidadService);
   private notify = inject(NotifyService);
-
+  private reporte = inject(ReporteService);
   ngOnInit() {
     this.cargar();
     this.cargarLocalidades();
@@ -294,4 +295,12 @@ export class EquiposPageComponent implements OnInit {
   }
 
   trackByEquipoId = (_: number, it: any) => it?.id_Equipo ?? it?.id ?? _;
+
+  generarReporteEquipos(){
+    this.notify.info('Generando reporte de equipos...');
+    this.reporte.descargarReporteEquipos().subscribe({
+      next: () => this.notify.success('Reporte de equipos generado correctamente'),
+      error: () => this.notify.error('Error al generar el reporte de equipos')
+    });
+  } 
 }

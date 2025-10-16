@@ -83,7 +83,7 @@
       <img
         *ngIf="logoUrl"
         class="team-logo--preview"
-        [src]="imgError ? 'https://via.placeholder.com/64?text=Logo' : logoUrl"
+        [src]=" logoUrl"
         (error)="onImgErr($event)"
         alt="Logo (preview)"
       />

@@ -80,6 +80,7 @@ export class NavigationService {
   getFilteredNavigation(): NavigationSection[] {
     // Validar autenticación antes de filtrar navegación
     if (!this.authService.isAuthenticated()) {
+      console.warn('Usuario no autenticado. No se muestra navegación.');
       return [];
     }
 
@@ -92,6 +93,7 @@ export class NavigationService {
         const realmRoles = decoded?.realm_access?.roles || [];
         const resourceRoles: string[] = [];
         if (decoded?.resource_access) {
+          console.log('Decoded resource_access:', decoded.resource_access);
           Object.values(decoded.resource_access).forEach((resource: any) => {
             if (Array.isArray(resource.roles)) {
               resourceRoles.push(...resource.roles);
@@ -99,6 +101,7 @@ export class NavigationService {
           });
         }
         jwtRoles = [...realmRoles, ...resourceRoles];
+        console.log('Roles extraídos del JWT:', jwtRoles);
       } catch (e) {
         console.warn('Error decodificando el token:', e);
       }

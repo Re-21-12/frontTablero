@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { PermissionGuard } from './core/guards/permission.guard';
+import { permissionGuardFn } from './core/guards/permission.guard';
 import { canActivateAuthRole } from './core/guards/keycloak-functional.guard';
 
 export const routes: Routes = [
@@ -50,7 +50,7 @@ export const routes: Routes = [
         (m) => m.AdminPageComponent,
       ),
     title: 'Administración',
-    canActivateChild: [PermissionGuard, canActivateAuthRole],
+    canActivateChild: [permissionGuardFn],
     data: {
       requiredPermissions: [
         'Localidad:Consultar',
@@ -131,7 +131,7 @@ export const routes: Routes = [
         './pages/seguridad-admin/seguridad-admin-page/seguridad-admin-page.component'
       ).then((m) => m.SeguridadAdminPageComponent),
     title: 'Administración (Seguridad)',
-    canActivate: [PermissionGuard],
+    canActivate: [permissionGuardFn],
     data: {
       requiredPermissions: [
         'Usuario:Consultar',
@@ -149,7 +149,7 @@ export const routes: Routes = [
         (m) => m.RecursosPageComponent,
       ),
     title: 'Recursos',
-    canActivate: [PermissionGuard],
+    canActivate: [permissionGuardFn],
     data: { requiredPermissions: ['Imagen:Consultar'] },
     children: [
       { path: '', redirectTo: 'imagenes', pathMatch: 'full' },

@@ -44,12 +44,33 @@ const hasAllRequiredRoles = (
   requiredRoles: string[],
   grantedResourceRoles: Record<string, string[]>,
 ): boolean => {
-  if (requiredRoles.length === 0) return false;
+  console.log('[Guard] requiredRoles:', requiredRoles);
+  console.log('[Guard] grantedResourceRoles:', grantedResourceRoles);
 
-  const hasRole = (role: string) =>
-    Object.values(grantedResourceRoles).some((roles) => roles.includes(role));
+  if (!requiredRoles || requiredRoles.length === 0) {
+    console.log('[Guard] No required roles, returning false');
+    return false;
+  }
 
-  return requiredRoles.every((role) => hasRole(role));
+  if (!grantedResourceRoles || typeof grantedResourceRoles !== 'object') {
+    console.log('[Guard] grantedResourceRoles inválido, returning false');
+    return false;
+  }
+
+  const hasRole = (role: string) => {
+    const result = Object.values(grantedResourceRoles).some(
+      (roles) => Array.isArray(roles) && roles.includes(role),
+    );
+    console.log(`[Guard] ¿El usuario tiene el rol "${role}"?`, result);
+    return result;
+  };
+
+  const allRoles = requiredRoles.every((role) => hasRole(role));
+  console.log(
+    '[Guard] ¿El usuario tiene todos los roles requeridos?',
+    allRoles,
+  );
+  return allRoles;
 };
 
 const isAccessAllowed = async (
@@ -59,8 +80,14 @@ const isAccessAllowed = async (
 ): Promise<boolean | UrlTree> => {
   const { authenticated, grantedRoles } = authData;
 
+  console.log('[Guard] authenticated:', authenticated);
+  console.log('[Guard] grantedRoles:', grantedRoles);
+
   const requiredRoles = collectRequiredRoles(route);
+  console.log('[Guard] requiredRoles recolectados:', requiredRoles);
+
   if (requiredRoles.length === 0) {
+    console.log('[Guard] No hay roles requeridos, acceso denegado');
     return false;
   }
 
@@ -68,9 +95,11 @@ const isAccessAllowed = async (
     authenticated &&
     hasAllRequiredRoles(requiredRoles, grantedRoles.resourceRoles)
   ) {
+    console.log('[Guard] Acceso permitido');
     return true;
   }
 
+  console.log('[Guard] Acceso denegado, redirigiendo a /forbidden');
   const router = inject(Router);
   return router.parseUrl('/forbidden');
 };

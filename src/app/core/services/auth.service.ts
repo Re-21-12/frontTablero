@@ -13,6 +13,7 @@ import {
   Permiso,
 } from '../interfaces/auth-interface';
 import Keycloak from 'keycloak-js';
+import { jwtDecode } from 'jwt-decode';
 @Injectable({
   providedIn: 'root',
 })
@@ -296,16 +297,6 @@ export class AuthService {
       );
       return permission.nombre === permissionName.replace(' ', '');
     });
-  }
-
-  hasAnyPermission(permissionNames: string[]): boolean {
-    const permissions = this.getPermissions();
-    const anyPermissions = permissionNames.some((permissionName) => {
-      return permissions.some(
-        (permission) => permission.nombre.trim() === permissionName.trim(),
-      );
-    });
-    return anyPermissions;
   }
 
   getPermissionsByAction(action: string): Permiso[] {
@@ -631,6 +622,22 @@ export class AuthService {
       }
     } catch (error) {
       console.error('Error al sincronizar Keycloak con datos locales:', error);
+    }
+  }
+
+  hasAnyPermission(requiredPermissions: string[]): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const userRoles: string[] = decoded?.realm_access?.roles || [];
+
+      // Verifica si el usuario tiene al menos uno de los permisos requeridos
+      return requiredPermissions.some((perm) => userRoles.includes(perm));
+    } catch (e) {
+      console.warn('Error decodificando el token:', e);
+      return false;
     }
   }
 }

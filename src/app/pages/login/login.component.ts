@@ -48,7 +48,7 @@ export class LoginComponent implements OnInit {
     try {
       const isFullyAuth = await this._authService.isFullyAuthenticated();
       if (isFullyAuth) {
-        this._router.navigate(['/seleccion']);
+
       }
     } catch (error) {
       console.error('Error al verificar autenticación existente:', error);
@@ -72,7 +72,7 @@ export class LoginComponent implements OnInit {
 
       // Configurar eventos de Keycloak
 
-      this._router.navigate(['/seleccion']);
+      this._router.navigate(['/bienvenida']);
     } catch (error) {
       console.error('Error en login con Keycloak:', error);
       this.errorMessage = 'Error al autenticar con Keycloak';
@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
       this._authService.login(loginData).subscribe({
         next: (response) => {
           this._authService.saveLoginData(response);
-          this._router.navigate(['/seleccion']);
+          this._router.navigate(['/bienvenida']);
           this.isLoading = false;
         },
         error: (error) => {

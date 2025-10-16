@@ -8,6 +8,7 @@ export interface KeycloakConfig {
 export interface EnvironmentConfig {
   apiBaseUrl: string;
   keycloak: KeycloakConfig;
+  homepage: string;
 }
 
 export type EnvironmentType = 'prod' | 'dev' | 'local';
@@ -30,14 +31,16 @@ export const environment: Environment = {
       realm: 'master',
       clientId: 'frontend',
     },
+    homepage: 'https://auth.corazondeseda.lat',
   },
   dev: {
-    apiBaseUrl: 'http://localhost:5232/api',
+    apiBaseUrl: 'http://localhost:5000/api',
     keycloak: {
       url: 'http://localhost:8080/auth',
       realm: 'master',
       clientId: 'frontend',
     },
+    homepage: 'http://localhost:8080',
   },
   local: {
     apiBaseUrl: 'http://192.168.137.1:8080/api',
@@ -46,5 +49,6 @@ export const environment: Environment = {
       realm: 'master',
       clientId: 'frontend',
     },
+    homepage: 'http://192.168.137.1:8080',
   },
 };

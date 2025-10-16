@@ -14,6 +14,10 @@ export class NavigationService {
 
   private navigationConfig: NavigationSection[] = [
     {
+      title: 'Inicio',
+      items: [{ label: 'Mi perfil', route: '/bienvenida' }],
+    },
+    {
       title: 'Tablero',
       items: [
         { label: 'Selección', route: '/seleccion' },
@@ -79,18 +83,19 @@ export class NavigationService {
 
   async getFilteredNavigation(): Promise<NavigationSection[]> {
     // Validar autenticación antes de filtrar navegación
+    console.log('Filtrando navegación para el usuario');
     if (!this.authService.isAuthenticated()) {
       console.warn('Usuario no autenticado. No se muestra navegación.');
       return [];
     }
-
+    console.log('Usuario autenticado, obteniendo roles y permisos');
     // Obtener todos los roles del usuario desde el JWT usando jwtDecode importado
     const token = await this.authService.getToken();
     let jwtRoles: string[] = [];
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        const realmRoles = decoded?.realm_access?.roles || [];
+        const realmRoles = this.authService.getPermissionsByToken() || [];
         const resourceRoles: string[] = [];
         if (decoded?.resource_access) {
           console.log('Decoded resource_access:', decoded.resource_access);

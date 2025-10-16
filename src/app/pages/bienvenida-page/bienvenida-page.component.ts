@@ -2,11 +2,14 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { Subscription } from 'rxjs';
 
 type UserInfo = {
   nombre: string;
   rol: { id_rol: number; nombre: string } | null;
   permisos: Array<{ id?: number; nombre: string }>;
+  username?: string;
+  emailVerified?: boolean;
 } | null;
 
 @Component({
@@ -25,6 +28,8 @@ export class BienvenidaPagesComponent implements OnInit {
   nombre = computed(() => this.user()?.nombre ?? 'Usuario');
   rol = computed(() => this.user()?.rol?.nombre ?? '—');
   permisos = computed(() => this.user()?.permisos ?? []);
+  username = computed(() => this.user()?.username ?? '');
+  emailVerified = computed(() => this.user()?.emailVerified ?? false);
 
   private showAll = signal(false);
 

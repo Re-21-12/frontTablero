@@ -7,6 +7,7 @@ import {
   AutoRefreshTokenService,
   UserActivityService,
 } from 'keycloak-angular';
+import { environment } from '../environments/environment';
 
 const localhostCondition =
   createInterceptorCondition<IncludeBearerTokenCondition>({
@@ -17,7 +18,7 @@ export const provideKeycloakAngular = () =>
   provideKeycloak({
     config: {
       realm: 'master',
-      url: 'https://auth.corazondeseda.lat',
+      url: environment[ environment.selectedEnvironment].homepage,
       clientId: 'frontend',
     },
     initOptions: {

@@ -7,6 +7,17 @@
         <span class="meta__item"><span class="dot"></span>Rol: <strong>{{ rol() }}</strong></span>
         <span class="meta__sep"></span>
         <span class="meta__item"><span class="dot"></span>Permisos: <strong>{{ permisos().length }}</strong></span>
+        <span class="meta__sep"></span>
+        <span class="meta__item"><span class="dot"></span>Usuario: <strong>{{ username() }}</strong></span>
+        <span class="meta__sep"></span>
+        <span class="meta__item">
+          <span class="dot"></span>
+          Email verificado:
+          <strong>
+            <span *ngIf="emailVerified(); else notVerified">Sí</span>
+            <ng-template #notVerified>No</ng-template>
+          </strong>
+        </span>
       </p>
     </div>
     <div class="hero__cta">

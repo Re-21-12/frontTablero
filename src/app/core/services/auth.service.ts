@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, timer, of, throwError } from 'rxjs';
+import { from, Observable, BehaviorSubject, timer, of, throwError } from 'rxjs';
 import { switchMap, tap, catchError, finalize } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import {
@@ -107,7 +107,7 @@ export class AuthService {
     if (!expirationTime) return;
 
     const now = Date.now();
-    const timeUntilRefresh = expirationTime - now - 5 * 60 * 1000; // 5 minutos antes
+    const timeUntilRefresh = expirationTime - now - 2 * 60 * 1000; // 2 minutos antes
 
     if (timeUntilRefresh > 0) {
       this.refreshTimer = timer(timeUntilRefresh).subscribe(() => {
@@ -189,64 +189,32 @@ export class AuthService {
       localStorage.removeItem(this.roleKey);
     }
 
+    this._keycloakService.logout();
     this.refreshTokenSubject.next(null);
+
     this._router.navigate(['/inicio_sesion']);
   }
 
   isAuthenticated(): boolean {
     if (!this.isBrowser()) return false;
 
-    const token = this.getKeycloakToken();
-    const expiration = this.getTokenExpiration();
-
-    if (!token || !expiration) return false;
-
-    const isExpired = Date.now() >= expiration;
-
-    if (isExpired) {
-      // Intentar refresh automático si está disponible
-      const refreshToken = localStorage.getItem(this.refreshTokenKey);
-      if (refreshToken) {
-        this.refreshToken().subscribe({
-          error: () => this.logout(),
-        });
-      } else {
-        this.logout();
-      }
-      return false;
-    }
-
+    const token = this._keycloakService.token;
     return true;
   }
 
   async getToken(): Promise<string | null> {
     if (!this.isBrowser()) return null;
 
-    // Primero intenta obtener el token local
-    const token = localStorage.getItem(this.tokenKey);
+    const token = this._keycloakService.token;
     const expiration = this.getTokenExpiration();
 
-    if (token && expiration) {
-      // Si el token expira en menos de 1 minuto, intentar refresh
-      const timeUntilExpiration = expiration - Date.now();
-      if (timeUntilExpiration < 60000 && timeUntilExpiration > 0) {
-        this.refreshToken().subscribe({
-          error: () => console.warn('Failed to refresh token automatically'),
-        });
-      }
-      return token;
-    }
+    if (!token) return null;
 
-    // Si no existe en localStorage, intenta obtener el token de Keycloak
-    try {
-      const keycloakToken = await this.getKeycloakToken();
-      return keycloakToken || null;
-    } catch (error) {
-      console.error('Error al obtener token de Keycloak:', error);
-      // Si falla Keycloak, limpiar estado y redirigir
-      this.logout();
-      return null;
-    }
+    return token;
+  }
+  getPermissionsByToken(): any[] {
+    if (!this.isBrowser()) return [];
+    return this._keycloakService.tokenParsed?.realm_access?.roles || [];
   }
 
   getTokenExpiration(): number | null {
@@ -277,27 +245,19 @@ export class AuthService {
     return roleData ? JSON.parse(roleData) : null;
   }
 
-  async getPermissions(): Promise<Permiso[]> {
-    // Siempre decodifica el JWT actual para obtener los permisos/roles
-    const token = await this.getToken();
-    if (!token) return [];
-    try {
-      const decoded: any = jwtDecode(token);
-      const realmRoles: string[] = decoded?.realm_access?.roles || [];
-      const resourceRoles: string[] = [];
-      if (decoded?.resource_access) {
-        Object.values(decoded.resource_access).forEach((resource: any) => {
-          if (Array.isArray(resource.roles)) {
-            resourceRoles.push(...resource.roles);
-          }
-        });
-      }
-      // Unifica todos los roles como permisos
-      const allRoles = [...realmRoles, ...resourceRoles];
-      // Devuelve como Permiso[] con id_Rol por defecto
-      return allRoles.map((nombre) => ({ nombre, id_Rol: 0 }));
-    } catch (e) {
-      console.warn('Error decodificando el token para permisos:', e);
+  getPermissions(): any[] {
+    console.log('Obteniendo permisos del usuario');
+    if (!this.isBrowser()) return [];
+
+    // Primero intenta obtener los permisos guardados
+    const permissions = this._keycloakService.tokenParsed?.realm_access?.roles;
+    console.log('Permisos desde Keycloak:', permissions);
+    if (permissions) {
+      return permissions.map((p) => ({
+        nombre: p.replace(/\s+/g, ''),
+        id_Rol: 0,
+      }));
+    } else {
       return [];
     }
   }
@@ -359,14 +319,39 @@ export class AuthService {
     nombre: string;
     rol: { id_rol: number; nombre: string } | null;
     permisos: Permiso[];
+    username?: string;
+    emailVerified?: boolean;
   } | null> {
     if (!this.isAuthenticated()) return null;
+    try {
+      const profile = await this._keycloakService.loadUserProfile();
+      console.log('Perfil de usuario cargado desde Keycloak:', profile);
+      return {
+        nombre: `${profile.firstName ?? ''} ${profile.lastName ?? ''}`.trim(),
+        rol: this.getRoleComplete(),
+        permisos: this.getPermissions(),
+        username: profile.username,
+        emailVerified: profile.emailVerified,
+      };
+    } catch (e) {
+      // Si falla, retorna datos mínimos
+      return {
+        nombre: '',
+        rol: this.getRoleComplete(),
+        permisos: this.getPermissions(),
+        username: undefined,
+        emailVerified: undefined,
+      };
+    }
+  }
 
-    return {
-      nombre: this.getUsername() || '',
-      rol: this.getRoleComplete(),
-      permisos: await this.getPermissions(),
-    };
+  getCurrentUser$(): Observable<{
+    nombre: string;
+    rol: { id_rol: number; nombre: string } | null;
+    permisos: Permiso[];
+  } | null> {
+    if (!this.isAuthenticated()) return of(null);
+    return from(this.getCurrentUser());
   }
 
   // ========================= KEYCLOAK METHODS =========================
@@ -404,9 +389,9 @@ export class AuthService {
   /**
    * Verificar si el usuario está autenticado con Keycloak
    */
-  async isAuthenticatedWithKeycloak(): Promise<boolean> {
+  isAuthenticatedWithKeycloak(): boolean {
     try {
-      return await this._keycloakService.authenticated;
+      return this._keycloakService.authenticated;
     } catch (error) {
       console.error('Error al verificar autenticación con Keycloak:', error);
       // Si falla Keycloak, limpiar estado y redirigir
@@ -418,9 +403,9 @@ export class AuthService {
   /**
    * Obtener el token de Keycloak
    */
-  async getKeycloakToken(): Promise<string> {
+  getKeycloakToken(): string {
     try {
-      return (await this._keycloakService.token) || '';
+      return this._keycloakService.token || '';
     } catch (error) {
       console.error('Error al obtener token de Keycloak:', error);
       throw error;
@@ -637,14 +622,24 @@ export class AuthService {
     }
   }
 
-  async hasAnyPermission(requiredPermissions: string[]): Promise<boolean> {
-    // Verifica si el usuario tiene al menos uno de los permisos requeridos usando el JWT
-    const permissions: Permiso[] = await this.getPermissions();
-    const cleanedRequired = requiredPermissions.map((perm) =>
-      perm.replace(/\s+/g, ''),
-    );
-    return permissions.some((permission) =>
-      cleanedRequired.includes(permission.nombre),
-    );
+  hasAnyPermission(requiredPermissions: string[]): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      // Roles del realm
+      const realmRoles: string[] = this.getPermissionsByToken() || [];
+
+      // Limpiar espacios en blanco de los permisos requeridos
+      const cleanedRequired = requiredPermissions.map((perm) =>
+        perm.replace(/\s+/g, ''),
+      );
+
+      // Validar si el usuario tiene al menos uno de los permisos requeridos
+      return cleanedRequired.some((perm) => realmRoles.includes(perm));
+    } catch (e) {
+      console.warn('Error decodificando el token:', e);
+      return false;
+    }
   }
 }

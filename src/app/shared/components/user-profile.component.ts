@@ -1,8 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { KeycloakConfigService } from '../../core/services/keycloak-config.service';
-import { KeycloakService } from 'keycloak-angular';
+import Keycloak from 'keycloak-js';
 
 @Component({
   selector: 'app-user-profile',
@@ -13,8 +12,7 @@ import { KeycloakService } from 'keycloak-angular';
 })
 export class UserProfileComponent implements OnInit {
   private readonly _authService = inject(AuthService);
-  private readonly _keycloakConfigService = inject(KeycloakConfigService);
-  private readonly _keycloakService = inject(KeycloakService);
+  private readonly _keycloakService = inject(Keycloak);
 
   userInfo: any = null;
   isKeycloakAuth = false;
@@ -35,7 +33,7 @@ export class UserProfileComponent implements OnInit {
       this.isLocalAuth = this._authService.isAuthenticated();
 
       // Obtener información completa del usuario
-      this.userInfo = await this._keycloakConfigService.getCompleteUserInfo();
+      this.userInfo = await this._keycloakService.profile;
     } catch (error) {
       console.error('Error al cargar información del usuario:', error);
     } finally {

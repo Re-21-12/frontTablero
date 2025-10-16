@@ -53,6 +53,7 @@
     <label class="label inline">Logo URL</label>
     <input
       class="input"
+
       placeholder="https://mi-cdn.com/logo.png"
       [(ngModel)]="logoUrl"
       (keyup.enter)="guardarLogo()"
@@ -69,7 +70,7 @@
     <img
       *ngIf="logoUrl"
       class="team-logo--preview"
-      [src]="imgError ? 'assets/placeholder-team.svg' : logoUrl"
+      [src]="imgError ? 'https://via.placeholder.com/64?text=Logo' : logoUrl"
       (error)="onImgErr($event)"
       alt="Logo (preview)"
     />

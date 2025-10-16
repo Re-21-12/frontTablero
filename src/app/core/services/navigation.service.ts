@@ -72,22 +72,22 @@ export class NavigationService {
     },
   ];
 
-  getFilteredNavigation(): NavigationSection[] {
-    // Solo mostrar navegación si el usuario está autenticado
-    if (!this.authService.isAuthenticated()) {
-      console.log('Usuario no autenticado. Navegación no cargada.');
-      return [];
-    }
+  getNavigation(): NavigationSection[] {
+    return this.navigationConfig;
+  }
 
-    const filteredNavigation = this.navigationConfig
+  getFilteredNavigation(): NavigationSection[] {
+    const sections = this.getNavigation(); // tu navegación completa
+    return sections
       .map((section) => ({
         ...section,
-        items: section.items.filter((item) => this.canShowItem(item)),
+        items: section.items.filter(
+          (item) =>
+            !item.requiredPermissions ||
+            this.authService.hasAnyPermission(item.requiredPermissions),
+        ),
       }))
       .filter((section) => section.items.length > 0);
-
-    console.log('Navegación filtrada basada en permisos:', filteredNavigation);
-    return filteredNavigation;
   }
 
   private canShowItem(item: NavigationItem): boolean {

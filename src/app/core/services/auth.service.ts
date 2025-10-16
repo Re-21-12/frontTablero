@@ -196,7 +196,7 @@ export class AuthService {
   isAuthenticated(): boolean {
     if (!this.isBrowser()) return false;
 
-    const token = this.getToken();
+    const token = this.getKeycloakToken();
     const expiration = this.getTokenExpiration();
 
     if (!token || !expiration) return false;

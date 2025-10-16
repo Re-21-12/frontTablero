@@ -77,8 +77,32 @@ export class NavigationService {
   }
 
   getFilteredNavigation(): NavigationSection[] {
+    // Obtener todos los roles del usuario desde el JWT
+    const token = this.authService.getToken();
+    let jwtRoles: string[] = [];
+    if (token) {
+      try {
+        const decoded: any = (window as any).jwtDecode
+          ? (window as any).jwtDecode(token)
+          : require('jwt-decode').default(token);
+        const realmRoles = decoded?.realm_access?.roles || [];
+        const resourceRoles: any[] = [];
+        if (decoded?.resource_access) {
+          Object.values(decoded.resource_access).forEach((resource: any) => {
+            if (Array.isArray(resource.roles)) {
+              resourceRoles.push(...resource.roles);
+            }
+          });
+        }
+        jwtRoles = [...realmRoles, ...resourceRoles];
+      } catch (e) {
+        console.warn('Error decodificando el token:', e);
+      }
+    }
+    console.log('Roles del JWT:', jwtRoles);
+
     const sections = this.getNavigation(); // tu navegación completa
-    return sections
+    const filtered = sections
       .map((section) => ({
         ...section,
         items: section.items.filter(
@@ -88,6 +112,9 @@ export class NavigationService {
         ),
       }))
       .filter((section) => section.items.length > 0);
+
+    console.log('Navegación filtrada:', filtered);
+    return filtered;
   }
 
   private canShowItem(item: NavigationItem): boolean {

@@ -269,21 +269,40 @@ export class AuthService {
   getPermissions(): Permiso[] {
     if (!this.isBrowser()) return [];
 
-    const permissionsData: Permiso[] = JSON.parse(
-      localStorage.getItem(this.permissionsKey) || '[]',
-    );
-    console.log(permissionsData);
-    // Eliminar todos los espacios en blanco de los nombres de los permisos
-    const cleanedPermissions = permissionsData.map((permission) => ({
-      ...permission,
-      nombre: permission.nombre.replace(/\s+/g, ''),
-    }));
+    // Primero intenta obtener los permisos guardados
+    const permissionsData = localStorage.getItem(this.permissionsKey);
+    if (permissionsData) {
+      const parsed: Permiso[] = JSON.parse(permissionsData);
+      return parsed.map((p) => ({
+        ...p,
+        nombre: p.nombre.replace(/\s+/g, ''),
+        id_Rol: p.id_Rol ?? 0, // Asegura que id_Rol exista
+      }));
+    }
 
-    console.log(
-      'Permisos del usuario obtenidos (espacios eliminados):',
-      cleanedPermissions,
-    );
-    return cleanedPermissions;
+    // Si no hay permisos guardados, decodifica el JWT
+    const token = this.getToken();
+    if (!token) return [];
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const realmRoles: string[] = decoded?.realm_access?.roles || [];
+      const resourceRoles: string[] = [];
+      if (decoded?.resource_access) {
+        Object.values(decoded.resource_access).forEach((resource: any) => {
+          if (Array.isArray(resource.roles)) {
+            resourceRoles.push(...resource.roles);
+          }
+        });
+      }
+      // Unifica todos los roles como permisos
+      const allRoles = [...realmRoles, ...resourceRoles];
+      // Devuelve como Permiso[] con id_Rol por defecto
+      return allRoles.map((nombre) => ({ nombre, id_Rol: 0 }));
+    } catch (e) {
+      console.warn('Error decodificando el token para permisos:', e);
+      return [];
+    }
   }
 
   hasPermission(permissionName: string): boolean {

@@ -96,13 +96,19 @@
     <ul class="list">
       <li class="row-item" *ngFor="let e of items(); trackBy: trackByEquipoId">
         <span class="mono">#{{ e.id_Equipo }}</span>
-
+        @if(e.url){
         <img
           class="team-logo"
           [src]="logoOf(e)"
           (error)="onImgErr($event)"
           alt="Logo equipo"
         />
+        }@else{
+          <p>
+          N/A
+          </p>
+        }
+
 
         <span class="name">{{ e.nombre }}</span>
         <span class="muted">Loc: {{ locOf(e) }}</span>

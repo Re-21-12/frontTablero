@@ -77,7 +77,7 @@ export class NavigationService {
     return this.navigationConfig;
   }
 
-  getFilteredNavigation(): NavigationSection[] {
+  async getFilteredNavigation(): Promise<NavigationSection[]> {
     // Validar autenticación antes de filtrar navegación
     if (!this.authService.isAuthenticated()) {
       console.warn('Usuario no autenticado. No se muestra navegación.');
@@ -85,7 +85,7 @@ export class NavigationService {
     }
 
     // Obtener todos los roles del usuario desde el JWT usando jwtDecode importado
-    const token = this.authService.getToken();
+    const token = await this.authService.getToken();
     let jwtRoles: string[] = [];
     if (token) {
       try {
@@ -108,46 +108,50 @@ export class NavigationService {
     }
 
     const sections = this.getNavigation();
-    const filtered = sections
-      .map((section) => ({
-        ...section,
-        items: section.items.filter(
-          (item) =>
-            !item.requiredPermissions ||
-            this.authService.hasAnyPermission(item.requiredPermissions),
-        ),
-      }))
-      .filter((section) => section.items.length > 0);
-
+    const filtered: NavigationSection[] = [];
+    for (const section of sections) {
+      const items: NavigationItem[] = [];
+      for (const item of section.items) {
+        if (
+          !item.requiredPermissions ||
+          (await this.authService.hasAnyPermission(item.requiredPermissions))
+        ) {
+          items.push(item);
+        }
+      }
+      if (items.length > 0) {
+        filtered.push({ ...section, items });
+      }
+    }
     return filtered;
   }
 
-  private canShowItem(item: NavigationItem): boolean {
+  private async canShowItem(item: NavigationItem): Promise<boolean> {
     // Si no requiere permisos específicos, mostrar siempre (rutas públicas como tablero)
     if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
       return true;
     }
-
     // Verificar si el usuario tiene al menos uno de los permisos requeridos
-    return this.authService.hasAnyPermission(item.requiredPermissions);
+    return await this.authService.hasAnyPermission(item.requiredPermissions);
   }
 
   // Método para verificar acceso a una ruta específica
-  canAccessRoute(route: string, requiredPermissions?: string[]): boolean {
+  async canAccessRoute(
+    route: string,
+    requiredPermissions?: string[],
+  ): Promise<boolean> {
     if (!this.authService.isAuthenticated()) {
       return false;
     }
-
     if (!requiredPermissions || requiredPermissions.length === 0) {
       return true;
     }
-
-    return this.authService.hasAnyPermission(requiredPermissions);
+    return await this.authService.hasAnyPermission(requiredPermissions);
   }
 
   // Métodos auxiliares para verificar permisos específicos por módulo
-  canManageLocalidades(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManageLocalidades(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Localidad:Agregar',
       'Localidad:Editar',
       'Localidad:Eliminar',
@@ -155,8 +159,8 @@ export class NavigationService {
     ]);
   }
 
-  canManageEquipos(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManageEquipos(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Equipo:Agregar',
       'Equipo:Editar',
       'Equipo:Eliminar',
@@ -164,8 +168,8 @@ export class NavigationService {
     ]);
   }
 
-  canManagePartidos(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManagePartidos(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Partido:Agregar',
       'Partido:Editar',
       'Partido:Eliminar',
@@ -173,8 +177,8 @@ export class NavigationService {
     ]);
   }
 
-  canManageJugadores(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManageJugadores(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Jugador:Agregar',
       'Jugador:Editar',
       'Jugador:Eliminar',
@@ -182,8 +186,8 @@ export class NavigationService {
     ]);
   }
 
-  canManageUsuarios(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManageUsuarios(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Usuario:Agregar',
       'Usuario:Editar',
       'Usuario:Eliminar',
@@ -191,8 +195,8 @@ export class NavigationService {
     ]);
   }
 
-  canManageImagenes(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManageImagenes(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Imagen:Agregar',
       'Imagen:Editar',
       'Imagen:Eliminar',
@@ -200,8 +204,8 @@ export class NavigationService {
     ]);
   }
 
-  canManageRoles(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManageRoles(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Rol:Agregar',
       'Rol:Editar',
       'Rol:Eliminar',
@@ -209,8 +213,8 @@ export class NavigationService {
     ]);
   }
 
-  canManagePermisos(): boolean {
-    return this.authService.hasAnyPermission([
+  async canManagePermisos(): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       'Permiso:Agregar',
       'Permiso:Editar',
       'Permiso:Eliminar',
@@ -219,40 +223,40 @@ export class NavigationService {
   }
 
   // Métodos para verificar permisos específicos de acciones
-  canViewModule(module: string): boolean {
-    return this.authService.hasPermission(`${module}:Consultar`);
+  async canViewModule(module: string): Promise<boolean> {
+    return await this.authService.hasPermission(`${module}:Consultar`);
   }
 
-  canCreateIn(module: string): boolean {
-    return this.authService.hasPermission(`${module}:Agregar`);
+  async canCreateIn(module: string): Promise<boolean> {
+    return await this.authService.hasPermission(`${module}:Agregar`);
   }
 
-  canEditIn(module: string): boolean {
-    return this.authService.hasPermission(`${module}:Editar`);
+  async canEditIn(module: string): Promise<boolean> {
+    return await this.authService.hasPermission(`${module}:Editar`);
   }
 
-  canDeleteFrom(module: string): boolean {
-    return this.authService.hasPermission(`${module}:Eliminar`);
+  async canDeleteFrom(module: string): Promise<boolean> {
+    return await this.authService.hasPermission(`${module}:Eliminar`);
   }
 
   // Método para obtener los permisos disponibles para un módulo específico
-  getModulePermissions(module: string): {
+  async getModulePermissions(module: string): Promise<{
     canView: boolean;
     canCreate: boolean;
     canEdit: boolean;
     canDelete: boolean;
-  } {
+  }> {
     return {
-      canView: this.canViewModule(module),
-      canCreate: this.canCreateIn(module),
-      canEdit: this.canEditIn(module),
-      canDelete: this.canDeleteFrom(module),
+      canView: await this.canViewModule(module),
+      canCreate: await this.canCreateIn(module),
+      canEdit: await this.canEditIn(module),
+      canDelete: await this.canDeleteFrom(module),
     };
   }
 
   // Método para verificar si el usuario tiene acceso completo a un módulo
-  hasFullAccessTo(module: string): boolean {
-    return this.authService.hasAnyPermission([
+  async hasFullAccessTo(module: string): Promise<boolean> {
+    return await this.authService.hasAnyPermission([
       `${module}:Consultar`,
       `${module}:Agregar`,
       `${module}:Editar`,
@@ -261,15 +265,14 @@ export class NavigationService {
   }
 
   // Método para obtener todas las rutas disponibles para el usuario actual
-  getAvailableRoutes(): string[] {
+  async getAvailableRoutes(): Promise<string[]> {
     const availableRoutes: string[] = [];
-
-    this.getFilteredNavigation().forEach((section) => {
+    const filteredNavigation = await this.getFilteredNavigation();
+    filteredNavigation.forEach((section) => {
       section.items.forEach((item) => {
         availableRoutes.push(item.route);
       });
     });
-
     return availableRoutes;
   }
 }

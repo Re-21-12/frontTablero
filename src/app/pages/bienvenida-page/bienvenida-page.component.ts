@@ -20,16 +20,18 @@ export class BienvenidaPagesComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  user = signal<UserInfo>(this.auth.getCurrentUser());
+  user = signal<UserInfo>(null); // Inicializa con null
 
-  nombre   = computed(() => this.user()?.nombre ?? 'Usuario');
-  rol      = computed(() => this.user()?.rol?.nombre ?? '—');
+  nombre = computed(() => this.user()?.nombre ?? 'Usuario');
+  rol = computed(() => this.user()?.rol?.nombre ?? '—');
   permisos = computed(() => this.user()?.permisos ?? []);
 
   private showAll = signal(false);
 
   sortedPermisos = computed(() =>
-    [...this.permisos()].sort((a, b) => (a?.nombre ?? '').localeCompare(b?.nombre ?? ''))
+    [...this.permisos()].sort((a, b) =>
+      (a?.nombre ?? '').localeCompare(b?.nombre ?? ''),
+    ),
   );
 
   permisosVisibles = computed(() => {
@@ -41,7 +43,7 @@ export class BienvenidaPagesComponent implements OnInit {
 
   togglePerms(): void {
     if (this.restantes() <= 0) return;
-    this.showAll.update(v => !v);
+    this.showAll.update((v) => !v);
   }
 
   viendoTodos = computed(() => this.showAll());
@@ -64,16 +66,23 @@ export class BienvenidaPagesComponent implements OnInit {
       'Equipo:Consultar',
       'Partido:Consultar',
       'Jugador:Consultar',
-    ])
+    ]),
   );
 
-  ngOnInit(): void {
-    if (!this.auth.isAuthenticated()) this.router.navigate(['/inicio_sesion']);
+  async ngOnInit(): Promise<void> {
+    if (!this.auth.isAuthenticated()) {
+      this.router.navigate(['/inicio_sesion']);
+      return;
+    }
+    // Espera el usuario y actualiza el signal
+    const userInfo = await this.auth.getCurrentUser();
+    this.user.set(userInfo);
   }
 
   ir(path: string): void {
     this.router.navigate([path]);
   }
 
-  trackByPerm = (_: number, p: { id?: number; nombre: string }) => p?.id ?? p?.nombre ?? _;
+  trackByPerm = (_: number, p: { id?: number; nombre: string }) =>
+    p?.id ?? p?.nombre ?? _;
 }

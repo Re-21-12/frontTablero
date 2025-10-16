@@ -219,23 +219,34 @@ export class AuthService {
     return true;
   }
 
-  getToken(): string | null {
+  async getToken(): Promise<string | null> {
     if (!this.isBrowser()) return null;
 
+    // Primero intenta obtener el token local
     const token = localStorage.getItem(this.tokenKey);
     const expiration = this.getTokenExpiration();
 
-    if (!token || !expiration) return null;
-
-    // Si el token expira en menos de 1 minuto, intentar refresh
-    const timeUntilExpiration = expiration - Date.now();
-    if (timeUntilExpiration < 60000 && timeUntilExpiration > 0) {
-      this.refreshToken().subscribe({
-        error: () => console.warn('Failed to refresh token automatically'),
-      });
+    if (token && expiration) {
+      // Si el token expira en menos de 1 minuto, intentar refresh
+      const timeUntilExpiration = expiration - Date.now();
+      if (timeUntilExpiration < 60000 && timeUntilExpiration > 0) {
+        this.refreshToken().subscribe({
+          error: () => console.warn('Failed to refresh token automatically'),
+        });
+      }
+      return token;
     }
 
-    return token;
+    // Si no existe en localStorage, intenta obtener el token de Keycloak
+    try {
+      const keycloakToken = await this.getKeycloakToken();
+      return keycloakToken || null;
+    } catch (error) {
+      console.error('Error al obtener token de Keycloak:', error);
+      // Si falla Keycloak, limpiar estado y redirigir
+      this.logout();
+      return null;
+    }
   }
 
   getTokenExpiration(): number | null {
@@ -266,24 +277,10 @@ export class AuthService {
     return roleData ? JSON.parse(roleData) : null;
   }
 
-  getPermissions(): Permiso[] {
-    if (!this.isBrowser()) return [];
-
-    // Primero intenta obtener los permisos guardados
-    const permissionsData = localStorage.getItem(this.permissionsKey);
-    if (permissionsData) {
-      const parsed: Permiso[] = JSON.parse(permissionsData);
-      return parsed.map((p) => ({
-        ...p,
-        nombre: p.nombre.replace(/\s+/g, ''),
-        id_Rol: p.id_Rol ?? 0, // Asegura que id_Rol exista
-      }));
-    }
-
-    // Si no hay permisos guardados, decodifica el JWT
-    const token = this.getToken();
+  async getPermissions(): Promise<Permiso[]> {
+    // Siempre decodifica el JWT actual para obtener los permisos/roles
+    const token = await this.getToken();
     if (!token) return [];
-
     try {
       const decoded: any = jwtDecode(token);
       const realmRoles: string[] = decoded?.realm_access?.roles || [];
@@ -305,28 +302,22 @@ export class AuthService {
     }
   }
 
-  hasPermission(permissionName: string): boolean {
-    const permissions = this.getPermissions();
-    return permissions.some((permission) => {
-      console.log(
-        'Verificando permiso:',
-        permission.nombre,
-        'contra',
-        permissionName,
-      );
-      return permission.nombre === permissionName.replace(' ', '');
-    });
+  async hasPermission(permissionName: string): Promise<boolean> {
+    // Verifica si el usuario tiene el permiso/rol solicitado usando el JWT
+    const permissions: Permiso[] = await this.getPermissions();
+    const cleanName = permissionName.replace(/\s+/g, '');
+    return permissions.some((permission) => permission.nombre === cleanName);
   }
 
-  getPermissionsByAction(action: string): Permiso[] {
-    const permissions = this.getPermissions();
+  async getPermissionsByAction(action: string): Promise<Permiso[]> {
+    const permissions = await this.getPermissions();
     return permissions.filter((permission) =>
       permission.nombre.includes(action),
     );
   }
 
-  getPermissionsByModule(module: string): Permiso[] {
-    const permissions = this.getPermissions();
+  async getPermissionsByModule(module: string): Promise<Permiso[]> {
+    const permissions = await this.getPermissions();
     return permissions.filter((permission) =>
       permission.nombre.startsWith(module + ':'),
     );
@@ -364,17 +355,17 @@ export class AuthService {
   }
 
   // Método para obtener información completa del usuario autenticado
-  getCurrentUser(): {
+  async getCurrentUser(): Promise<{
     nombre: string;
     rol: { id_rol: number; nombre: string } | null;
     permisos: Permiso[];
-  } | null {
+  } | null> {
     if (!this.isAuthenticated()) return null;
 
     return {
       nombre: this.getUsername() || '',
       rol: this.getRoleComplete(),
-      permisos: this.getPermissions(),
+      permisos: await this.getPermissions(),
     };
   }
 
@@ -418,6 +409,8 @@ export class AuthService {
       return await this._keycloakService.authenticated;
     } catch (error) {
       console.error('Error al verificar autenticación con Keycloak:', error);
+      // Si falla Keycloak, limpiar estado y redirigir
+      this.logout();
       return false;
     }
   }
@@ -644,39 +637,14 @@ export class AuthService {
     }
   }
 
-  hasAnyPermission(requiredPermissions: string[]): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-
-    try {
-      const decoded: any = jwtDecode(token);
-
-      // Roles del realm
-      const realmRoles: string[] = decoded?.realm_access?.roles || [];
-
-      // Roles de recursos (puedes combinarlos si lo necesitas)
-      const resourceRoles: string[] = [];
-      if (decoded?.resource_access) {
-        Object.values(decoded.resource_access).forEach((resource: any) => {
-          if (Array.isArray(resource.roles)) {
-            resourceRoles.push(...resource.roles);
-          }
-        });
-      }
-
-      // Unir todos los roles
-      const allRoles = [...realmRoles, ...resourceRoles];
-
-      // Limpiar espacios en blanco de los permisos requeridos
-      const cleanedRequired = requiredPermissions.map((perm) =>
-        perm.replace(/\s+/g, ''),
-      );
-
-      // Validar si el usuario tiene al menos uno de los permisos requeridos
-      return cleanedRequired.some((perm) => allRoles.includes(perm));
-    } catch (e) {
-      console.warn('Error decodificando el token:', e);
-      return false;
-    }
+  async hasAnyPermission(requiredPermissions: string[]): Promise<boolean> {
+    // Verifica si el usuario tiene al menos uno de los permisos requeridos usando el JWT
+    const permissions: Permiso[] = await this.getPermissions();
+    const cleanedRequired = requiredPermissions.map((perm) =>
+      perm.replace(/\s+/g, ''),
+    );
+    return permissions.some((permission) =>
+      cleanedRequired.includes(permission.nombre),
+    );
   }
 }

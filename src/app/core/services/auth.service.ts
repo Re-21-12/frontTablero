@@ -631,10 +631,30 @@ export class AuthService {
 
     try {
       const decoded: any = jwtDecode(token);
-      const userRoles: string[] = decoded?.realm_access?.roles || [];
 
-      // Verifica si el usuario tiene al menos uno de los permisos requeridos
-      return requiredPermissions.some((perm) => userRoles.includes(perm));
+      // Roles del realm
+      const realmRoles: string[] = decoded?.realm_access?.roles || [];
+
+      // Roles de recursos (puedes combinarlos si lo necesitas)
+      const resourceRoles: string[] = [];
+      if (decoded?.resource_access) {
+        Object.values(decoded.resource_access).forEach((resource: any) => {
+          if (Array.isArray(resource.roles)) {
+            resourceRoles.push(...resource.roles);
+          }
+        });
+      }
+
+      // Unir todos los roles
+      const allRoles = [...realmRoles, ...resourceRoles];
+
+      // Limpiar espacios en blanco de los permisos requeridos
+      const cleanedRequired = requiredPermissions.map((perm) =>
+        perm.replace(/\s+/g, ''),
+      );
+
+      // Validar si el usuario tiene al menos uno de los permisos requeridos
+      return cleanedRequired.some((perm) => allRoles.includes(perm));
     } catch (e) {
       console.warn('Error decodificando el token:', e);
       return false;

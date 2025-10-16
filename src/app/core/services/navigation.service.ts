@@ -4,6 +4,7 @@ import {
   NavigationSection,
   NavigationItem,
 } from '../interfaces/navigation.interface';
+import { jwtDecode } from 'jwt-decode';
 
 @Injectable({
   providedIn: 'root',
@@ -77,16 +78,19 @@ export class NavigationService {
   }
 
   getFilteredNavigation(): NavigationSection[] {
-    // Obtener todos los roles del usuario desde el JWT
+    // Validar autenticación antes de filtrar navegación
+    if (!this.authService.isAuthenticated()) {
+      return [];
+    }
+
+    // Obtener todos los roles del usuario desde el JWT usando jwtDecode importado
     const token = this.authService.getToken();
     let jwtRoles: string[] = [];
     if (token) {
       try {
-        const decoded: any = (window as any).jwtDecode
-          ? (window as any).jwtDecode(token)
-          : require('jwt-decode').default(token);
+        const decoded: any = jwtDecode(token);
         const realmRoles = decoded?.realm_access?.roles || [];
-        const resourceRoles: any[] = [];
+        const resourceRoles: string[] = [];
         if (decoded?.resource_access) {
           Object.values(decoded.resource_access).forEach((resource: any) => {
             if (Array.isArray(resource.roles)) {
@@ -99,9 +103,8 @@ export class NavigationService {
         console.warn('Error decodificando el token:', e);
       }
     }
-    console.log('Roles del JWT:', jwtRoles);
 
-    const sections = this.getNavigation(); // tu navegación completa
+    const sections = this.getNavigation();
     const filtered = sections
       .map((section) => ({
         ...section,
@@ -113,7 +116,6 @@ export class NavigationService {
       }))
       .filter((section) => section.items.length > 0);
 
-    console.log('Navegación filtrada:', filtered);
     return filtered;
   }
 

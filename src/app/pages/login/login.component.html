@@ -27,14 +27,12 @@
       </div>
     </div>
 
-    <!-- Formulario tradicional (solo si no usa Keycloak) -->
-    <form
+<!--     <form
       *ngIf="!useKeycloak"
       [formGroup]="loginForm"
       (ngSubmit)="onSubmit()"
       class="login-form"
     >
-      <!-- Campo Usuario -->
       <div class="form-group">
         <label for="nombre" class="form-label">Usuario</label>
         <div class="input-wrapper">
@@ -54,7 +52,6 @@
         </div>
       </div>
 
-      <!-- Campo Contraseña -->
       <div class="form-group">
         <label for="contrasena" class="form-label">Contraseña</label>
         <div class="input-wrapper">
@@ -81,7 +78,6 @@
         </div>
       </div>
 
-      <!-- Botón de envío para login tradicional -->
       <button
         type="submit"
         class="btn btn-primary btn-login"
@@ -93,7 +89,7 @@
           Iniciando...
         </span>
       </button>
-    </form>
+    </form> -->
 
     <!-- Sección Keycloak -->
     <div *ngIf="useKeycloak" class="keycloak-section">
@@ -143,7 +139,7 @@
       {{ errorMessage }}
     </div>
 
-    <div class="login-footer">
+<!--     <div class="login-footer">
       <p class="login-help">¿No posees una cuenta todavía? <a class="login-link" routerLink="/registro">Registrarse</a></p>
-    </div>
+    </div> -->
   </div>

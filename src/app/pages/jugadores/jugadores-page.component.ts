@@ -19,6 +19,9 @@ import { ReporteService } from '../../core/services/reporte.service';
   styleUrls: ['./jugadores-page.component.css']
 })
 export class JugadoresPageComponent implements OnInit {
+generarReporte() {
+throw new Error('Method not implemented.');
+}
 
   jugadores = signal<Jugador[]>([]);
   equipos   = signal<Equipo[]>([]);
@@ -46,6 +49,7 @@ export class JugadoresPageComponent implements OnInit {
   private paisSvc = inject(PaisService);
   private notify  = inject(NotifyService);
   private reporte = inject(ReporteService);
+j: any;
 
   ngOnInit(): void {
     this.cargarEquipos();

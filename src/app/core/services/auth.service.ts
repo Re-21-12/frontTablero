@@ -32,6 +32,7 @@ export class AuthService {
   private refreshTokenInProgress = false;
   private refreshTokenSubject = new BehaviorSubject<string | null>(null);
   private refreshTimer?: any;
+  private keycloakRefreshInterval: any;
 
   private isBrowser(): boolean {
     return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
@@ -292,8 +293,23 @@ export class AuthService {
 
   // Método para inicializar el servicio al cargar la app
   initializeAuth(): void {
+    if (this.isAuthenticatedWithKeycloak()) {
+      // Inicia el timer para refrescar el token cada 60 segundos
+      this.clearKeycloakRefreshInterval();
+      this.keycloakRefreshInterval = setInterval(() => {
+        this.updateKeycloakToken();
+      }, 60 * 1000); // cada 60 segundos
+    }
+    // ...si usas autenticación local, puedes mantener tu lógica actual...
     if (this.isAuthenticated()) {
       this.startTokenRefreshTimer();
+    }
+  }
+
+  private clearKeycloakRefreshInterval(): void {
+    if (this.keycloakRefreshInterval) {
+      clearInterval(this.keycloakRefreshInterval);
+      this.keycloakRefreshInterval = null;
     }
   }
 

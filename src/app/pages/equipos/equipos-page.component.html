@@ -16,7 +16,9 @@
     <label class="label inline">Localidad</label>
     <select class="input" [(ngModel)]="idLocalidad">
       <option [ngValue]="null">Seleccionar</option>
-      <option *ngFor="let l of localidades()" [ngValue]="l.id">{{ l.nombre }}</option>
+      <option *ngFor="let l of localidades()" [ngValue]="l.id">
+        {{ l.nombre }}
+      </option>
     </select>
 
     <button
@@ -25,7 +27,7 @@
       [disabled]="!nombre.trim() || !idLocalidad || loading()"
       aria-label="Agregar equipo"
     >
-      {{ loading() ? 'Guardando…' : 'Agregar' }}
+      {{ loading() ? "Guardando…" : "Agregar" }}
     </button>
 
     <label class="label inline">ID</label>
@@ -38,7 +40,13 @@
       (keyup.enter)="buscarPorId()"
     />
 
-    <button class="btn btn--ghost" (click)="buscarPorId()" [disabled]="!idCrud || loading()">Buscar</button>
+    <button
+      class="btn btn--ghost"
+      (click)="buscarPorId()"
+      [disabled]="!idCrud || loading()"
+    >
+      Buscar
+    </button>
     <button
       class="btn btn--ghost"
       (click)="editar()"
@@ -46,14 +54,19 @@
     >
       Editar
     </button>
-    <button class="btn btn--ghost danger" (click)="borrarPorId()" [disabled]="!idCrud || loading()">Borrar</button>
+    <button
+      class="btn btn--ghost danger"
+      (click)="borrarPorId()"
+      [disabled]="!idCrud || loading()"
+    >
+      Borrar
+    </button>
   </div>
 
-  <div class="toolbar toolbar--one-row" style="margin-top:8px">
+  <div class="toolbar toolbar--one-row" style="margin-top: 8px">
     <label class="label inline">Logo URL</label>
     <input
       class="input"
-
       placeholder="https://mi-cdn.com/logo.png"
       [(ngModel)]="logoUrl"
       (keyup.enter)="guardarLogo()"
@@ -66,14 +79,17 @@
     >
       Guardar logo
     </button>
-
-    <img
-      *ngIf="logoUrl"
-      class="team-logo--preview"
-      [src]="imgError ? 'https://via.placeholder.com/64?text=Logo' : logoUrl"
-      (error)="onImgErr($event)"
-      alt="Logo (preview)"
-    />
+    @if (logoUrl) {
+      <img
+        *ngIf="logoUrl"
+        class="team-logo--preview"
+        [src]="imgError ? 'https://via.placeholder.com/64?text=Logo' : logoUrl"
+        (error)="onImgErr($event)"
+        alt="Logo (preview)"
+      />
+    } @else {
+      <p>N/A</p>
+    }
   </div>
 
   <div class="list-scroll">
@@ -91,19 +107,27 @@
         <span class="name">{{ e.nombre }}</span>
         <span class="muted">Loc: {{ locOf(e) }}</span>
 
-        <button class="btn btn--ghost" (click)="borrarDesdeLista(e)">Eliminar</button>
+        <button class="btn btn--ghost" (click)="borrarDesdeLista(e)">
+          Eliminar
+        </button>
       </li>
     </ul>
   </div>
 
-  <div class="toolbar" style="margin: .5rem 0 0; display:flex; justify-content:flex-end;">
-    <button class="btn" (click)="generarReporteEquipos()">Generar Reporte</button>
+  <div
+    class="toolbar"
+    style="margin: 0.5rem 0 0; display: flex; justify-content: flex-end"
+  >
+    <button class="btn" (click)="generarReporteEquipos()">
+      Generar Reporte
+    </button>
   </div>
 
   <mat-paginator
     [length]="totalRegistros()"
     [pageSize]="tamanio"
     [pageSizeOptions]="[5, 10, 25]"
-    (page)="cambiarPagina($event)">
+    (page)="cambiarPagina($event)"
+  >
   </mat-paginator>
 </section>

@@ -25,7 +25,7 @@ export const environment: Environment = {
   production: true,
   selectedEnvironment: 'prod',
   prod: {
-    apiBaseUrl: '/api/api',
+    apiBaseUrl: 'https://traefik.corazondeseda.lat/api',
     keycloak: {
       url: 'https://keycloack:8080.com/auth',
       realm: 'master',

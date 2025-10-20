@@ -18,7 +18,7 @@ export const provideKeycloakAngular = () =>
   provideKeycloak({
     config: {
       realm: 'master',
-      url: environment[ environment.selectedEnvironment].homepage,
+      url: environment[environment.selectedEnvironment].keycloak.url,
       clientId: 'frontend',
     },
     initOptions: {

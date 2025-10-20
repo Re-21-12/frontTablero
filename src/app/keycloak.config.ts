@@ -23,9 +23,12 @@ export const provideKeycloakAngular = () =>
     },
     initOptions: {
       onLoad: 'check-sso',
+      // Use the homepage configured in the environment for redirect URIs so
+      // the Keycloak redirect matches the selected environment (prod/dev/local)
       silentCheckSsoRedirectUri:
-        window.location.origin + '/silent-check-sso.html',
-      redirectUri: window.location.origin + '/',
+        environment[environment.selectedEnvironment].homepage +
+        '/silent-check-sso.html',
+      redirectUri: environment[environment.selectedEnvironment].homepage + '/',
     },
     features: [
       withAutoRefreshToken({

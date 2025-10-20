@@ -27,7 +27,7 @@ export const environment: Environment = {
   prod: {
     apiBaseUrl: 'https://api.corazondeseda.lat/api',
     keycloak: {
-      url: 'https://auth.corazondeseda.lat/auth',
+      url: 'https://auth.corazondeseda.lat/',
       realm: 'master',
       clientId: 'frontend',
     },

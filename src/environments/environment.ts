@@ -9,6 +9,7 @@ export interface EnvironmentConfig {
   apiBaseUrl: string;
   keycloak: KeycloakConfig;
   homepage: string;
+  redirect?: string;
 }
 
 export type EnvironmentType = 'prod' | 'dev' | 'local';
@@ -31,7 +32,8 @@ export const environment: Environment = {
       realm: 'master',
       clientId: 'frontend',
     },
-    homepage: 'https://auth.corazondeseda.lat',
+    homepage: 'https://app.corazondeseda.lat',
+    redirect: 'https://app.corazondeseda.lat',
   },
   dev: {
     apiBaseUrl: 'http://localhost:5000/api',

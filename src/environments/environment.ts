@@ -32,8 +32,8 @@ export const environment: Environment = {
       realm: 'master',
       clientId: 'frontend',
     },
-    homepage: 'https://auth.corazondeseda.lat',
-    redirect: 'https://app.corazondeseda.lat',
+    homepage: 'https://app.corazondeseda.lat',
+    redirect: 'https://auth.corazondeseda.lat',
   },
   dev: {
     apiBaseUrl: 'http://localhost:5000/api',

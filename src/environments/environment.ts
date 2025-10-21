@@ -32,7 +32,7 @@ export const environment: Environment = {
       realm: 'master',
       clientId: 'frontend',
     },
-    homepage: 'https://app.corazondeseda.lat',
+    homepage: 'https://auth.corazondeseda.lat',
     redirect: 'https://app.corazondeseda.lat',
   },
   dev: {

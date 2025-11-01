@@ -47,7 +47,7 @@
     >
       Buscar
     </button>
-    <button
+<!--     <button
       class="btn btn--ghost"
       (click)="editar()"
       [disabled]="!idCrud || !nombre.trim() || !idLocalidad || loading()"
@@ -60,10 +60,10 @@
       [disabled]="!idCrud || loading()"
     >
       Borrar
-    </button>
+    </button> -->
   </div>
 
-  <div class="toolbar toolbar--one-row" style="margin-top: 8px">
+ <!--  <div class="toolbar toolbar--one-row" style="margin-top: 8px">
     <label class="label inline">Logo URL</label>
     <input
       class="input"
@@ -90,7 +90,7 @@
     } @else {
       <p>N/A</p>
     }
-  </div>
+  </div> -->
 
   <div class="list-scroll">
     <ul class="list">
@@ -113,21 +113,21 @@
         <span class="name">{{ e.nombre }}</span>
         <span class="muted">Loc: {{ locOf(e) }}</span>
 
-        <button class="btn btn--ghost" (click)="borrarDesdeLista(e)">
+<!--         <button class="btn btn--ghost" (click)="borrarDesdeLista(e)">
           Eliminar
-        </button>
+        </button> -->
       </li>
     </ul>
   </div>
 
-  <div
+<!--   <div
     class="toolbar"
     style="margin: 0.5rem 0 0; display: flex; justify-content: flex-end"
   >
     <button class="btn" (click)="generarReporteEquipos()">
       Generar Reporte
     </button>
-  </div>
+  </div> -->
 
   <mat-paginator
     [length]="totalRegistros()"

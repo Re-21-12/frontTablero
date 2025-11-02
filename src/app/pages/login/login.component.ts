@@ -13,7 +13,7 @@ import { LoginRequest } from '../../core/interfaces/auth-interface';
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
 })

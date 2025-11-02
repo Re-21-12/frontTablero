@@ -1,8 +1,11 @@
 import { Routes } from '@angular/router';
 import { permissionGuardFn } from './core/guards/permission.guard';
 import { canActivateAuthRole } from './core/guards/keycloak-functional.guard';
+import { EmailsComponent } from './pages/emails/emails.component';
 
 export const routes: Routes = [
+
+
   // Inicio en Bienvenida
   { path: '', redirectTo: 'inicio_sesion', pathMatch: 'full' },
 
@@ -121,6 +124,11 @@ export const routes: Routes = [
         (m) => m.HistorialComponent,
       ),
     title: 'Historial',
+  },
+    {
+    path: 'emails',
+    loadComponent: () =>
+      import('./pages/emails/emails.component').then(m => m.EmailsComponent),
   },
 
   // Administración de seguridad

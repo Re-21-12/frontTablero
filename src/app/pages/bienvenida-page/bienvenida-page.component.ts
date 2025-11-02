@@ -23,7 +23,7 @@ export class BienvenidaPagesComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  user = signal<UserInfo>(null); // Inicializa con null
+  user = signal<UserInfo>(null);
 
   nombre = computed(() => this.user()?.nombre ?? 'Usuario');
   rol = computed(() => this.user()?.rol?.nombre ?? '—');
@@ -35,8 +35,8 @@ export class BienvenidaPagesComponent implements OnInit {
 
   sortedPermisos = computed(() =>
     [...this.permisos()].sort((a, b) =>
-      (a?.nombre ?? '').localeCompare(b?.nombre ?? ''),
-    ),
+      (a?.nombre ?? '').localeCompare(b?.nombre ?? '')
+    )
   );
 
   permisosVisibles = computed(() => {
@@ -71,7 +71,7 @@ export class BienvenidaPagesComponent implements OnInit {
       'Equipo:Consultar',
       'Partido:Consultar',
       'Jugador:Consultar',
-    ]),
+    ])
   );
 
   async ngOnInit(): Promise<void> {
@@ -79,7 +79,6 @@ export class BienvenidaPagesComponent implements OnInit {
       this.router.navigate(['/inicio_sesion']);
       return;
     }
-    // Espera el usuario y actualiza el signal
     const userInfo = await this.auth.getCurrentUser();
     this.user.set(userInfo);
   }

@@ -1,11 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  Router,
-  RouterOutlet,
-  RouterLink,
-  RouterLinkActive,
-} from '@angular/router';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from './core/services/auth.service';
 import { NavigationService } from './core/services/navigation.service';
 import { NavigationSection } from './core/interfaces/navigation.interface';
@@ -14,25 +9,17 @@ import { GlobalLoaderComponent } from './shared/components/global-loader/global-
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterOutlet,
-    RouterLink,
-    RouterLinkActive,
-    GlobalLoaderComponent,
-  ],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, GlobalLoaderComponent],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
   private readonly _authService = inject(AuthService);
   private readonly _navigationService = inject(NavigationService);
-
   readonly _router = inject(Router);
 
   title = 'frontTablero';
 
-  // Signals para el estado
   isDarkMode = signal(true);
   sidebarOpen = signal(false);
   navigationSections = signal<NavigationSection[]>([]);
@@ -43,23 +30,42 @@ export class AppComponent implements OnInit {
   }
 
   private async loadNavigation() {
-    console.log('Cargando navegación...');
+    const filtered = await this._navigationService.getFilteredNavigation();
 
-    // El NavigationService ya maneja internamente la verificación de autenticación
-    const filteredNavigation =
-      await this._navigationService.getFilteredNavigation();
-    this.navigationSections.set(filteredNavigation);
-    console.log('Navegación filtrada:', filteredNavigation);
-    if (filteredNavigation.length > 0) {
-      console.log('Navegación cargada:', filteredNavigation);
+    // Clonamos y normalizamos títulos
+    const sections: NavigationSection[] = [...filtered].map(s => ({
+      ...s,
+      title: (s.title ?? '').trim(),
+    }));
+
+    // Buscar "Recursos" robusto
+    const findIdx = sections.findIndex(
+      s => s.title?.trim().toLowerCase() === 'recursos'
+    );
+
+    let recursos: NavigationSection;
+    if (findIdx >= 0) {
+      recursos = { ...sections[findIdx] };
+      sections[findIdx] = recursos;
     } else {
-      console.log('Sin navegación disponible para el usuario actual');
+      recursos = { title: 'Recursos', items: [] };
+      sections.push(recursos);
     }
+
+    // Inyectar Emails si no existe
+    const hasEmails = (recursos.items ?? []).some(i => i.route === '/emails');
+    if (!hasEmails) {
+      recursos.items = [...(recursos.items ?? []), { label: 'Emails', route: '/emails' }];
+    }
+
+    this.navigationSections.set(sections);
+
+    // DEBUG opcional:
+    console.log('[NAV] Final:', JSON.parse(JSON.stringify(sections)));
   }
 
   private setInitialTheme() {
     const hour = new Date().getHours();
-    // Modo oscuro entre 18:00 y 6:00
     const shouldBeDark = hour >= 18 || hour < 6;
     this.isDarkMode.set(shouldBeDark);
     this.applyTheme();
@@ -71,7 +77,7 @@ export class AppComponent implements OnInit {
   }
 
   toggleTheme() {
-    this.isDarkMode.update((current) => !current);
+    this.isDarkMode.update(c => !c);
     this.applyTheme();
   }
 
@@ -86,43 +92,19 @@ export class AppComponent implements OnInit {
     }
   }
 
-  toggleSidebar() {
-    this.sidebarOpen.update((current) => !current);
-  }
+  toggleSidebar() { this.sidebarOpen.update(c => !c); }
+  closeSidebar() { this.sidebarOpen.set(false); }
+  onSidebarClick(e: Event) { e.stopPropagation(); }
 
-  closeSidebar() {
-    this.sidebarOpen.set(false);
-  }
+  get isAuthenticated(): boolean { return this._authService.isAuthenticated(); }
+  get shouldShowNavigation(): boolean { return this.isAuthenticated && this.navigationSections().length > 0; }
 
-  onSidebarClick(event: Event) {
-    event.stopPropagation();
-  }
-
-  // Métodos auxiliares para la template
-  get isAuthenticated(): boolean {
-    return this._authService.isAuthenticated();
-  }
-
-  // Método para verificar si se debe mostrar el menú de navegación
-  get shouldShowNavigation(): boolean {
-    return this.isAuthenticated && this.navigationSections().length > 0;
-  }
-
-  // Método para obtener el nombre de la sección actual
   getCurrentSectionName(): string {
-    const currentUrl = this._router.url;
-
-    if (currentUrl.startsWith('/admin')) {
-      return 'Administración';
-    } else if (currentUrl.startsWith('/recursos')) {
-      return 'Recursos';
-    } else if (
-      currentUrl.includes('/tablero') ||
-      currentUrl.includes('/resultado')
-    ) {
-      return 'Marcador';
-    } else {
-      return 'Marcador';
-    }
+    const u = this._router.url;
+    if (u.startsWith('/admin')) return 'Administración';
+    if (u.startsWith('/recursos')) return 'Recursos';
+    if (u.startsWith('/emails')) return 'Emails';
+    if (u.includes('/tablero') || u.includes('/resultado')) return 'Marcador';
+    return 'Marcador';
   }
 }

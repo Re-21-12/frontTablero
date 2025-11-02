@@ -20,8 +20,6 @@
     </a>
 
     <div class="pro-nav-group">
-
-
       <nav class="pro-nav" role="navigation" aria-label="Principal">
         <!-- Navegación condicional basada en autenticación -->
         <ng-container *ngIf="!isAuthenticated">
@@ -33,18 +31,21 @@
             [routerLinkActiveOptions]="{ exact: true }"
             [class.is-hidden]="_router.url.startsWith('/seleccion')"
           >Marcador</a>
-<!--           <a
-            routerLink="/inicio_sesion"
-            class="pro-chip"
-            routerLinkActive="is-active"
-            [class.is-hidden]="_router.url.startsWith('/inicio_sesion')"
-          >Iniciar sesión</a>
+
+          <!-- Emails siempre visible en top bar -->
           <a
-            routerLink="/registro"
+            routerLink="/emails"
             class="pro-chip"
             routerLinkActive="is-active"
-            [class.is-hidden]="_router.url.startsWith('/registro')"
-          >Registrarse</a> -->
+            [class.is-hidden]="_router.url.startsWith('/emails')"
+          >Emails</a>
+
+          <!--
+          <a routerLink="/inicio_sesion" class="pro-chip" routerLinkActive="is-active"
+             [class.is-hidden]="_router.url.startsWith('/inicio_sesion')">Iniciar sesión</a>
+          <a routerLink="/registro" class="pro-chip" routerLinkActive="is-active"
+             [class.is-hidden]="_router.url.startsWith('/registro')">Registrarse</a>
+          -->
         </ng-container>
 
         <ng-container *ngIf="isAuthenticated">
@@ -56,6 +57,15 @@
             [routerLinkActiveOptions]="{ exact: true }"
             [class.is-hidden]="_router.url.startsWith('/seleccion')"
           >Marcador</a>
+
+          <!-- Emails siempre visible en top bar -->
+          <a
+            routerLink="/emails"
+            class="pro-chip"
+            routerLinkActive="is-active"
+            [class.is-hidden]="_router.url.startsWith('/emails')"
+          >Emails</a>
+
           <button
             class="pro-chip"
             (click)="logout()"
@@ -71,6 +81,7 @@
     <i></i><i></i>
   </div>
 </header>
+
 <app-global-loader></app-global-loader>
 
 <!-- Sidebar - Solo mostrar si hay navegación disponible -->
@@ -86,6 +97,7 @@
   </div>
 
   <nav class="sidebar-nav">
+    <!-- Secciones dinámicas proporcionadas por NavigationService -->
     <div class="nav-section" *ngFor="let section of navigationSections()">
       <h4>{{ section.title }}</h4>
       <a
@@ -94,6 +106,18 @@
         (click)="closeSidebar()"
         routerLinkActive="active">
         {{ item.label }}
+      </a>
+    </div>
+
+    <!-- BLOQUE FIJO: garantiza que 'Emails' SIEMPRE aparezca bajo Recursos -->
+    <div class="nav-section">
+      <h4>Recursos</h4>
+      <a
+        routerLink="/emails"
+        (click)="closeSidebar()"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">
+        Emails
       </a>
     </div>
   </nav>

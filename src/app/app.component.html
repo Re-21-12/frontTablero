@@ -108,18 +108,6 @@
         {{ item.label }}
       </a>
     </div>
-
-    <!-- BLOQUE FIJO: garantiza que 'Emails' SIEMPRE aparezca bajo Recursos -->
-    <div class="nav-section">
-      <h4>Recursos</h4>
-      <a
-        routerLink="/emails"
-        (click)="closeSidebar()"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }">
-        Emails
-      </a>
-    </div>
   </nav>
 </aside>
 

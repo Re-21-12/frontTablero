@@ -122,8 +122,11 @@ export class NavigationService {
     for (const section of sections) {
       const items: NavigationItem[] = [];
       for (const item of section.items) {
+        // Si no existen permisos requeridos o la lista está vacía, mostrar el item
         if (
           !item.requiredPermissions ||
+          (Array.isArray(item.requiredPermissions) &&
+            item.requiredPermissions.length === 0) ||
           (await this.authService.hasAnyPermission(item.requiredPermissions))
         ) {
           items.push(item);
@@ -138,7 +141,11 @@ export class NavigationService {
 
   private async canShowItem(item: NavigationItem): Promise<boolean> {
     // Si no requiere permisos específicos, mostrar siempre (rutas públicas como tablero)
-    if (!item.requiredPermissions || item.requiredPermissions.length === 0) {
+    if (
+      !item.requiredPermissions ||
+      (Array.isArray(item.requiredPermissions) &&
+        item.requiredPermissions.length === 0)
+    ) {
       return true;
     }
     // Verificar si el usuario tiene al menos uno de los permisos requeridos

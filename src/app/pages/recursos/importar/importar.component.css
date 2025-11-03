@@ -52,6 +52,13 @@
   align-items: center;
 }
 
+/* make form two-column on wide screens */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 /* File input */
 .file-input {
   position: relative;
@@ -60,19 +67,80 @@
   flex-direction: column;
 }
 .file-input input[type="file"] {
-  background: transparent;
-  border: 1px dashed rgba(255, 255, 255, 0.04);
-  padding: 0.5rem 0.6rem;
-  border-radius: 8px;
+  /* visually larger click target that looks like a button */
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  border: 1px dashed rgba(255, 255, 255, 0.06);
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
   color: var(--txt);
   max-width: 100%;
   cursor: pointer;
+  transition: all 160ms ease;
+}
+.file-input input[type="file"]:hover {
+  transform: translateY(-1px);
+  border-color: rgba(96, 165, 250, 0.35);
+}
+.file-input input[type="file"]:focus {
+  outline: none;
+  box-shadow: 0 6px 18px rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.5);
 }
 /* info del archivo */
 .file-input small {
   color: var(--muted);
   font-size: 0.85rem;
   margin-top: 6px;
+}
+
+/* Styled selects and text-like controls */
+select[formControlName],
+select {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.01),
+    rgba(255, 255, 255, 0)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--txt);
+  padding: 0.48rem 0.6rem;
+  border-radius: 8px;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+select:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.45);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.06);
+}
+
+/* Radio buttons - custom look */
+.format label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.format input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--brand);
+  cursor: pointer;
+}
+.format label:hover {
+  background: rgba(255, 255, 255, 0.01);
 }
 
 /* Buttons */
@@ -95,6 +163,37 @@
   background: rgba(148, 163, 184, 0.1);
   border-color: rgba(148, 163, 184, 0.18);
   color: #e2e8f0;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.btn {
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+.btn--primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+}
+.btn--soft:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+}
+
+/* Result / mensajes tweaks */
+.import-result {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+/* Small helpers */
+.muted-block {
+  color: var(--muted);
+  font-size: 0.9rem;
 }
 
 /* Result / mensajes */

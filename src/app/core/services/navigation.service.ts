@@ -76,7 +76,6 @@ export class NavigationService {
         {
           label: 'Importar',
           route: '/recursos/importar',
-          requiredPermissions: [],
         },
       ],
     },
@@ -118,6 +117,7 @@ export class NavigationService {
     }
 
     const sections = this.getNavigation();
+    console.log('Navigation (raw):', JSON.parse(JSON.stringify(sections)));
     const filtered: NavigationSection[] = [];
     for (const section of sections) {
       const items: NavigationItem[] = [];
@@ -136,6 +136,7 @@ export class NavigationService {
         filtered.push({ ...section, items });
       }
     }
+    console.log('Navigation (filtered):', JSON.parse(JSON.stringify(filtered)));
     return filtered;
   }
 

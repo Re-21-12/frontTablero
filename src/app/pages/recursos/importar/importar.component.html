@@ -1,0 +1,45 @@
+<form [formGroup]="form" class="import-card form" (ngSubmit)="submit()">
+  <h3>Importar recursos</h3>
+
+  <label>
+    Tipo
+    <select formControlName="tipo">
+      <option *ngFor="let t of tipos" [value]="t.key">{{ t.label }}</option>
+    </select>
+  </label>
+
+  <label>
+    Formato
+    <div class="format">
+      <label><input type="radio" formControlName="formato" value="csv" /> CSV</label>
+      <label><input type="radio" formControlName="formato" value="json" /> JSON</label>
+    </div>
+  </label>
+
+  <label class="file-input">
+    Archivo
+    <input type="file" (change)="onFileChange($event)" />
+    <small *ngIf="file">{{ file.name }} • {{ (file.size / 1024 | number:'1.0-2') }} KB</small>
+  </label>
+
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <button class="btn btn--primary" type="submit" [disabled]="loading">{{ loading ? 'Importando...' : 'Importar' }}</button>
+    <button class="btn btn--soft" type="button" (click)="reset()" [disabled]="loading">Reset</button>
+  </div>
+
+  <div *ngIf="error" style="color:#fca5a5;margin-top:10px">
+    {{ error }}
+  </div>
+
+  <div *ngIf="result" style="margin-top:12px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.02)">
+    <div><strong>Procesados:</strong> {{ result.imported ?? result.processed ?? result.processedCount ?? 0 }}</div>
+    <div><strong>Errores:</strong> {{ result.errors ?? result.failed ?? 0 }}</div>
+
+    <div *ngIf="(result.messages ?? result.errorsList ?? result.messagesList)?.length" style="margin-top:8px">
+      <strong>Mensajes / Errores:</strong>
+      <ul>
+        <li *ngFor="let m of (result.messages ?? result.errorsList ?? result.messagesList)">{{ m }}</li>
+      </ul>
+    </div>
+  </div>
+</form>

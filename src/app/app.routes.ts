@@ -4,8 +4,6 @@ import { canActivateAuthRole } from './core/guards/keycloak-functional.guard';
 import { EmailsComponent } from './pages/emails/emails.component';
 
 export const routes: Routes = [
-
-
   // Inicio en Bienvenida
   { path: '', redirectTo: 'inicio_sesion', pathMatch: 'full' },
 
@@ -125,10 +123,10 @@ export const routes: Routes = [
       ),
     title: 'Historial',
   },
-    {
+  {
     path: 'emails',
     loadComponent: () =>
-      import('./pages/emails/emails.component').then(m => m.EmailsComponent),
+      import('./pages/emails/emails.component').then((m) => m.EmailsComponent),
   },
 
   // Administración de seguridad
@@ -169,6 +167,12 @@ export const routes: Routes = [
           ),
         title: 'Imágenes',
         data: { requiredPermissions: ['Imagen:Consultar'] },
+      },
+      {path: 'importar',
+        loadComponent: () =>
+          import('./pages/recursos/importar/importar.component').then(
+            (m) => m.ImportarComponent,
+          ),
       },
     ],
   },

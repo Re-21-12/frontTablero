@@ -73,6 +73,11 @@ export class NavigationService {
           route: '/recursos/imagenes',
           requiredPermissions: ['Imagen:Consultar'],
         },
+        {
+          label: 'Importar',
+          route: '/recursos/importar',
+          requiredPermissions: [],
+        },
       ],
     },
   ];

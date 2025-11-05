@@ -19,6 +19,7 @@ type UserInfo = {
   templateUrl: './bienvenida-page.component.html',
   styleUrls: ['./bienvenida-page.component.css'],
 })
+//prueba
 export class BienvenidaPagesComponent implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
@@ -35,8 +36,8 @@ export class BienvenidaPagesComponent implements OnInit {
 
   sortedPermisos = computed(() =>
     [...this.permisos()].sort((a, b) =>
-      (a?.nombre ?? '').localeCompare(b?.nombre ?? '')
-    )
+      (a?.nombre ?? '').localeCompare(b?.nombre ?? ''),
+    ),
   );
 
   permisosVisibles = computed(() => {
@@ -71,7 +72,7 @@ export class BienvenidaPagesComponent implements OnInit {
       'Equipo:Consultar',
       'Partido:Consultar',
       'Jugador:Consultar',
-    ])
+    ]),
   );
 
   async ngOnInit(): Promise<void> {

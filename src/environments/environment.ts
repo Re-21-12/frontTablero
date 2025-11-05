@@ -25,7 +25,7 @@ export interface Environment {
 
 export const environment: Environment = {
   production: true,
-  selectedEnvironment: 'local',
+  selectedEnvironment: 'prod',
   prod: {
     apiBaseUrl: 'https://api.corazondeseda.lat/api',
     keycloak: {
@@ -57,5 +57,4 @@ export const environment: Environment = {
     homepage: 'http://192.168.137.1:8080',
     socketUrl: 'http://localhost:3000',
   },
-
-}
+};

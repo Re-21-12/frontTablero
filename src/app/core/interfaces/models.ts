@@ -98,3 +98,26 @@ export interface PartidoPagina {
   local: string
   visitante: string
 }
+
+export interface SendEmailRequest {
+  to: string;
+  subject: string;
+  body: string; 
+}
+
+export interface EmailResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
+
+export interface EmailItem {
+  id: number;
+  to: string;
+  subject: string;
+  body: string;
+  status: 'queued' | 'sent' | 'failed';
+  error?: string | null;
+  createdAt: string;      
+  sentAt?: string | null; 
+}

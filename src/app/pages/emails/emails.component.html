@@ -1,82 +1,88 @@
-<h2>Emails</h2>
-<p *ngIf="msgOk" class="msg msg-ok">{{ msgOk }}</p>
-<p *ngIf="msgErr" class="msg msg-err">{{ msgErr }}</p>
+<div class="wrap">
+  <h2>Emails</h2>
 
-<form [formGroup]="form" (ngSubmit)="submit()" aria-label="Formulario de envío de emails">
-  <div class="field">
-    <label for="to">Para</label>
-    <input id="to" type="email" formControlName="to" placeholder="correo@dominio.com" required />
-    <small class="hint" *ngIf="form.controls.to.touched && form.controls.to.invalid">
-      Ingresa un correo válido.
-    </small>
+  <div class="panel">
+    <label>Filtrar por estado:</label>
+    <select [(ngModel)]="filterStatusValue">
+      <option value="">(todos)</option>
+      <option value="queued">queued</option>
+      <option value="sent">sent</option>
+      <option value="failed">failed</option>
+    </select>
+    <button (click)="refresh()">Actualizar</button>
   </div>
 
-  <div class="field">
-    <label for="subject">Asunto</label>
-    <input id="subject" type="text" formControlName="subject" placeholder="Asunto del correo" maxlength="256" required />
-    <small class="hint" *ngIf="form.controls.subject.touched && form.controls.subject.invalid">
-      El asunto es requerido (máx. 256).
-    </small>
+  <div class="msgs" *ngIf="msg() || err()">
+    <p class="ok" *ngIf="msg()">{{ msg() }}</p>
+    <p class="bad" *ngIf="err()">{{ err() }}</p>
   </div>
 
-  <div class="field">
-    <label for="body">Body (HTML)</label>
-    <textarea id="body" formControlName="body" rows="8" placeholder="<h1>Hola</h1><p>Contenido...</p>" required></textarea>
-    <small class="hint" *ngIf="form.controls.body.touched && form.controls.body.invalid">
-      El contenido es requerido.
-    </small>
+  <div class="grid">
+    <div class="col">
+      <h3>Formulario</h3>
+      <div class="tabs">
+        <button [class.active]="mode() === 'send'" (click)="mode.set('send')">Enviar</button>
+        <button [class.active]="mode() === 'draft'" (click)="mode.set('draft')">Borrador</button>
+        <button [class.active]="mode() === 'edit-draft'" disabled *ngIf="mode() === 'edit-draft'">
+          Editando borrador #{{ editingId() }}
+        </button>
+      </div>
+
+      <form (ngSubmit)="mode()==='send' ? send() : mode()==='draft' ? saveDraft() : updateDraft()">
+        <label>Para</label>
+        <input type="email" [(ngModel)]="to" name="to" required />
+
+        <label>Asunto</label>
+        <input type="text" [(ngModel)]="subject" name="subject" required />
+
+        <label>Cuerpo (HTML permitido)</label>
+        <textarea rows="8" [(ngModel)]="body" name="body" required></textarea>
+
+        <div class="actions">
+          <button type="submit" *ngIf="mode()==='send'">Enviar ahora</button>
+          <button type="submit" *ngIf="mode()==='draft'">Guardar borrador</button>
+          <button type="submit" *ngIf="mode()==='edit-draft'">Guardar cambios</button>
+          <button type="button" (click)="clearForm()">Limpiar</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col">
+      <h3>Listado</h3>
+      <div *ngIf="loading()">Cargando...</div>
+      <table *ngIf="!loading()">
+        <thead>
+          <tr>
+            <th>Id</th>
+            <th>Para</th>
+            <th>Asunto</th>
+            <th>Estado</th>
+            <th>Creado</th>
+            <th>Enviado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of emails()">
+            <td>{{ e.id }}</td>
+            <td>{{ e.to }}</td>
+            <td>{{ e.subject }}</td>
+            <td>
+              <span [class.bad]="e.status==='failed'"
+                    [class.warn]="e.status==='queued'"
+                    [class.ok]="e.status==='sent'">
+                {{ e.status }}
+              </span>
+            </td>
+            <td>{{ e.createdAt | date:'short' }}</td>
+            <td>{{ e.sentAt ? (e.sentAt | date:'short') : '-' }}</td>
+            <td class="row-actions">
+              <button (click)="editDraft(e)" [disabled]="e.status!=='queued'">Editar</button>
+              <button (click)="remove(e)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <div class="actions">
-    <button type="submit" [disabled]="form.invalid">Enviar</button>
-  </div>
-</form>
-<hr />
-
-
-<div class="list-header">
-  <h3>Listado</h3>
-  <div class="list-meta" *ngIf="total">Total: {{ total }}</div>
-</div>
-
-<div *ngIf="loading" class="loading">Cargando…</div>
-
-<table *ngIf="!loading" class="table">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Para</th>
-      <th>Asunto</th>
-      <th>Status</th>
-      <th>Creado</th>
-      <th>Enviado</th>
-      <th>Acciones</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr *ngFor="let e of items">
-      <td data-label="ID">{{ e.id }}</td>
-      <td data-label="Para">{{ e.to }}</td>
-      <td data-label="Asunto">{{ e.subject }}</td>
-      <td data-label="Status">{{ e.status }}</td>
-      <td data-label="Creado">{{ e.createdAt | date:'short' }}</td>
-      <td data-label="Enviado">{{ e.sentAt ? (e.sentAt | date:'short') : '-' }}</td>
-      <td data-label="Acciones" class="row-actions">
-        <button (click)="sendDraft(e.id)" [disabled]="e.status !== 0">Enviar borrador</button>
-        <button (click)="remove(e.id)">Eliminar</button>
-      </td>
-    </tr>
-
-    <tr *ngIf="!items?.length">
-      <td colspan="7" class="empty">No hay registros para mostrar.</td>
-    </tr>
-  </tbody>
-</table>
-
-
-<div class="pagination" *ngIf="totalPages > 1">
-  <button (click)="load(page-1)" [disabled]="page <= 1" aria-label="Página anterior">Anterior</button>
-  <span>Página {{ page }} / {{ totalPages }}</span>
-  <button (click)="load(page+1)" [disabled]="page >= totalPages" aria-label="Página siguiente">Siguiente</button>
 </div>

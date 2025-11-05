@@ -1,15 +1,17 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { EmailItem, EmailResponse, SendEmailRequest } from '../interfaces/models';
+import {
+  EmailItem,
+  EmailResponse,
+  SendEmailRequest,
+} from '../interfaces/models';
 import { Observable } from 'rxjs';
-
 
 @Injectable({ providedIn: 'root' })
 export class EmailService {
   private http = inject(HttpClient);
-  private base = `${environment.dev.apiBaseUrl}/email`; 
-
+  private base = `${environment.prod.apiBaseUrl}/email`;
 
   //  POST /api/email/send
   send(req: SendEmailRequest): Observable<EmailResponse> {
@@ -17,13 +19,24 @@ export class EmailService {
   }
 
   //  POST /api/email/drafts  (crear borrador)
-  createDraft(req: SendEmailRequest): Observable<{ success: boolean; id: number }> {
-    return this.http.post<{ success: boolean; id: number }>(`${this.base}/drafts`, req);
+  createDraft(
+    req: SendEmailRequest,
+  ): Observable<{ success: boolean; id: number }> {
+    return this.http.post<{ success: boolean; id: number }>(
+      `${this.base}/drafts`,
+      req,
+    );
   }
 
   //  PUT /api/email/drafts/{id} (editar borrador)
-  updateDraft(id: number, req: SendEmailRequest): Observable<{ success: boolean }> {
-    return this.http.put<{ success: boolean }>(`${this.base}/drafts/${id}`, req);
+  updateDraft(
+    id: number,
+    req: SendEmailRequest,
+  ): Observable<{ success: boolean }> {
+    return this.http.put<{ success: boolean }>(
+      `${this.base}/drafts/${id}`,
+      req,
+    );
   }
 
   //  GET /api/email (listar)

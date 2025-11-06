@@ -59,22 +59,20 @@
 
         <div class="match-body">
           <div class="team">
-            @if(p.local){
-              <img class="crest-img" [src]="logoEquipo(p.local)" (error)="onImgErr($event)" alt="logo local" />
-            }@else {
-              N/A
-            }
+            <ng-container *ngIf="logoEquipo(p.local) as logo; else noLogoLocal">
+              <img class="crest-img" [src]="logo" (error)="onImgErr($event)" alt="logo local" />
+            </ng-container>
+            <ng-template #noLogoLocal>N/A</ng-template>
             <span class="team-name">{{ p.local }}</span>
           </div>
 
           <div class="vs">VS</div>
 
           <div class="team">
-            @if(p.visitante){
-              <img class="crest-img crest--away" [src]="logoEquipo(p.visitante)" (error)="onImgErr($event)" alt="logo visitante" />
-            }@else {
-              N/A
-            }
+            <ng-container *ngIf="logoEquipo(p.visitante) as logo; else noLogoVisitante">
+              <img class="crest-img crest--away" [src]="logo" (error)="onImgErr($event)" alt="logo visitante" />
+            </ng-container>
+            <ng-template #noLogoVisitante>N/A</ng-template>
             <span class="team-name">{{ p.visitante }}</span>
           </div>
         </div>

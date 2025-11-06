@@ -8,7 +8,12 @@ import { LocalidadService } from '../../core/services/localidad.service';
 import { PartidoService } from '../../core/services/partido.service';
 import { NotifyService } from '../shared/notify.service';
 
-import { Equipo, Localidad, Pagina, PartidoPagina } from '../../core/interfaces/models';
+import {
+  Equipo,
+  Localidad,
+  Pagina,
+  PartidoPagina,
+} from '../../core/interfaces/models';
 import { ReporteService } from '../../core/services/reporte.service';
 
 @Component({
@@ -19,31 +24,26 @@ import { ReporteService } from '../../core/services/reporte.service';
   styleUrls: ['./partidos-page.component.css'],
 })
 export class PartidosPageComponent implements OnInit {
-
-
   fechaHoraLocal = '';
   partLocalidadId = model<number>();
-  equipoLocal     = model<Equipo>();
+  equipoLocal = model<Equipo>();
   equipoVisitante = model<Equipo>();
 
-
-  equipos     = signal<Equipo[]>([]);
+  equipos = signal<Equipo[]>([]);
   localidades = signal<Localidad[]>([]);
-  partidos    = signal<any[]>([]);           
-  items       = signal<PartidoPagina[]>([]); 
+  partidos = signal<any[]>([]);
+  items = signal<PartidoPagina[]>([]);
   totalRegistros = signal(0);
 
-
   tamanio = 5;
-  pagina  = 1;
+  pagina = 1;
   expandedIndex = signal<number | null>(null);
 
-
-  private eqService   = inject(EquipoService);
-  private locService  = inject(LocalidadService);
+  private eqService = inject(EquipoService);
+  private locService = inject(LocalidadService);
   private partService = inject(PartidoService);
-  private notify      = inject(NotifyService);
-  private reporte     = inject(ReporteService);
+  private notify = inject(NotifyService);
+  private reporte = inject(ReporteService);
 
   ngOnInit() {
     this.cargar();
@@ -51,10 +51,14 @@ export class PartidosPageComponent implements OnInit {
   }
 
   cargar() {
-    this.eqService.getAll().subscribe({ next: d => this.equipos.set(d ?? []) });
-    this.locService.getAll().subscribe({ next: d => this.localidades.set(d ?? []) });
+    this.eqService
+      .getAll()
+      .subscribe({ next: (d) => this.equipos.set(d ?? []) });
+    this.locService
+      .getAll()
+      .subscribe({ next: (d) => this.localidades.set(d ?? []) });
     this.partService.getAll().subscribe({
-      next: d => this.partidos.set(d ?? []),
+      next: (d) => this.partidos.set(d ?? []),
       error: () => this.notify.error('No se pudieron cargar partidos'),
     });
   }
@@ -72,16 +76,19 @@ export class PartidosPageComponent implements OnInit {
     }
     const eqLocal = this.equipoLocal();
     const eqVisit = this.equipoVisitante();
-    if (!eqLocal || !eqVisit) { this.notify.info('Selecciona ambos equipos'); return; }
+    if (!eqLocal || !eqVisit) {
+      this.notify.info('Selecciona ambos equipos');
+      return;
+    }
     if (eqLocal.id_Equipo === eqVisit.id_Equipo) {
       this.notify.info('El equipo local y visitante no pueden ser el mismo');
       return;
     }
 
     const payload = {
-      fechaHora:    this.toLocalIso(this.fechaHoraLocal),
+      fechaHora: this.toLocalIso(this.fechaHoraLocal),
       id_Localidad: this.partLocalidadId()!,
-      id_Local:     eqLocal.id_Equipo,
+      id_Local: eqLocal.id_Equipo,
       id_Visitante: eqVisit.id_Equipo,
     };
 
@@ -100,7 +107,7 @@ export class PartidosPageComponent implements OnInit {
   }
 
   cambiarPagina(event: PageEvent) {
-    this.pagina  = event.pageIndex + 1;
+    this.pagina = event.pageIndex + 1;
     this.tamanio = event.pageSize;
     this.cargarPagina();
   }
@@ -114,15 +121,21 @@ export class PartidosPageComponent implements OnInit {
     });
   }
 
-  logoEquipo(nombre?: string): string {
-    if (!nombre) return 'assets/placeholder-team.svg';
-    const eq = this.equipos().find(e => e?.nombre?.toLowerCase() === nombre.toLowerCase());
-    return (eq as any)?.url || 'assets/placeholder-team.svg';
+  logoEquipo(nombre?: string): string | null {
+    if (!nombre) return null;
+    const eq = this.equipos().find(
+      (e) => e?.nombre?.toLowerCase() === nombre.toLowerCase(),
+    );
+    const url = (eq as any)?.url;
+    if (!url || typeof url !== 'string' || !url.trim()) return null;
+    return url;
   }
 
   nombreLocalidad(id?: number): string {
     if (!id) return '';
-    const l = this.localidades().find(x => (x as any).id === id || (x as any).id_Localidad === id);
+    const l = this.localidades().find(
+      (x) => (x as any).id === id || (x as any).id_Localidad === id,
+    );
     return l?.nombre ?? `Loc: ${id}`;
   }
 
@@ -132,29 +145,35 @@ export class PartidosPageComponent implements OnInit {
 
   onImgErr(ev: Event) {
     const img = ev.target as HTMLImageElement | null;
-    if (img) img.src = 'assets/placeholder-team.svg';
+    if (img) {
+      // ocultar la imagen si falla la carga en vez de reemplazar por un svg inexistente
+      img.style.display = 'none';
+    }
   }
 
   trackByPartido = (index: number, _p: PartidoPagina) => index;
 
   private normTxt(s?: string): string {
     return (s ?? '')
-      .normalize('NFD').replace(/\p{Diacritic}/gu, '')
-      .toLowerCase().replace(/\s+/g, ' ').trim();
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 
   private toDate(d: any): Date | null {
-    const x = d instanceof Date ? d : (d ? new Date(d) : null);
-    return (x && !isNaN(+x)) ? x : null;
+    const x = d instanceof Date ? d : d ? new Date(d) : null;
+    return x && !isNaN(+x) ? x : null;
   }
 
   private diffMinutes(a?: any, b?: any): number | null {
-    const da = this.toDate(a), db = this.toDate(b);
+    const da = this.toDate(a),
+      db = this.toDate(b);
     if (!da || !db) return null;
     return Math.abs((da.getTime() - db.getTime()) / 60000);
   }
 
-  
   private idDirecto(p: any): number | null {
     if (!p) return null;
     return (
@@ -163,16 +182,17 @@ export class PartidosPageComponent implements OnInit {
       (typeof p.idPartido === 'number' && p.idPartido) ||
       (typeof p.partidoId === 'number' && p.partidoId) ||
       (typeof p.id === 'number' && p.id) ||
-      (p.partido && typeof p.partido.id_Partido === 'number' && p.partido.id_Partido) ||
+      (p.partido &&
+        typeof p.partido.id_Partido === 'number' &&
+        p.partido.id_Partido) ||
       (p.partido && typeof p.partido.id === 'number' && p.partido.id) ||
       null
     );
   }
 
-
   private idPorCoincidencia(p: any): number | null {
-    const loc  = this.normTxt(p?.local);
-    const vis  = this.normTxt(p?.visitante);
+    const loc = this.normTxt(p?.local);
+    const vis = this.normTxt(p?.visitante);
     const fecha = p?.fechaHora;
     const candidatos = this.partidos().filter((x: any) => {
       const l = this.normTxt(x?.local ?? x?.equipoLocal);
@@ -207,20 +227,26 @@ export class PartidosPageComponent implements OnInit {
     const ejecutar = () => {
       const id = this.resolverIdPartido(p);
       if (!id) {
-        this.notify.error('No hay partido seleccionado (no se pudo resolver el ID).');
+        this.notify.error(
+          'No hay partido seleccionado (no se pudo resolver el ID).',
+        );
         return;
       }
       this.notify.info('Generando reporte de roster…');
       this.reporte.descargarReporteRosterPartido(id).subscribe({
         next: () => this.notify.success('Reporte de roster descargado'),
-        error: () => this.notify.error('No se pudo generar el reporte de roster')
+        error: () =>
+          this.notify.error('No se pudo generar el reporte de roster'),
       });
     };
 
     if (!this.partidos().length) {
       this.partService.getAll().subscribe({
-        next: d => { this.partidos.set(d ?? []); ejecutar(); },
-        error: () => this.notify.error('No se pudieron cargar partidos')
+        next: (d) => {
+          this.partidos.set(d ?? []);
+          ejecutar();
+        },
+        error: () => this.notify.error('No se pudieron cargar partidos'),
       });
     } else {
       ejecutar();

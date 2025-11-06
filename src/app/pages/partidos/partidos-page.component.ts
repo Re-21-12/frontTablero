@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, model, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  model,
+  signal,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -7,6 +14,7 @@ import { EquipoService } from '../../core/services/equipo.service';
 import { LocalidadService } from '../../core/services/localidad.service';
 import { PartidoService } from '../../core/services/partido.service';
 import { NotifyService } from '../shared/notify.service';
+import { SocketService } from '../../core/services/socket.service';
 
 import {
   Equipo,
@@ -23,7 +31,7 @@ import { ReporteService } from '../../core/services/reporte.service';
   templateUrl: './partidos-page.component.html',
   styleUrls: ['./partidos-page.component.css'],
 })
-export class PartidosPageComponent implements OnInit {
+export class PartidosPageComponent implements OnInit, OnDestroy {
   fechaHoraLocal = '';
   partLocalidadId = model<number>();
   equipoLocal = model<Equipo>();
@@ -44,6 +52,8 @@ export class PartidosPageComponent implements OnInit {
   private partService = inject(PartidoService);
   private notify = inject(NotifyService);
   private reporte = inject(ReporteService);
+  private socket = inject(SocketService);
+  private subscribedIds = new Set<number>();
 
   ngOnInit() {
     this.cargar();
@@ -58,7 +68,10 @@ export class PartidosPageComponent implements OnInit {
       .getAll()
       .subscribe({ next: (d) => this.localidades.set(d ?? []) });
     this.partService.getAll().subscribe({
-      next: (d) => this.partidos.set(d ?? []),
+      next: (d) => {
+        this.partidos.set(d ?? []);
+        this.subscribeSocketToPartidos(d ?? []);
+      },
       error: () => this.notify.error('No se pudieron cargar partidos'),
     });
   }
@@ -68,7 +81,50 @@ export class PartidosPageComponent implements OnInit {
     const pad = (n: number) => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:00`;
   }
+  editarPartido(p: PartidoPagina) {
+    const id = this.resolverIdPartido(p);
+    if (!id) {
+      this.notify.error('No se pudo resolver el ID del partido');
+      return;
+    }
 
+    const nombreLocal = (p as any).local ?? (p as any).equipoLocal;
+    const nombreVisitante = (p as any).visitante ?? (p as any).equipoVisitante;
+
+    const eqLocal = this.equipos().find(
+      (e) => this.normTxt(e?.nombre) === this.normTxt(nombreLocal),
+    );
+    const eqVisit = this.equipos().find(
+      (e) => this.normTxt(e?.nombre) === this.normTxt(nombreVisitante),
+    );
+
+    if (!eqLocal || !eqVisit) {
+      this.notify.error('No se pudieron resolver los equipos del partido');
+      return;
+    }
+
+    if (eqLocal.id_Equipo === eqVisit.id_Equipo) {
+      this.notify.info('El equipo local y visitante no pueden ser el mismo');
+      return;
+    }
+
+    const payload: any = {
+      // el backend acepta FechaHora o fechaHora; enviamos FechaHora si está disponible
+      FechaHora:
+        (p as any).fechaHora ?? (p as any).FechaHora ?? (p as any).fecha,
+      id_Local: eqLocal.id_Equipo,
+      id_visitante: eqVisit.id_Equipo,
+    };
+
+    this.partService.update(id, payload).subscribe({
+      next: () => {
+        this.notify.success('Partido actualizado');
+        this.cargar();
+        this.cargarPagina();
+      },
+      error: () => this.notify.error('Error al actualizar partido'),
+    });
+  }
   crearPartido() {
     if (!this.fechaHoraLocal || !this.partLocalidadId()) {
       this.notify.info('Completa todos los campos');
@@ -117,6 +173,7 @@ export class PartidosPageComponent implements OnInit {
       next: (res: Pagina<PartidoPagina>) => {
         this.items.set(res.items ?? []);
         this.totalRegistros.set(res.totalRegistros ?? 0);
+        this.subscribeSocketToPartidos(res.items ?? []);
       },
     });
   }
@@ -251,5 +308,31 @@ export class PartidosPageComponent implements OnInit {
     } else {
       ejecutar();
     }
+  }
+
+  private subscribeSocketToPartidos(list: any[]) {
+    if (!Array.isArray(list)) return;
+    for (const p of list) {
+      const id = this.resolverIdPartido(p);
+      if (!id || this.subscribedIds.has(id)) continue;
+      this.socket.on('partido', String(id), (data: any) => {
+        // refrescar datos cuando backend notifique cambio en este partido
+        this.notify.info('Partido actualizado');
+        this.cargar();
+        this.cargarPagina();
+      });
+      this.subscribedIds.add(id);
+    }
+  }
+
+  private clearSocketSubscriptions() {
+    for (const id of Array.from(this.subscribedIds)) {
+      this.socket.off('partido', String(id));
+    }
+    this.subscribedIds.clear();
+  }
+
+  ngOnDestroy(): void {
+    this.clearSocketSubscriptions();
   }
 }

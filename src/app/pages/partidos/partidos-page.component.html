@@ -59,14 +59,22 @@
 
         <div class="match-body">
           <div class="team">
-            <img class="crest-img" [src]="logoEquipo(p.local)" (error)="onImgErr($event)" alt="logo local" />
+            @if(p.local){
+              <img class="crest-img" [src]="logoEquipo(p.local)" (error)="onImgErr($event)" alt="logo local" />
+            }@else {
+              N/A
+            }
             <span class="team-name">{{ p.local }}</span>
           </div>
 
           <div class="vs">VS</div>
 
           <div class="team">
-            <img class="crest-img crest--away" [src]="logoEquipo(p.visitante)" (error)="onImgErr($event)" alt="logo visitante" />
+            @if(p.visitante){
+              <img class="crest-img crest--away" [src]="logoEquipo(p.visitante)" (error)="onImgErr($event)" alt="logo visitante" />
+            }@else {
+              N/A
+            }
             <span class="team-name">{{ p.visitante }}</span>
           </div>
         </div>

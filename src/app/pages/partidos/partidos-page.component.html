@@ -78,8 +78,8 @@
         </div>
 
         <div class="match-actions">
-          <button class="btn btn--ghost" (click)="editarTablero(i)">Editar Tablero</button>
-          <button class="btn btn--ghost" (click)="editarPartido(p)">Editar</button>
+
+          <button class="btn btn--ghost" (click)="verPartido(p.id_Partido)">Editar Partido</button>
           <button class="btn btn--ghost" (click)="toggleDetallesByIndex(i)">Detalles</button>
           <button class="btn" (click)="generarReporteRosterFromRow(p)">Generar Roster</button>
         </div>
@@ -100,4 +100,3 @@
   </mat-paginator>
 
 </section>
-

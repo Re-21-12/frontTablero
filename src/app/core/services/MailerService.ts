@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class MailerService {
-  private baseUrl = 'https://localhost:7146/api/mailer';
+  private baseUrl = `${environment[environment.selectedEnvironment].apiBaseUrl}/mailer`;
 
   constructor(private http: HttpClient) {}
 
@@ -20,17 +21,14 @@ export class MailerService {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
   createTemplate(payload: any): Observable<any> {
-  return this.http.post(`${this.baseUrl}/templates`, payload);
-}
+    return this.http.post(`${this.baseUrl}/templates`, payload);
+  }
 
+  updateTemplate(id: number, payload: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/templates/${id}`, payload);
+  }
 
-updateTemplate(id: number, payload: any): Observable<any> {
-  return this.http.put(`${this.baseUrl}/templates/${id}`, payload);
-}
-
-deleteTemplate(id: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}/templates/${id}`);
-}
-
-
+  deleteTemplate(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/templates/${id}`);
+  }
 }

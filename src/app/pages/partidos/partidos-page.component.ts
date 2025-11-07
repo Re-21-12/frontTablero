@@ -23,7 +23,7 @@ import {
   PartidoPagina,
 } from '../../core/interfaces/models';
 import { ReporteService } from '../../core/services/reporte.service';
-import { ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -55,6 +55,7 @@ export class PartidosPageComponent implements OnInit, OnDestroy {
   private reporte = inject(ReporteService);
   private socket = inject(SocketService);
   private activatedRoute = inject(ActivatedRouteSnapshot);
+  private route = inject(Router);
 
   private subscribedIds = new Set<number>();
 
@@ -77,6 +78,10 @@ export class PartidosPageComponent implements OnInit, OnDestroy {
       },
       error: () => this.notify.error('No se pudieron cargar partidos'),
     });
+  }
+
+  editarTablero(id: any) {
+    this.route.navigate(['/tablero', id]);
   }
 
   private toLocalIso(dtLocal: string): string {

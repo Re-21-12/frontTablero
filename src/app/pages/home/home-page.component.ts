@@ -34,7 +34,7 @@ export class HomePageComponent implements OnInit {
   private _routerService = inject(Router);
   private socket = inject(SocketService);
   private notify = inject(NotifyService);
-  private activatedRoute = inject(ActivatedRouteSnapshot);
+  private activatedRoute = inject(ActivatedRoute);
 
   constructor(private facade: TableroFacade) {}
   Math: any;
@@ -57,7 +57,7 @@ export class HomePageComponent implements OnInit {
     this.starEmit();
   }
   starEmit() {
-    const id: any = this.activatedRoute.params['id'];
+    const id: any = this.activatedRoute.snapshot.params['id'];
     if (id) {
       this.socket.on(`partido`, `${id}`, (data) => {
         this.notify.info(`Partido actualizado: ${data}`);

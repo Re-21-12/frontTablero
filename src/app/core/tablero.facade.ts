@@ -12,7 +12,7 @@ export class TableroFacade {
     private locSvc: LocalidadService,
     private eqSvc: EquipoService,
     private parSvc: PartidoService,
-    private cuaSvc: CuartoService
+    private cuaSvc: CuartoService,
   ) {}
 
   save(it: Itabler) {
@@ -20,41 +20,56 @@ export class TableroFacade {
     if (!nombreLoc) throw new Error('Localidad.nombre es requerido');
 
     return this.locSvc.getAll().pipe(
-      map(list => list.find(l => l.nombre.toLowerCase() === nombreLoc.toLowerCase())),
-      switchMap(found => {
+      map((list) =>
+        list.find((l) => l.nombre.toLowerCase() === nombreLoc.toLowerCase()),
+      ),
+      switchMap((found) => {
         if (found) return of(found);
         return this.locSvc.create({ nombre: nombreLoc }).pipe(
           switchMap(() => this.locSvc.getAll()),
-          map(list => {
-            const l = list.find(x => x.nombre.toLowerCase() === nombreLoc.toLowerCase());
+          map((list) => {
+            const l = list.find(
+              (x) => x.nombre.toLowerCase() === nombreLoc.toLowerCase(),
+            );
             if (!l) throw new Error('No se pudo resolver id');
             return l;
-          })
+          }),
         );
       }),
       switchMap((loc: Localidad) => {
         const ensureEquipo = (e: Local) =>
           this.eqSvc.getAll().pipe(
-            map(list => list.find(x => x.nombre.toLowerCase() === e.nombre.toLowerCase())),
-            switchMap(found => {
+            map((list) =>
+              list.find(
+                (x) => x.nombre.toLowerCase() === e.nombre.toLowerCase(),
+              ),
+            ),
+            switchMap((found) => {
               if (found) return of(found);
-              return this.eqSvc.create({ nombre: e.nombre, id_Localidad: loc.id }).pipe(
-                switchMap(() => this.eqSvc.getAll()),
-                map(list => {
-                  const eq = list.find(x => x.nombre.toLowerCase() === e.nombre.toLowerCase());
-                  if (!eq) throw new Error('No se pudo resolver id_Equipo de ' + e.nombre);
-                  return eq;
-                })
-              );
-            })
+              return this.eqSvc
+                .create({ nombre: e.nombre, id_Localidad: loc.id })
+                .pipe(
+                  switchMap(() => this.eqSvc.getAll()),
+                  map((list) => {
+                    const eq = list.find(
+                      (x) => x.nombre.toLowerCase() === e.nombre.toLowerCase(),
+                    );
+                    if (!eq)
+                      throw new Error(
+                        'No se pudo resolver id_Equipo de ' + e.nombre,
+                      );
+                    return eq;
+                  }),
+                );
+            }),
           );
 
         return ensureEquipo(it.local).pipe(
-          concatMap(localTeam =>
+          concatMap((localTeam) =>
             ensureEquipo(it.visitante).pipe(
-              map(visitTeam => ({ loc, localTeam, visitTeam }))
-            )
-          )
+              map((visitTeam) => ({ loc, localTeam, visitTeam })),
+            ),
+          ),
         );
       }),
       switchMap(({ loc, localTeam, visitTeam }) => {
@@ -63,13 +78,12 @@ export class TableroFacade {
           fechaHora: fechaISO,
           id: loc.id,
           id_Local: localTeam.id_Equipo,
-          id_Visitante: visitTeam.id_Equipo
+          id_Visitante: visitTeam.id_Equipo,
         };
-
 
         return this.parSvc.create(body).pipe(
           switchMap(() => this.parSvc.getAll()),
-          map(list => {
+          map((list) => {
             if (!Array.isArray(list) || list.length === 0) {
               throw new Error('No se pudo resolver id_Partido (lista vacía)');
             }
@@ -81,27 +95,32 @@ export class TableroFacade {
 
             if (!partidoId) throw new Error('No se pudo resolver id_Partido');
 
-            return { partidoId, localTeam, visitTeam };
-          })
+            return { partidoId, localTeam, visitTeam, loc } as any;
+          }),
         );
       }),
-      switchMap(({ partidoId, localTeam, visitTeam }) => {
+      switchMap(({ partidoId, localTeam, visitTeam, loc }) => {
         const ownerToEquipo = (duenio: string) =>
-          duenio?.toLowerCase() === 'l' ? localTeam.id_Equipo : visitTeam.id_Equipo;
+          duenio?.toLowerCase() === 'l'
+            ? localTeam.id_Equipo
+            : visitTeam.id_Equipo;
 
-        const seq = it.cuartos.reduce((flow, q) => {
-          const payload: Omit<Cuarto, 'id_Cuarto'> = {
-            no_Cuarto: q.no_Cuarto,
-            total_Punteo: q.total_Punteo,
-            total_Faltas: q.total_Faltas,
-            id_Partido: partidoId,
-          } as any;
+        const seq = it.cuartos.reduce(
+          (flow, q) => {
+            const payload: Omit<Cuarto, 'id_Cuarto'> = {
+              no_Cuarto: q.no_Cuarto,
+              total_Punteo: q.total_Punteo,
+              total_Faltas: q.total_Faltas,
+              id_Partido: partidoId,
+            } as any;
 
-          return flow.pipe(concatMap(() => this.cuaSvc.create(payload)));
-        }, of('start') as any);
+            return flow.pipe(concatMap(() => this.cuaSvc.create(payload)));
+          },
+          of('start') as any,
+        );
 
-        return seq;
-      })
+        return seq.pipe(map(() => ({ partidoId, localTeam, visitTeam, loc })));
+      }),
     );
   }
 }

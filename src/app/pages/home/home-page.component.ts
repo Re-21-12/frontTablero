@@ -113,27 +113,33 @@ export class HomePageComponent implements OnInit {
   addLocal(n: number) {
     if (!this.canOperate()) return;
     this.scoreLocal.set(Math.max(0, this.scoreLocal() + n));
+    this._emitAction('score:local', { delta: n, score: this.scoreLocal() });
   }
   addVisit(n: number) {
     if (!this.canOperate()) return;
     this.scoreVisit.set(Math.max(0, this.scoreVisit() + n));
+    this._emitAction('score:visit', { delta: n, score: this.scoreVisit() });
   }
 
   addFoulLocal() {
     if (!this.canOperate()) return;
     this.foulsLocal.set(this.foulsLocal() + 1);
+    this._emitAction('foul:local', { faltas: this.foulsLocal() });
   }
   subFoulLocal() {
     if (!this.canOperate()) return;
     this.foulsLocal.set(Math.max(0, this.foulsLocal() - 1));
+    this._emitAction('foul:local', { faltas: this.foulsLocal() });
   }
   addFoulVisit() {
     if (!this.canOperate()) return;
     this.foulsVisit.set(this.foulsVisit() + 1);
+    this._emitAction('foul:visit', { faltas: this.foulsVisit() });
   }
   subFoulVisit() {
     if (!this.canOperate()) return;
     this.foulsVisit.set(Math.max(0, this.foulsVisit() - 1));
+    this._emitAction('foul:visit', { faltas: this.foulsVisit() });
   }
 
   getLocalidad() {
@@ -225,6 +231,7 @@ export class HomePageComponent implements OnInit {
         this._onTimeExpired();
       }
     }, 1000);
+    this._emitAction('control:start', { running: true });
   }
 
   pause() {
@@ -234,6 +241,7 @@ export class HomePageComponent implements OnInit {
       this._handler = undefined;
     }
     this.shotPause();
+    this._emitAction('control:pause', { running: false });
   }
 
   // AJUSTADO: enviar datos al resultado
@@ -255,7 +263,169 @@ export class HomePageComponent implements OnInit {
       },
     };
 
+    // emitir resultado antes de navegar
+    this._emitResultado();
     this._routerService.navigate(['/resultado'], { state });
+  }
+
+  // Emitir resultado del partido al servidor via socket
+  private _emitResultado() {
+    const s = this._tableroService.getEquiposSeleccionados() ?? [];
+    const partidoId = Number(this._tableroService.id_partido) || 0;
+    const fecha = this.fechaHoraLocal
+      ? new Date(this.fechaHoraLocal).toISOString()
+      : new Date().toISOString();
+
+    const emitObj: any = {
+      id_Partido: partidoId,
+      FechaHora: fecha,
+      id_Localidad: s[0]?.id_localidad ?? 0,
+      localidad: null,
+      id_Local: s[0]?.id_Equipo ?? 0,
+      Local: {
+        id_Equipo: s[0]?.id_Equipo ?? 0,
+        Nombre: this.equipoLocalNombre || null,
+        id_Localidad: s[0]?.id_localidad ?? 0,
+        url_imagen: null,
+        Localidad: null,
+        Jugadores: [],
+      },
+      id_Visitante: s[1]?.id_Equipo ?? 0,
+      Visitante: null,
+      Resultado: {
+        puntos_local: this.scoreLocal(),
+        puntos_visitante: this.scoreVisit(),
+        faltas_local: this.foulsLocal(),
+        faltas_visitante: this.foulsVisit(),
+      },
+    };
+
+    try {
+      this.socket.emit('partido', String(partidoId), emitObj);
+      this.notify.info('Evento partido emitido.');
+    } catch (e) {
+      console.error('Error emitiendo partido:', e);
+    }
+  }
+
+  // Estado canónico que siempre enviamos (estructura exacta requerida)
+  private _socketState: any = {
+    id_Partido: 0,
+    FechaHora: new Date().toISOString(),
+    id_Localidad: 0,
+    localidad: null,
+    id_Local: 0,
+    Local: {
+      id_Equipo: 0,
+      Nombre: null,
+      id_Localidad: 0,
+      url_imagen: null,
+      Localidad: null,
+      Jugadores: [] as any[],
+    },
+    id_Visitante: 0,
+    Visitante: null,
+  };
+
+  // Lista de claves permitidas para actualizar (top level)
+  private _allowedTop = new Set([
+    'id_Partido',
+    'FechaHora',
+    'id_Localidad',
+    'localidad',
+    'id_Local',
+    'Local',
+    'id_Visitante',
+    'Visitante',
+  ]);
+  // Allowed keys for Local object
+  private _allowedLocal = new Set([
+    'id_Equipo',
+    'Nombre',
+    'id_Localidad',
+    'url_imagen',
+    'Localidad',
+    'Jugadores',
+  ]);
+
+  private _initSocketState() {
+    const s = this._tableroService.getEquiposSeleccionados() ?? [];
+    this._socketState.id_Partido = Number(this._tableroService.id_partido) || 0;
+    this._socketState.FechaHora = this.fechaHoraLocal
+      ? new Date(this.fechaHoraLocal).toISOString()
+      : new Date().toISOString();
+    this._socketState.id_Localidad = s[0]?.id_localidad ?? 0;
+    this._socketState.id_Local = s[0]?.id_Equipo ?? 0;
+    this._socketState.Local = {
+      id_Equipo: s[0]?.id_Equipo ?? 0,
+      Nombre: this.equipoLocalNombre || null,
+      id_Localidad: s[0]?.id_localidad ?? 0,
+      url_imagen: null,
+      Localidad: null,
+      Jugadores: [],
+    };
+    this._socketState.id_Visitante = s[1]?.id_Equipo ?? 0;
+    this._socketState.Visitante = null;
+  }
+
+  // Actualiza solo claves permitidas del estado canónico
+  private _updateSocketState(partial: any) {
+    if (!partial || typeof partial !== 'object') return;
+    Object.keys(partial).forEach((k) => {
+      if (this._allowedTop.has(k)) {
+        if (k === 'Local' && typeof partial.Local === 'object') {
+          this._socketState.Local = this._socketState.Local || {};
+          Object.keys(partial.Local).forEach((lk) => {
+            if (this._allowedLocal.has(lk)) {
+              this._socketState.Local[lk] = partial.Local[lk];
+            }
+          });
+        } else if (k === 'Visitante' && typeof partial.Visitante === 'object') {
+          this._socketState.Visitante = this._socketState.Visitante || {};
+          Object.keys(partial.Visitante).forEach((vk) => {
+            if (this._allowedLocal.has(vk)) {
+              this._socketState.Visitante[vk] = partial.Visitante[vk];
+            }
+          });
+        } else {
+          this._socketState[k] = partial[k];
+        }
+      }
+    });
+  }
+
+  // Emite una acción genérica con el estado mínimo del tablero
+  private _emitAction(action: string, payload?: any) {
+    // Emitimos siempre el objeto canónico. Para acciones que no afectan
+    // directamente la estructura canónica (p.ej. cambios de marcador), no
+    // añadimos nuevas claves: simplemente actualizamos FechaHora y emitimos.
+    this._initSocketState();
+    // actualizar timestamp para indicar cambio
+    this._socketState.FechaHora = new Date().toISOString();
+    // si el payload contiene sub-objetos permitidos (Local/Visitante), los aplicamos
+    if (payload && typeof payload === 'object') {
+      const allowedPartial: any = {};
+      if (payload.Local) allowedPartial.Local = payload.Local;
+      if (payload.Visitante) allowedPartial.Visitante = payload.Visitante;
+      if (payload.id_Partido) allowedPartial.id_Partido = payload.id_Partido;
+      if (payload.id_Localidad)
+        allowedPartial.id_Localidad = payload.id_Localidad;
+      if (payload.id_Local) allowedPartial.id_Local = payload.id_Local;
+      if (payload.id_Visitante)
+        allowedPartial.id_Visitante = payload.id_Visitante;
+      // aplicar sólo claves permitidas
+      this._updateSocketState(allowedPartial);
+    }
+
+    try {
+      this.socket.emit(
+        'partido',
+        String(this._socketState.id_Partido),
+        this._socketState,
+      );
+    } catch (e) {
+      console.error('Error emitiendo acción', action, e);
+    }
   }
 
   reset() {
@@ -263,6 +433,7 @@ export class HomePageComponent implements OnInit {
     this.timerSeconds.set(10 * 60);
     this._periodEndLock = false;
     this.winnerMsg.set(null);
+    this._emitAction('control:reset', { timer: this.timerSeconds() });
   }
 
   prevQuarter() {
@@ -271,6 +442,7 @@ export class HomePageComponent implements OnInit {
       this.quarter.set(this.quarter() - 1);
       this.timerSeconds.set(10 * 60);
       this._resetPeriodState();
+      this._emitAction('control:prevQuarter', { quarter: this.quarter() });
     }
   }
 
@@ -278,6 +450,7 @@ export class HomePageComponent implements OnInit {
     this.winnerMsg.set(null);
     if (this.running()) return;
     this._advancePeriod();
+    this._emitAction('control:nextQuarter', { quarter: this.quarter() });
   }
 
   private _onTimeExpired() {
@@ -367,6 +540,7 @@ export class HomePageComponent implements OnInit {
     this._backcourtStop();
     this._periodEndLock = false;
     this.winnerMsg.set(null);
+    this._emitAction('control:hardReset', {});
   }
 
   mmSS(s: number) {
@@ -435,7 +609,44 @@ export class HomePageComponent implements OnInit {
     };
     this.msg = 'Guardando...';
     this.facade.save(payload).subscribe({
-      next: () => (this.msg = 'Partido y cuartos guardados'),
+      next: (res: any) => {
+        this.msg = 'Partido y cuartos guardados';
+
+        const partidoId = Number(res?.partidoId ?? 0);
+        // actualizar payload mínimamente
+        payload.partido.id = partidoId;
+
+        const emitObj: any = {
+          id_Partido: partidoId,
+          FechaHora: new Date(payload.partido.fechaHora).toISOString(),
+          id_Localidad: res?.loc?.id ?? payload.localidad?.id ?? 0,
+          localidad: null,
+          id_Local: res?.localTeam?.id_Equipo ?? 0,
+          Local: {
+            id_Equipo: res?.localTeam?.id_Equipo ?? 0,
+            Nombre: res?.localTeam?.nombre ?? payload.local.nombre,
+            id_Localidad: res?.loc?.id ?? payload.localidad?.id ?? 0,
+            url_imagen: null,
+            Localidad: null,
+            Jugadores: [],
+          },
+          id_Visitante: res?.visitTeam?.id_Equipo ?? 0,
+          Visitante: null,
+        };
+
+        try {
+          // actualizar estado canónico y emitir
+          this._updateSocketState(emitObj);
+          this.socket.emit(
+            'partido',
+            String(this._socketState.id_Partido),
+            this._socketState,
+          );
+          this.notify.info('Partido guardado y emitido.');
+        } catch (e) {
+          console.error('Error emitiendo after save:', e);
+        }
+      },
       error: (e) => (this.msg = 'Error: ' + (e?.message ?? e)),
     });
   }
@@ -479,6 +690,7 @@ export class HomePageComponent implements OnInit {
           this._timeoutsUsedInLast2minLocal() + 1,
         );
       }
+      this._emitAction('timeout:local', { remaining: this._timeoutsLocal() });
     } else {
       this._timeoutsVisit.set(this._timeoutsVisit() - 1);
       if (this._inLastTwoMinutes()) {
@@ -486,6 +698,7 @@ export class HomePageComponent implements OnInit {
           this._timeoutsUsedInLast2minVisit() + 1,
         );
       }
+      this._emitAction('timeout:visit', { remaining: this._timeoutsVisit() });
     }
   }
 
@@ -516,10 +729,12 @@ export class HomePageComponent implements OnInit {
   setPossession(side: 'local' | 'visit') {
     if (!this.canOperate()) return;
     this._possession.set(side);
+    this._emitAction('possession:set', { possession: side });
   }
   clearPossession() {
     if (!this.canOperate()) return;
     this._possession.set('none');
+    this._emitAction('possession:clear', { possession: 'none' });
   }
   possessionIsLeftOn() {
     return this._possession() === 'local';
@@ -536,6 +751,7 @@ export class HomePageComponent implements OnInit {
     this.shotReset(24);
     if (this._possession() === 'local') this._possession.set('visit');
     else if (this._possession() === 'visit') this._possession.set('local');
+    this._emitAction('possession:change', { possession: this._possession() });
   }
 
   // Shot clock
@@ -563,6 +779,7 @@ export class HomePageComponent implements OnInit {
         this.shotPause();
       }
     }, 1000);
+    this._emitAction('shot:start', { shot: this._shot() });
   }
 
   shotPause() {
@@ -571,15 +788,18 @@ export class HomePageComponent implements OnInit {
       clearInterval(this._shotHandler);
       this._shotHandler = undefined;
     }
+    this._emitAction('shot:pause', { shot: this._shot() });
   }
 
   shotReset(to: 24 | 14) {
     this._shot.set(to);
+    this._emitAction('shot:reset', { shot: this._shot() });
   }
   shot24() {
     if (!this.canOperate()) return;
     this.shotReset(24);
     this.shotStart();
+    this._emitAction('shot:24', { shot: this._shot() });
   }
 
   // 8s backcourt
@@ -612,10 +832,12 @@ export class HomePageComponent implements OnInit {
         this._backcourtStop();
       }
     }, 1000);
+    this._emitAction('backcourt:start', { seconds: this._backcourt() });
   }
   crossedMidcourt() {
     if (!this.canOperate()) return;
     this._backcourtStop();
+    this._emitAction('backcourt:crossed', {});
   }
   private _backcourtStop() {
     if (this._backcourtHandler !== undefined) {

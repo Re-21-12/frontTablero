@@ -1,15 +1,9 @@
-.wrap { max-width: 1100px; margin: 0 auto; padding: 12px; }
-.panel { display:flex; gap:8px; align-items:center; margin-bottom:10px; }
-.grid { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.col { border: 1px solid #e5e5e5; padding: 12px; border-radius: 8px; background:#fff; }
-.tabs { display:flex; gap:8px; margin-bottom:10px; }
-.tabs button.active { font-weight: 700; text-decoration: underline; }
-form label { display:block; margin-top:8px; font-weight:600; }
-input, textarea, select { width:100%; box-sizing: border-box; }
-.actions { display:flex; gap:8px; margin-top:10px; }
-.ok { color: #137333; }
-.bad { color: #b00020; }
-.warn { color: #b8860b; }
-.row-actions { display:flex; gap:6px; }
-table { width:100%; border-collapse: collapse; }
-th, td { border-bottom: 1px solid #eee; padding: 6px; text-align:left; }
+.container {
+  max-width: 900px;
+}
+.card {
+  border-radius: 10px;
+}
+.table {
+  margin-top: 20px;
+}

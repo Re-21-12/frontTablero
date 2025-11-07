@@ -1,58 +1,40 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import {
-  EmailItem,
-  EmailResponse,
-  SendEmailRequest,
-} from '../interfaces/models';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
+export interface Email {
+  id?: number;
+  to_addr?: string;
+  subject?: string;
+  body?: string;
+  status?: string;
+  created_at?: string;
+}
+
 @Injectable({ providedIn: 'root' })
-export class EmailService {
-  private http = inject(HttpClient);
-  private base = `${environment.prod.apiBaseUrl}/email`;
+export class MailerService {
+  // Ajusta esta URL si tu backend cambia de puerto o dominio
+  private readonly baseUrl = 'https://localhost:7146/api/mailer';
 
-  //  POST /api/email/send
-  send(req: SendEmailRequest): Observable<EmailResponse> {
-    return this.http.post<EmailResponse>(`${this.base}/send`, req);
+  constructor(private http: HttpClient) {}
+
+  /** 🔹 Obtener todos los correos */
+  getEmails(): Observable<{ success: boolean; data: Email[] }> {
+    return this.http.get<{ success: boolean; data: Email[] }>(this.baseUrl);
   }
 
-  //  POST /api/email/drafts  (crear borrador)
-  createDraft(
-    req: SendEmailRequest,
-  ): Observable<{ success: boolean; id: number }> {
-    return this.http.post<{ success: boolean; id: number }>(
-      `${this.base}/drafts`,
-      req,
-    );
+  /** 🔹 Obtener un correo por ID */
+  getEmailById(id: number): Observable<{ success: boolean; data: Email }> {
+    return this.http.get<{ success: boolean; data: Email }>(`${this.baseUrl}/${id}`);
   }
 
-  //  PUT /api/email/drafts/{id} (editar borrador)
-  updateDraft(
-    id: number,
-    req: SendEmailRequest,
-  ): Observable<{ success: boolean }> {
-    return this.http.put<{ success: boolean }>(
-      `${this.base}/drafts/${id}`,
-      req,
-    );
+  /** 🔹 Enviar nuevo correo */
+  sendEmail(payload: { to: string; subject: string; body: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/send`, payload);
   }
 
-  //  GET /api/email (listar)
-  list(status?: string, limit = 50, offset = 0): Observable<EmailItem[]> {
-    let params = new HttpParams().set('limit', limit).set('offset', offset);
-    if (status) params = params.set('status', status);
-    return this.http.get<EmailItem[]>(`${this.base}`, { params });
-  }
-
-  //  GET /api/email/{id}
-  getById(id: number): Observable<EmailItem> {
-    return this.http.get<EmailItem>(`${this.base}/${id}`);
-  }
-
-  // DELETE /api/email/{id}
-  delete(id: number): Observable<{ success: boolean }> {
-    return this.http.delete<{ success: boolean }>(`${this.base}/${id}`);
+  /** 🔹 Eliminar un correo (opcional) */
+  deleteEmail(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

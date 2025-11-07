@@ -1,13 +1,15 @@
-// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { permissionGuardFn } from './core/guards/permission.guard';
-// OJO: canActivateAuthRole no se usaba; lo removí del import para evitar warning
 
 export const routes: Routes = [
+  // -------------------------------------------------
   // Inicio en Bienvenida de login
+  // -------------------------------------------------
   { path: '', redirectTo: 'inicio_sesion', pathMatch: 'full' },
 
+  // -------------------------------------------------
   // Bienvenida (libre)
+  // -------------------------------------------------
   {
     path: 'bienvenida',
     loadComponent: () =>
@@ -17,7 +19,9 @@ export const routes: Routes = [
     title: 'Bienvenida',
   },
 
+  // -------------------------------------------------
   // Autenticación
+  // -------------------------------------------------
   {
     path: 'inicio_sesion',
     loadComponent: () =>
@@ -33,7 +37,9 @@ export const routes: Routes = [
     title: 'Registro',
   },
 
+  // -------------------------------------------------
   // Tablero / Home
+  // -------------------------------------------------
   {
     path: 'tablero',
     loadComponent: () =>
@@ -51,18 +57,22 @@ export const routes: Routes = [
     title: 'Marcador',
   },
 
-  // Emails (vista que conecta con tus 6 endpoints)
+  // -------------------------------------------------
+  // Emails (conexión a API MailerController)
+  // -------------------------------------------------
   {
     path: 'emails',
     loadComponent: () =>
       import('./pages/emails/emails.component').then((m) => m.EmailsComponent),
     title: 'Emails',
-    // Si deseas protegerlo con permisos, descomenta:
-    // canActivate: [permissionGuardFn],
-    // data: { requiredPermissions: ['Email:Consultar'] },
+
+    canActivate: [permissionGuardFn],
+    data: { requiredPermissions: ['Email:Consultar'] },
   },
 
+  // -------------------------------------------------
   // Admin (protección a nivel padre)
+  // -------------------------------------------------
   {
     path: 'admin',
     loadComponent: () =>
@@ -116,7 +126,9 @@ export const routes: Routes = [
     ],
   },
 
+  // -------------------------------------------------
   // Selección / Resultado / Historial
+  // -------------------------------------------------
   {
     path: 'seleccion',
     loadComponent: () =>
@@ -142,7 +154,9 @@ export const routes: Routes = [
     title: 'Historial',
   },
 
+  // -------------------------------------------------
   // Administración de seguridad
+  // -------------------------------------------------
   {
     path: 'admin/seguridad',
     loadComponent: () =>
@@ -160,7 +174,9 @@ export const routes: Routes = [
     },
   },
 
+  // -------------------------------------------------
   // Recursos
+  // -------------------------------------------------
   {
     path: 'recursos',
     loadComponent: () =>
@@ -191,6 +207,8 @@ export const routes: Routes = [
     ],
   },
 
+  // -------------------------------------------------
   // Fallback
+  // -------------------------------------------------
   { path: '**', redirectTo: 'inicio_sesion' },
 ];

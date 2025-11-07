@@ -25,7 +25,7 @@ export interface Environment {
 
 export const environment: Environment = {
   production: true,
-  selectedEnvironment: 'prod',
+  selectedEnvironment: 'dev',
   prod: {
     apiBaseUrl: 'https://api.corazondeseda.lat/api',
     keycloak: {

@@ -53,7 +53,7 @@ export class PartidosPageComponent implements OnInit {
   }
   verPartido(id: number) {
     console.log('Navegando a partido', id);
-    this.router.navigate(['partidos', id]);
+    this.router.navigate(['tablero', id]);
   }
   cargar() {
     this.eqService

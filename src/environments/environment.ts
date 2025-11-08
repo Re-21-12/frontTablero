@@ -35,7 +35,7 @@ export const environment: Environment = {
     },
     homepage: 'https://backoffice.corazondeseda.lat',
     redirect: 'https://backoffice.corazondeseda.lat',
-    socketUrl: 'http://socket-service:3000',
+    socketUrl: 'https://socket.corazondeseda.lat',
   },
   dev: {
     apiBaseUrl: 'http://localhost:5000/api',
